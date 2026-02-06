@@ -1,0 +1,196 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:sepro/screens/rideshare/driver/driver_earnings_screen.dart';
+import '../../../theme/app_theme.dart';
+import '../driver/driver_home_screen.dart';
+import '../rider/ride_booking_screen.dart';
+import '../rider/rider_booking_screen.dart';
+import 'rides_history_screen.dart';
+import 'maps_screen.dart';
+import 'chat_list_screen.dart';
+import 'user_profile_screen.dart';
+
+/// Main navigation screen for the ride-sharing platform
+class RideshareHomeScreen extends StatefulWidget {
+  final String userRole;
+
+  const RideshareHomeScreen({super.key, this.userRole = 'rider'});
+
+  @override
+  State<RideshareHomeScreen> createState() => _RideshareHomeScreenState();
+}
+
+class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
+  int _currentIndex = 0;
+
+  late final List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = widget.userRole == 'driver'
+        ? [
+            const DriverHomeScreen(),
+            const DriverEarningsScreen(), // History for driver is earnings
+            const MapsScreen(),
+            const ChatListScreen(),
+            const UserProfileScreen(),
+          ]
+        : [
+            RideBookingScreen(userRole: widget.userRole),
+            const RiderBookingScreen(), // Book for rider
+            const MapsScreen(),
+            const ChatListScreen(),
+            const UserProfileScreen(),
+          ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDriver = widget.userRole == 'driver';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: IndexedStack(index: _currentIndex, children: _screens),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          boxShadow: [
+            BoxShadow(
+              color: isDark ? Colors.black.withOpacity(0.3) : Colors.grey.withOpacity(0.2),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: SizedBox(
+            height: 70,
+            child: Stack(
+              children: [
+                // Bottom navigation items
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(
+                      icon: FontAwesomeIcons.house,
+                      label: 'Home',
+                      index: 0,
+                    ),
+                    _buildNavItem(
+                      icon: isDriver 
+                          ? FontAwesomeIcons.clockRotateLeft 
+                          : FontAwesomeIcons.calendarCheck,
+                      label: isDriver ? 'History' : 'Book',
+                      index: 1,
+                    ),
+                    const SizedBox(width: 60), // Space for center button
+                    _buildNavItem(
+                      icon: FontAwesomeIcons.message,
+                      label: 'Chat',
+                      index: 3,
+                    ),
+                    _buildNavItem(
+                      icon: FontAwesomeIcons.user,
+                      label: 'Profile',
+                      index: 4,
+                    ),
+                  ],
+                ),
+                // Circular Maps button in center
+                Center(
+                  child: Transform.translate(
+                    offset: const Offset(0, -15),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _currentIndex = 2;
+                        });
+                      },
+                      child: Container(
+                        width: 65,
+                        height: 65,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: _currentIndex == 2
+                                ? [AppTheme.primaryGreen, AppTheme.primaryGreen.withOpacity(0.8)]
+                                : isDark 
+                                    ? [Colors.grey[800]!, Colors.grey[700]!]
+                                    : [Colors.grey[300]!, Colors.grey[200]!],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (_currentIndex == 2 
+                                  ? AppTheme.primaryGreen 
+                                  : isDark ? Colors.black : Colors.grey).withOpacity(0.4),
+                              blurRadius: 15,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          FontAwesomeIcons.mapLocationDot,
+                          color: _currentIndex == 2 
+                              ? Colors.black 
+                              : (isDark ? Colors.white : Colors.grey[700]),
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required int index,
+  }) {
+    final isSelected = _currentIndex == index;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isSelected 
+                  ? AppTheme.primaryGreen 
+                  : (isDark ? Colors.grey[400] : Colors.grey[600]),
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected 
+                    ? AppTheme.primaryGreen 
+                    : (isDark ? Colors.grey[400] : Colors.grey[600]),
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
