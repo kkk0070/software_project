@@ -123,7 +123,7 @@ const runAllMigrations = async () => {
       await run2FAMigration();
       console.log('[SUCCESS] 2FA migration completed\n');
     } catch (e) {
-      console.log('ℹ️  2FA migration completed or skipped\n');
+      console.log('[INFO]  2FA migration completed or skipped\n');
     }
 
     // Step 3: Run encryption migration
@@ -132,7 +132,7 @@ const runAllMigrations = async () => {
       await runEncryptionMigration();
       console.log('[SUCCESS] Encryption migration completed\n');
     } catch (e) {
-      console.log('ℹ️  Encryption migration completed or skipped\n');
+      console.log('[INFO]  Encryption migration completed or skipped\n');
     }
 
     // Step 4: Run chat migration
@@ -141,7 +141,7 @@ const runAllMigrations = async () => {
       await runChatMigration();
       console.log('[SUCCESS] Chat migration completed\n');
     } catch (e) {
-      console.log('ℹ️  Chat migration completed or skipped\n');
+      console.log('[INFO]  Chat migration completed or skipped\n');
     }
 
     // Step 5: Run profile photo migration
@@ -150,7 +150,7 @@ const runAllMigrations = async () => {
       await runProfilePhotoMigration();
       console.log('[SUCCESS] Profile photo migration completed\n');
     } catch (e) {
-      console.log('ℹ️  Profile photo migration completed or skipped\n');
+      console.log('[INFO]  Profile photo migration completed or skipped\n');
     }
 
     console.log('[COMPLETE] All migrations completed successfully!');

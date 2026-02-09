@@ -28,7 +28,7 @@ const add2FAFields = async () => {
       `);
       console.log('[SUCCESS] 2FA fields added successfully');
     } else {
-      console.log('ℹ️  2FA fields already exist');
+      console.log('[INFO]  2FA fields already exist');
     }
     
   } catch (error) {

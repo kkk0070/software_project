@@ -216,7 +216,7 @@ const seedDummyData = async () => {
     }
 
     // Seed Settings
-    console.log('⚙️  Seeding additional settings...');
+    console.log('[INFO]  Seeding additional settings...');
     const settingsToAdd = [
       { key: 'surge_pricing_enabled', value: 'true', category: 'pricing', description: 'Enable surge pricing during peak hours' },
       { key: 'max_pool_riders', value: '4', category: 'features', description: 'Maximum riders in a pool ride' },

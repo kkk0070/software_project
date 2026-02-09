@@ -134,7 +134,7 @@ const migrateEncryption = async () => {
     console.log('[SUCCESS] Created index on key_id');
     
     console.log('[COMPLETE] Encryption migration completed successfully!');
-    console.log('\nℹ️  Next steps:');
+    console.log('\n[INFO]  Next steps:');
     console.log('   1. Generate master key pair by starting the server');
     console.log('   2. New document uploads will be encrypted automatically');
     console.log('   3. Existing documents remain unencrypted unless re-uploaded');

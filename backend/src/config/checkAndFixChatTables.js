@@ -36,12 +36,12 @@ const checkAndFixChatTables = async () => {
     
     const messagesExists = messagesCheck.rows[0].exists;
 
-    console.log(`📋 Table Status:`);
-    console.log(`   conversations: ${conversationsExists ? '✅ EXISTS' : '❌ MISSING'}`);
-    console.log(`   messages: ${messagesExists ? '✅ EXISTS' : '❌ MISSING'}\n`);
+    console.log(`[INFO] Table Status:`);
+    console.log(`   conversations: ${conversationsExists ? '[OK] EXISTS' : '[MISSING] MISSING'}`);
+    console.log(`   messages: ${messagesExists ? '[OK] EXISTS' : '[MISSING] MISSING'}\n`);
 
     if (conversationsExists && messagesExists) {
-      console.log('✅ All chat tables exist! No action needed.\n');
+      console.log('[SUCCESS] All chat tables exist! No action needed.\n');
       console.log('='.repeat(60) + '\n');
       return;
     }
@@ -63,7 +63,7 @@ const checkAndFixChatTables = async () => {
           UNIQUE(rider_id, driver_id)
         );
       `);
-      console.log('✅ Conversations table created');
+      console.log('[SUCCESS] Conversations table created');
     }
 
     // Create messages table if it doesn't exist
@@ -79,7 +79,7 @@ const checkAndFixChatTables = async () => {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
-      console.log('✅ Messages table created');
+      console.log('[SUCCESS] Messages table created');
     }
 
     // Create indexes for better performance
@@ -105,9 +105,9 @@ const checkAndFixChatTables = async () => {
       ON conversations(driver_id);
     `);
     
-    console.log('✅ Indexes created\n');
+    console.log('[SUCCESS] Indexes created\n');
     console.log('='.repeat(60));
-    console.log('✅ SUCCESS! Chat tables have been created.');
+    console.log('[SUCCESS] SUCCESS! Chat tables have been created.');
     console.log('='.repeat(60) + '\n');
     console.log('You can now:');
     console.log('  1. Restart your backend server');
@@ -116,7 +116,7 @@ const checkAndFixChatTables = async () => {
 
   } catch (error) {
     console.error('\n' + '='.repeat(60));
-    console.error('❌ ERROR: Failed to create chat tables');
+    console.error('[ERROR] ERROR: Failed to create chat tables');
     console.error('='.repeat(60) + '\n');
     console.error('Error message:', error.message);
     console.error('\nCommon issues:');

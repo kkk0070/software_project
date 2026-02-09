@@ -191,7 +191,7 @@ const seedInitialData = async () => {
     const adminCheck = await client.query(`SELECT id FROM users WHERE email = 'admin@ecoride.com'`);
     
     if (adminCheck.rows.length === 0) {
-      console.log('🔐 Creating default login credentials...\n');
+      console.log('[ENCRYPTING] Creating default login credentials...\n');
       
       // Generate password hashes
       const adminPasswordHash = await bcrypt.hash('admin123', 10);
@@ -204,7 +204,7 @@ const seedInitialData = async () => {
       `, [adminPasswordHash]);
       console.log('[SUCCESS] Admin user created');
       console.log('   📧 Email: admin@ecoride.com');
-      console.log('   🔑 Password: admin123\n');
+      console.log('   [KEY] Password: admin123\n');
 
       // Insert sample riders
       await client.query(`
@@ -264,9 +264,9 @@ const seedInitialData = async () => {
       
       // Display login credentials summary
       console.log('\n' + '='.repeat(60));
-      console.log('📋 DEFAULT LOGIN CREDENTIALS');
+      console.log('[INFO] DEFAULT LOGIN CREDENTIALS');
       console.log('='.repeat(60));
-      console.log('\n🔐 Admin Account:');
+      console.log('\n[ENCRYPTING] Admin Account:');
       console.log('   Email: admin@ecoride.com');
       console.log('   Password: admin123');
       console.log('\n👥 Sample Users (All riders and drivers):');
@@ -274,7 +274,7 @@ const seedInitialData = async () => {
       console.log('\n📄 Full details: See DEFAULT_LOGIN_CREDENTIALS.md');
       console.log('='.repeat(60) + '\n');
     } else {
-      console.log('ℹ️  Initial data already exists, skipping seed');
+      console.log('[INFO]  Initial data already exists, skipping seed');
     }
 
     console.log('[COMPLETE] Database initialization completed!');
