@@ -6,7 +6,6 @@ import { Lock, Mail, AlertCircle, ArrowRight, HelpCircle, FileText } from 'lucid
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('Fleet Manager');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -67,33 +66,6 @@ const Login = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Role Selector */}
-              <div className="space-y-3">
-                <label className="text-slate-900 dark:text-white text-sm font-semibold">Select Administrative Role</label>
-                <div className="flex h-12 w-full items-center justify-center rounded-lg bg-slate-100 dark:bg-[#28392e] p-1.5">
-                  {['Fleet Manager', 'Admin', 'Support'].map((roleOption) => (
-                    <label
-                      key={roleOption}
-                      className={`flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-md px-2 transition-all text-sm font-medium ${
-                        role === roleOption
-                          ? 'bg-white dark:bg-background-dark shadow-sm text-primary'
-                          : 'text-slate-500 dark:text-[#9db9a6]'
-                      }`}
-                    >
-                      <span className="truncate">{roleOption}</span>
-                      <input
-                        type="radio"
-                        name="role-select"
-                        value={roleOption}
-                        checked={role === roleOption}
-                        onChange={(e) => setRole(e.target.value)}
-                        className="invisible w-0"
-                      />
-                    </label>
-                  ))}
-                </div>
-              </div>
-
               {/* Email Field */}
               <div className="space-y-2">
                 <label className="text-slate-900 dark:text-white text-sm font-semibold">Email Address</label>
