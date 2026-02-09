@@ -27,6 +27,7 @@ class DocumentService {
         return 'application/octet-stream';
     }
   }
+
   // Upload document
   static Future<Map<String, dynamic>> uploadDocument({
     required File file,
@@ -35,15 +36,12 @@ class DocumentService {
   }) async {
     try {
       final token = await StorageService.getToken();
-      
+
       if (token == null) {
         if (kDebugMode) {
           print('[ERROR] Document Upload: No authentication token found');
         }
-        return {
-          'success': false,
-          'message': 'No authentication token found',
-        };
+        return {'success': false, 'message': 'No authentication token found'};
       }
 
       if (kDebugMode) {
@@ -59,9 +57,7 @@ class DocumentService {
       );
 
       // Add headers
-      request.headers.addAll({
-        'Authorization': 'Bearer $token',
-      });
+      request.headers.addAll({'Authorization': 'Bearer $token'});
 
       // Add file
       request.files.add(
@@ -86,15 +82,15 @@ class DocumentService {
       final streamedResponse = await request.send().timeout(
         const Duration(minutes: 5),
       );
-      
+
       final response = await http.Response.fromStream(streamedResponse);
-      
+
       if (kDebugMode) {
         print('🔵 Document Upload: Response received');
         print('   - Status Code: ${response.statusCode}');
         print('   - Body: ${response.body}');
       }
-      
+
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 201 && data['success'] == true) {
@@ -119,10 +115,7 @@ class DocumentService {
       if (kDebugMode) {
         print('[ERROR] Document Upload: Exception - ${e.toString()}');
       }
-      return {
-        'success': false,
-        'message': 'Upload error: ${e.toString()}',
-      };
+      return {'success': false, 'message': 'Upload error: ${e.toString()}'};
     }
   }
 
@@ -135,15 +128,12 @@ class DocumentService {
   }) async {
     try {
       final token = await StorageService.getToken();
-      
+
       if (token == null) {
         if (kDebugMode) {
           print('[ERROR] Document Upload: No authentication token found');
         }
-        return {
-          'success': false,
-          'message': 'No authentication token found',
-        };
+        return {'success': false, 'message': 'No authentication token found'};
       }
 
       if (kDebugMode) {
@@ -160,9 +150,7 @@ class DocumentService {
       );
 
       // Add headers
-      request.headers.addAll({
-        'Authorization': 'Bearer $token',
-      });
+      request.headers.addAll({'Authorization': 'Bearer $token'});
 
       // Add file from bytes
       request.files.add(
@@ -188,15 +176,15 @@ class DocumentService {
       final streamedResponse = await request.send().timeout(
         const Duration(minutes: 5),
       );
-      
+
       final response = await http.Response.fromStream(streamedResponse);
-      
+
       if (kDebugMode) {
         print('🔵 Document Upload (Web): Response received');
         print('   - Status Code: ${response.statusCode}');
         print('   - Body: ${response.body}');
       }
-      
+
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 201 && data['success'] == true) {
@@ -221,10 +209,7 @@ class DocumentService {
       if (kDebugMode) {
         print('[ERROR] Document Upload (Web): Exception - ${e.toString()}');
       }
-      return {
-        'success': false,
-        'message': 'Upload error: ${e.toString()}',
-      };
+      return {'success': false, 'message': 'Upload error: ${e.toString()}'};
     }
   }
 
@@ -232,21 +217,20 @@ class DocumentService {
   static Future<Map<String, dynamic>> getUserDocuments() async {
     try {
       final token = await StorageService.getToken();
-      
+
       if (token == null) {
-        return {
-          'success': false,
-          'message': 'No authentication token found',
-        };
+        return {'success': false, 'message': 'No authentication token found'};
       }
 
-      final response = await http.get(
-        Uri.parse(ApiConfig.documentsUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      ).timeout(ApiConfig.connectionTimeout);
+      final response = await http
+          .get(
+            Uri.parse(ApiConfig.documentsUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(ApiConfig.connectionTimeout);
 
       final data = jsonDecode(response.body);
 
@@ -263,10 +247,7 @@ class DocumentService {
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': 'Network error: ${e.toString()}',
-      };
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
     }
   }
 
@@ -274,21 +255,20 @@ class DocumentService {
   static Future<Map<String, dynamic>> deleteDocument(int documentId) async {
     try {
       final token = await StorageService.getToken();
-      
+
       if (token == null) {
-        return {
-          'success': false,
-          'message': 'No authentication token found',
-        };
+        return {'success': false, 'message': 'No authentication token found'};
       }
 
-      final response = await http.delete(
-        Uri.parse('${ApiConfig.documentsUrl}/$documentId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      ).timeout(ApiConfig.connectionTimeout);
+      final response = await http
+          .delete(
+            Uri.parse('${ApiConfig.documentsUrl}/$documentId'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(ApiConfig.connectionTimeout);
 
       final data = jsonDecode(response.body);
 
@@ -304,10 +284,7 @@ class DocumentService {
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': 'Network error: ${e.toString()}',
-      };
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
     }
   }
 
