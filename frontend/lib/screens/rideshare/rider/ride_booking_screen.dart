@@ -12,6 +12,8 @@ import '../shared/ride_pooling_screen.dart';
 import '../shared/live_tracking_screen.dart';
 import '../shared/rewards_screen.dart';
 import '../shared/sustainability_dashboard_screen.dart';
+import '../shared/carpool_screen.dart';
+import '../shared/profile_setup_screen.dart';
 import '../driver/driver_profile_detail_screen.dart';
 
 /// Rider Home Dashboard Screen
@@ -122,6 +124,13 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                     
                     const SizedBox(height: 16),
                     
+                    // Profile Setup Banner (if incomplete)
+                    if (!profileSetupComplete)
+                      _buildProfileSetupBanner(),
+                    
+                    if (!profileSetupComplete)
+                      const SizedBox(height: 16),
+                    
                     // Search Bar
                     _buildSearchBar(),
                     
@@ -129,6 +138,11 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                     
                     // Enhanced Impact Tracker with Chart
                     _buildEnhancedImpactTracker(),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Carpool Box
+                    _buildCarpoolBox(),
                     
                     const SizedBox(height: 24),
                     
@@ -1240,6 +1254,162 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCarpoolBox() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return FadeInUp(
+      delay: const Duration(milliseconds: 450),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CarpoolScreen(userRole: 'rider'),
+            ),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppTheme.primaryGreen.withOpacity(0.8),
+                AppTheme.primaryGreen.withOpacity(0.6),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryGreen.withOpacity(0.3),
+                blurRadius: 15,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  FontAwesomeIcons.users,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Carpool Rides',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Schedule & join eco-friendly carpools',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileSetupBanner() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return FadeInLeft(
+      delay: const Duration(milliseconds: 100),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProfileSetupScreen(userRole: 'rider'),
+            ),
+          ).then((_) => loadUserProfile()); // Reload profile after returning
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryGreen.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppTheme.primaryGreen.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.person_outline,
+                  color: AppTheme.primaryGreen,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Complete Your Profile',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Add your details to enhance your experience',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: AppTheme.primaryGreen,
+                size: 20,
+              ),
+            ],
+          ),
         ),
       ),
     );

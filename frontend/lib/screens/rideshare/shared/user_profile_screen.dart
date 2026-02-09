@@ -4,11 +4,13 @@ import 'package:animate_do/animate_do.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/auth_service.dart';
 import '../../../utils/user_profile_loader.dart';
+import '../../profile_edit_screen.dart';
 import 'location_permission_screen.dart';
 import 'help_support_screen.dart';
 import 'document_upload_screen.dart';
 import 'landing_screen.dart';
 import 'preferences_screen.dart';
+import '../driver/driver_earnings_screen.dart';
 
 /// 3️⃣ User Profile Page
 /// Features:
@@ -64,7 +66,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
         actions: [
           IconButton(
             icon: Icon(Icons.edit, color: isDark ? Colors.white : AppTheme.textDark),
-            onPressed: () {},
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfileEditScreen(),
+                ),
+              );
+              
+              // Refresh profile if edit was successful
+              if (result == true && mounted) {
+                loadUserProfile();
+                _load2FAStatus();
+              }
+            },
           ),
         ],
       ),
@@ -183,6 +198,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
                       );
                     },
                   ),
+                  // History menu item for drivers only - positioned below Documents
+                  if (userRole?.toLowerCase() == 'driver')
+                    _buildMenuItem(
+                      context,
+                      icon: FontAwesomeIcons.clockRotateLeft,
+                      title: 'History',
+                      subtitle: 'View your earnings history',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DriverEarningsScreen(),
+                          ),
+                        );
+                      },
+                    ),
                   _buildMenuItem(
                     context,
                     icon: FontAwesomeIcons.gear,

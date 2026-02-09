@@ -1,39 +1,55 @@
+// Import Dart's JSON encoding/decoding utilities
 import 'dart:convert';
+// Import HTTP package for making API requests
 import 'package:http/http.dart' as http;
+// Import Flutter foundation for debug mode checking
 import 'package:flutter/foundation.dart';
+// Import API configuration (base URL, endpoints)
 import 'api_config.dart';
+// Import storage service for persisting user data locally
 import 'storage_service.dart';
 
+/// AuthService handles all authentication-related operations
+/// including login, signup, 2FA verification, and logout
 class AuthService {
-  /// Helper method to safely decode JSON responses
-  /// Returns null if the response is not valid JSON (e.g., HTML error page)
+  /// Helper method to safely decode JSON responses from the server
+  /// Provides better error handling when server returns non-JSON responses
+  /// 
+  /// Returns the parsed JSON data (dynamic type) or throws [FormatException] with helpful message
   static dynamic _safeJsonDecode(http.Response response) {
     try {
+      // Attempt to parse response body as JSON
       return jsonDecode(response.body);
     } catch (e) {
+      // In debug mode, print detailed error information
       if (kDebugMode) {
-        print('❌ Failed to parse response as JSON: ${e.toString()}');
+        print('[ERROR] Failed to parse response as JSON: ${e.toString()}');
         print('Response status: ${response.statusCode}');
+        // Print first 200 characters of response to avoid flooding console
         print('Response body (first 200 chars): ${response.body.substring(0, response.body.length > 200 ? 200 : response.body.length)}');
       }
       
-      // Check if response looks like HTML
+      // Check if server returned HTML error page instead of JSON
       if (response.body.trim().startsWith('<')) {
         throw FormatException(
           'Server returned an HTML error page. Please ensure the backend server is running at ${ApiConfig.baseUrl}'
         );
       }
       
+      // Generic error message for other parsing failures
       throw FormatException('Invalid response from server: ${e.toString()}');
     }
   }
 
-  // Login
+  /// Login user with email and password
+  /// Returns a map with success status, message, and user data
+  /// If 2FA is enabled, returns requires2FA flag and user must verify OTP
   static Future<Map<String, dynamic>> login({
     required String email,
     required String password,
   }) async {
     try {
+      // Send POST request to login endpoint with credentials
       final response = await http.post(
         Uri.parse('${ApiConfig.authUrl}/login'),
         headers: {'Content-Type': 'application/json'},
@@ -41,16 +57,19 @@ class AuthService {
           'email': email,
           'password': password,
         }),
-      ).timeout(ApiConfig.connectionTimeout);
+      ).timeout(ApiConfig.connectionTimeout); // Add timeout to prevent hanging
 
+      // Log response status in debug mode for troubleshooting
       if (kDebugMode) {
         print('🔵 Login Response Status: ${response.statusCode}');
       }
 
+      // Safely parse the JSON response
       final data = _safeJsonDecode(response);
 
+      // Check if login was successful
       if (response.statusCode == 200 && data['success'] == true) {
-        // Check if 2FA is required
+        // Check if user has 2FA enabled - requires OTP verification
         if (data['requires2FA'] == true) {
           return {
             'success': true,
@@ -61,11 +80,13 @@ class AuthService {
           };
         }
         
-        // Save token and user data
+        // Extract authentication token and user data from response
         final token = data['data']['token'];
         final user = data['data']['user'];
         
+        // Save token to local storage for subsequent API requests
         await StorageService.saveToken(token);
+        // Save user data to local storage for offline access
         await StorageService.saveUserData(
           userId: user['id'].toString(),
           email: user['email'],
@@ -73,20 +94,23 @@ class AuthService {
           role: user['role'],
         );
 
+        // Return success with user data
         return {
           'success': true,
           'message': data['message'] ?? 'Login successful',
           'user': user,
         };
       } else {
+        // Login failed - return error message from server
         return {
           'success': false,
           'message': data['message'] ?? 'Login failed',
         };
       }
     } catch (e) {
+      // Handle network errors or other exceptions
       if (kDebugMode) {
-        print('❌ Login error: ${e.toString()}');
+        print('[ERROR] Login error: ${e.toString()}');
       }
       return {
         'success': false,
@@ -142,7 +166,7 @@ class AuthService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Verify login OTP error: ${e.toString()}');
+        print('[ERROR] Verify login OTP error: ${e.toString()}');
       }
       return {
         'success': false,
@@ -221,7 +245,7 @@ class AuthService {
         );
 
         if (kDebugMode) {
-          print('✅ Signup successful - User Role: ${user['role']}');
+          print('[SUCCESS] Signup successful - User Role: ${user['role']}');
         }
 
         return {
@@ -231,7 +255,7 @@ class AuthService {
         };
       } else {
         if (kDebugMode) {
-          print('❌ Signup failed: ${data['message']}');
+          print('[ERROR] Signup failed: ${data['message']}');
         }
         return {
           'success': false,
@@ -240,7 +264,7 @@ class AuthService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Signup error: ${e.toString()}');
+        print('[ERROR] Signup error: ${e.toString()}');
       }
       return {
         'success': false,
@@ -601,7 +625,7 @@ class AuthService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Photo upload error: ${e.toString()}');
+        print('[ERROR] Photo upload error: ${e.toString()}');
       }
       return {
         'success': false,
@@ -656,7 +680,7 @@ class AuthService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Photo upload error: ${e.toString()}');
+        print('[ERROR] Photo upload error: ${e.toString()}');
       }
       return {
         'success': false,

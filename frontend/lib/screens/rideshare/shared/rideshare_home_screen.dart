@@ -9,6 +9,7 @@ import 'rides_history_screen.dart';
 import 'maps_screen.dart';
 import 'chat_list_screen.dart';
 import 'user_profile_screen.dart';
+import 'sustainability_dashboard_screen.dart';
 
 /// Main navigation screen for the ride-sharing platform
 class RideshareHomeScreen extends StatefulWidget {
@@ -28,10 +29,10 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
   @override
   void initState() {
     super.initState();
-    _screens = widget.userRole == 'driver'
+    _screens = widget.userRole.toLowerCase() == 'driver'
         ? [
             const DriverHomeScreen(),
-            const DriverEarningsScreen(), // History for driver is earnings
+            const SustainabilityDashboardScreen(), // Sustainability dashboard for driver
             const MapsScreen(),
             const ChatListScreen(),
             const UserProfileScreen(),
@@ -47,12 +48,14 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDriver = widget.userRole == 'driver';
+    final isDriver = widget.userRole.toLowerCase() == 'driver';
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: IndexedStack(index: _currentIndex, children: _screens),
+    return PopScope(
+      canPop: false, // Prevent back navigation
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
@@ -80,9 +83,9 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
                     ),
                     _buildNavItem(
                       icon: isDriver 
-                          ? FontAwesomeIcons.clockRotateLeft 
+                          ? FontAwesomeIcons.leaf 
                           : FontAwesomeIcons.calendarCheck,
-                      label: isDriver ? 'History' : 'Book',
+                      label: isDriver ? 'Eco' : 'Book',
                       index: 1,
                     ),
                     const SizedBox(width: 60), // Space for center button
@@ -148,7 +151,8 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
           ),
         ),
       ),
-    );
+    ), // Scaffold
+    ); // PopScope
   }
 
   Widget _buildNavItem({

@@ -5,6 +5,10 @@ import '../../../theme/app_theme.dart';
 import '../../../services/auth_service.dart';
 import '../shared/notifications_screen.dart';
 import '../shared/document_upload_screen.dart';
+import '../shared/carpool_screen.dart';
+import '../shared/profile_setup_screen.dart';
+import 'driver_earnings_screen.dart';
+import 'driver_online_stats_screen.dart';
 
 /// Driver Home Dashboard Screen
 /// Features:
@@ -23,6 +27,7 @@ class DriverHomeScreen extends StatefulWidget {
 class _DriverHomeScreenState extends State<DriverHomeScreen> {
   bool _isOnline = true;
   String _verificationStatus = 'Pending';
+  bool _profileSetupComplete = false; // Default to false until loaded
   bool _isLoading = true;
   late bool isDark;
 
@@ -38,6 +43,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       if (result['success'] == true) {
         setState(() {
           _verificationStatus = result['user']['verification_status'] ?? 'Pending';
+          _profileSetupComplete = result['user']['profile_setup_complete'] ?? false;
           _isLoading = false;
         });
       }
@@ -74,6 +80,13 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     
                     const SizedBox(height: 16),
                     
+                    // Profile Setup Banner (if incomplete)
+                    if (!_profileSetupComplete)
+                      _buildProfileSetupBanner(),
+                    
+                    if (!_profileSetupComplete)
+                      const SizedBox(height: 16),
+                    
                     // Verification Status Banner
                     if (_verificationStatus != 'Verified')
                       _buildVerificationBanner(),
@@ -88,6 +101,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     
                     // Eco-Driving Score
                     _buildEcoScore(),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Carpool Box
+                    _buildCarpoolBox(),
                     
                     const SizedBox(height: 24),
                     
@@ -307,6 +325,14 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               icon: FontAwesomeIcons.dollarSign,
               label: 'EARNINGS',
               value: '\$142.50',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DriverEarningsScreen(),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(width: 12),
@@ -315,6 +341,14 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               icon: FontAwesomeIcons.clock,
               label: 'ONLINE',
               value: '4h 20m',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DriverOnlineStatsScreen(),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -326,45 +360,49 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     required IconData icon,
     required String label,
     required String value,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.cardDark : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                icon,
-                color: AppTheme.primaryGreen,
-                size: 14,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
-                  letterSpacing: 0.5,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDark ? AppTheme.cardDark : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  color: AppTheme.primaryGreen,
+                  size: 14,
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black,
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -774,6 +812,160 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               const Icon(
                 Icons.arrow_forward_ios,
                 color: Colors.orange,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileSetupBanner() {
+    return FadeInLeft(
+      delay: const Duration(milliseconds: 100),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProfileSetupScreen(userRole: 'driver'),
+            ),
+          ).then((_) => _loadProfile()); // Reload profile after returning
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryGreen.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppTheme.primaryGreen.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.person_outline,
+                  color: AppTheme.primaryGreen,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Complete Your Profile',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Add your details to enhance your experience',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: AppTheme.primaryGreen,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCarpoolBox() {
+    return FadeInUp(
+      delay: const Duration(milliseconds: 450),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CarpoolScreen(userRole: 'driver'),
+            ),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppTheme.primaryGreen.withOpacity(0.8),
+                AppTheme.primaryGreen.withOpacity(0.6),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryGreen.withOpacity(0.3),
+                blurRadius: 15,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  FontAwesomeIcons.users,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Carpool Rides',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Create schedules & manage requests',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white,
                 size: 20,
               ),
             ],

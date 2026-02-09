@@ -38,7 +38,7 @@ class DocumentService {
       
       if (token == null) {
         if (kDebugMode) {
-          print('❌ Document Upload: No authentication token found');
+          print('[ERROR] Document Upload: No authentication token found');
         }
         return {
           'success': false,
@@ -99,7 +99,7 @@ class DocumentService {
 
       if (response.statusCode == 201 && data['success'] == true) {
         if (kDebugMode) {
-          print('✅ Document Upload: Success!');
+          print('[SUCCESS] Document Upload: Success!');
         }
         return {
           'success': true,
@@ -108,7 +108,7 @@ class DocumentService {
         };
       } else {
         if (kDebugMode) {
-          print('❌ Document Upload: Failed - ${data['message']}');
+          print('[ERROR] Document Upload: Failed - ${data['message']}');
         }
         return {
           'success': false,
@@ -117,7 +117,7 @@ class DocumentService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Document Upload: Exception - ${e.toString()}');
+        print('[ERROR] Document Upload: Exception - ${e.toString()}');
       }
       return {
         'success': false,
@@ -138,7 +138,7 @@ class DocumentService {
       
       if (token == null) {
         if (kDebugMode) {
-          print('❌ Document Upload: No authentication token found');
+          print('[ERROR] Document Upload: No authentication token found');
         }
         return {
           'success': false,
@@ -201,7 +201,7 @@ class DocumentService {
 
       if (response.statusCode == 201 && data['success'] == true) {
         if (kDebugMode) {
-          print('✅ Document Upload (Web): Success!');
+          print('[SUCCESS] Document Upload (Web): Success!');
         }
         return {
           'success': true,
@@ -210,7 +210,7 @@ class DocumentService {
         };
       } else {
         if (kDebugMode) {
-          print('❌ Document Upload (Web): Failed - ${data['message']}');
+          print('[ERROR] Document Upload (Web): Failed - ${data['message']}');
         }
         return {
           'success': false,
@@ -219,7 +219,7 @@ class DocumentService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print('❌ Document Upload (Web): Exception - ${e.toString()}');
+        print('[ERROR] Document Upload (Web): Exception - ${e.toString()}');
       }
       return {
         'success': false,

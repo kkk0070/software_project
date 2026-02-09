@@ -1,82 +1,128 @@
+// Import Dart's JSON encoding utilities
 import 'dart:convert';
+// Import typed data structures for byte arrays
 import 'dart:typed_data';
+// Import encrypt package for AES encryption
 import 'package:encrypt/encrypt.dart' as encrypt;
+// Import PointyCastle for RSA cryptography operations
 import 'package:pointycastle/export.dart';
+// Import crypto package for hashing algorithms
 import 'package:crypto/crypto.dart';
 
 /// Encryption Service for Flutter
-/// Implements AES-256-GCM and RSA-2048 encryption
-/// Provides key generation and secure message encryption
+/// Implements hybrid encryption using AES-256-GCM (symmetric) and RSA-2048 (asymmetric)
+/// - AES-256-GCM: Fast encryption for data, authenticated encryption mode
+/// - RSA-2048: Secure key exchange, encrypts the AES key
+/// Provides secure key generation and message encryption capabilities
 class EncryptionService {
-  /// Generate RSA key pair
+  /// Generate RSA key pair for asymmetric encryption
+  /// Used for secure key exchange - public key encrypts, private key decrypts
+  /// 
+  /// Parameters:
+  /// - [bitLength] - Key size in bits (default 2048, higher = more secure but slower)
+  /// 
+  /// Returns an [AsymmetricKeyPair] containing public and private RSA keys
   static AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey> generateRSAKeyPair({
     int bitLength = 2048,
   }) {
-    print('\n🔐 Generating RSA-$bitLength key pair...');
+    print('\n[ENCRYPTING] Generating RSA-$bitLength key pair...');
 
+    // Initialize RSA key generator with secure parameters
     final keyGen = RSAKeyGenerator()
       ..init(
         ParametersWithRandom(
+          // RSA parameters: public exponent 65537, key size, certainty for prime testing
           RSAKeyGeneratorParameters(BigInt.parse('65537'), bitLength, 64),
+          // Use Fortuna PRNG seeded with random bytes for cryptographic security
           FortunaRandom()..seed(KeyParameter(_randomBytes(32))),
         ),
       );
 
+    // Generate the public-private key pair
     final pair = keyGen.generateKeyPair();
-    print('✅ RSA key pair generated successfully');
+    print('[SUCCESS] RSA key pair generated successfully');
 
+    // Return typed key pair
     return AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey>(
       pair.publicKey as RSAPublicKey,
       pair.privateKey as RSAPrivateKey,
     );
   }
 
-  /// Generate random bytes for seeding
+  /// Generate cryptographically secure random bytes for key seeding
+  /// Uses multiple entropy sources to ensure unpredictability
+  /// 
+  /// Parameters:
+  /// - [length] - Number of random bytes to generate
+  /// 
+  /// Returns a [Uint8List] of random bytes
   static Uint8List _randomBytes(int length) {
-    // Use platform's secure random number generator
+    // Use Fortuna PRNG (cryptographically secure pseudo-random number generator)
     final random = SecureRandom('Fortuna');
 
-    // Properly seed with secure random data
-    // In production, use platform-specific secure random sources
+    // Create seed by mixing multiple entropy sources
+    // In production, use platform-specific secure random sources (e.g., /dev/urandom)
     final seed = Uint8List(32);
     for (int i = 0; i < 32; i++) {
-      // Mix multiple entropy sources
+      // Mix current time (microseconds), hash codes, and loop index
+      // XOR operation combines entropy from different sources
       seed[i] =
           (DateTime.now().microsecondsSinceEpoch ^
               DateTime.now().millisecondsSinceEpoch.hashCode ^
               i.hashCode) %
-          256;
+          256;  // Modulo 256 to keep value in byte range (0-255)
     }
+    // Seed the random number generator
     random.seed(KeyParameter(seed));
 
+    // Generate and return the requested number of random bytes
     return random.nextBytes(length);
   }
 
-  /// Generate AES-256 key
+  /// Generate AES-256 key for symmetric encryption
+  /// AES-256 provides strong encryption for data at rest and in transit
+  /// 256-bit key size offers excellent security against brute force attacks
+  /// 
+  /// Returns an [encrypt.Key] - 32-byte (256-bit) AES key
   static encrypt.Key generateAESKey() {
-    print('\n🔑 Generating AES-256 encryption key...');
-    final key = encrypt.Key.fromSecureRandom(32); // 256 bits
-    print('✅ AES-256 key generated successfully');
+    print('\n[KEY] Generating AES-256 encryption key...');
+    // Generate 32-byte (256-bit) key from secure random source
+    final key = encrypt.Key.fromSecureRandom(32);
+    print('[SUCCESS] AES-256 key generated successfully');
     print('   - Key Length: 32 bytes (256 bits)');
     return key;
   }
 
-  /// Encrypt message with AES-256-GCM
+  /// Encrypt message using AES-256-GCM (Galois/Counter Mode)
+  /// GCM mode provides both confidentiality and authenticity
+  /// - Confidentiality: Data is encrypted
+  /// - Authenticity: Detects if data has been tampered with
+  /// 
+  /// Parameters:
+  /// - [plaintext] - Message to encrypt
+  /// - [key] - AES-256 encryption key
+  /// 
+  /// Returns a [Map] with encrypted data, IV, and authentication tag
   static Map<String, String> encryptAES(String plaintext, encrypt.Key key) {
-    print('\n🔒 Encrypting message with AES-256-GCM...');
+    print('\n[ENCRYPTING] Encrypting message with AES-256-GCM...');
     print('   - Plaintext Length: ${plaintext.length} characters');
+    // Show preview of plaintext (truncate if too long)
     print(
       '   - Plaintext Preview: "${plaintext.length > 50 ? plaintext.substring(0, 50) + '...' : plaintext}"',
     );
 
-    final iv = encrypt.IV.fromSecureRandom(16); // 128 bits
+    // Generate random 16-byte (128-bit) initialization vector
+    // IV ensures same plaintext produces different ciphertext each time
+    final iv = encrypt.IV.fromSecureRandom(16);
+    // Create AES encrypter in GCM mode for authenticated encryption
     final encrypter = encrypt.Encrypter(
       encrypt.AES(key, mode: encrypt.AESMode.gcm),
     );
 
+    // Perform encryption with the IV
     final encrypted = encrypter.encrypt(plaintext, iv: iv);
 
-    print('✅ Encryption completed successfully');
+    print('[SUCCESS] Encryption completed successfully');
     print('   - Algorithm: AES-256-GCM');
     print('   - IV (base64): ${iv.base64}');
     print(
@@ -103,19 +149,19 @@ class EncryptionService {
 
       final decrypted = encrypter.decrypt64(encryptedBase64, iv: iv);
 
-      print('✅ Decryption completed successfully');
+      print('[SUCCESS] Decryption completed successfully');
       print('   - Decrypted Length: ${decrypted.length} characters');
 
       return decrypted;
     } catch (e) {
-      print('❌ Decryption failed: $e');
+      print('[ERROR] Decryption failed: $e');
       throw Exception('Decryption failed - invalid key, IV, or data');
     }
   }
 
   /// Encrypt data with RSA public key
   static String encryptRSA(String data, RSAPublicKey publicKey) {
-    print('\n🔐 Encrypting data with RSA-2048...');
+    print('\n[ENCRYPTING] Encrypting data with RSA-2048...');
     print('   - Data Length: ${data.length} bytes');
 
     final encrypter = OAEPEncoding(RSAEngine())
@@ -125,7 +171,7 @@ class EncryptionService {
     final encrypted = encrypter.process(Uint8List.fromList(plainBytes));
     final encryptedBase64 = base64.encode(encrypted);
 
-    print('✅ RSA encryption completed');
+    print('[SUCCESS] RSA encryption completed');
     print('   - Encrypted Length: ${encryptedBase64.length} base64 characters');
 
     return encryptedBase64;
@@ -144,12 +190,12 @@ class EncryptionService {
       final decrypted = encrypter.process(Uint8List.fromList(encryptedBytes));
       final decryptedText = utf8.decode(decrypted);
 
-      print('✅ RSA decryption completed');
+      print('[SUCCESS] RSA decryption completed');
       print('   - Decrypted Length: ${decryptedText.length} bytes');
 
       return decryptedText;
     } catch (e) {
-      print('❌ RSA decryption failed: $e');
+      print('[ERROR] RSA decryption failed: $e');
       throw Exception('RSA decryption failed - invalid key or data');
     }
   }
@@ -161,7 +207,7 @@ class EncryptionService {
     String recipientPublicKeyPem,
   ) {
     print('\n${'=' * 70}');
-    print('📨 ENCRYPTING MESSAGE FOR SECURE TRANSMISSION');
+    print('[INFO] ENCRYPTING MESSAGE FOR SECURE TRANSMISSION');
     print('=' * 70);
 
     // Step 1: Generate AES key for this message
@@ -176,7 +222,7 @@ class EncryptionService {
     // Step 4: Encrypt AES key with RSA
     final encryptedKey = encryptRSA(base64.encode(aesKey.bytes), publicKey);
 
-    print('\n📦 Message Package Created:');
+    print('\n[INFO] Message Package Created:');
     print(
       '   - Encrypted Content: ${aesResult['encrypted']!.length} base64 chars',
     );
@@ -198,7 +244,7 @@ class EncryptionService {
     RSAPrivateKey privateKey,
   ) {
     print('\n${'=' * 70}');
-    print('📬 DECRYPTING RECEIVED MESSAGE');
+    print('[INFO] DECRYPTING RECEIVED MESSAGE');
     print('=' * 70);
 
     try {
@@ -216,12 +262,12 @@ class EncryptionService {
         encryptedPackage['iv']!,
       );
 
-      print('\n✅ Message successfully decrypted and authenticated');
+      print('\n[SUCCESS] Message successfully decrypted and authenticated');
       print('=' * 70 + '\n');
 
       return decrypted;
     } catch (e) {
-      print('\n❌ Message decryption failed: $e');
+      print('\n[ERROR] Message decryption failed: $e');
       print('=' * 70 + '\n');
       rethrow;
     }

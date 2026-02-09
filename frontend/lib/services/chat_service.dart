@@ -5,25 +5,25 @@ import 'storage_service.dart';
 
 class ChatService {
   static const String chatEndpoint = '/api/chat';
-
+  
   // Get all conversations for the current user
   static Future<Map<String, dynamic>> getConversations() async {
     try {
       final token = await StorageService.getToken();
       final userId = await StorageService.getUserId();
-
-      print(
-        'ChatService.getConversations: userId=$userId, hasToken=${token != null}',
-      );
-
+      
+      print('ChatService.getConversations: userId=$userId, hasToken=${token != null}');
+      
       if (userId == null) {
-        return {'success': false, 'message': 'User ID not found'};
+        return {
+          'success': false,
+          'message': 'User ID not found'
+        };
       }
 
-      final url =
-          '${ApiConfig.baseUrl}$chatEndpoint/conversations?userId=$userId';
+      final url = '${ApiConfig.baseUrl}$chatEndpoint/conversations?userId=$userId';
       print('ChatService.getConversations: Calling $url');
-
+      
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -40,14 +40,16 @@ class ChatService {
       } else {
         return {
           'success': false,
-          'message':
-              'Failed to fetch conversations: ${response.statusCode}, Body: ${response.body}',
+          'message': 'Failed to fetch conversations: ${response.statusCode}, Body: ${response.body}'
         };
       }
     } catch (e, stackTrace) {
       print('ChatService.getConversations: Exception=$e');
       print('ChatService.getConversations: StackTrace=$stackTrace');
-      return {'success': false, 'message': 'Failed to fetch conversations: $e'};
+      return {
+        'success': false,
+        'message': 'Failed to fetch conversations: $e'
+      };
     }
   }
 
@@ -78,11 +80,14 @@ class ChatService {
       } else {
         return {
           'success': false,
-          'message': 'Failed to create conversation: ${response.statusCode}',
+          'message': 'Failed to create conversation: ${response.statusCode}'
         };
       }
     } catch (e) {
-      return {'success': false, 'message': 'Failed to create conversation: $e'};
+      return {
+        'success': false,
+        'message': 'Failed to create conversation: $e'
+      };
     }
   }
 
@@ -110,11 +115,14 @@ class ChatService {
       } else {
         return {
           'success': false,
-          'message': 'Failed to fetch messages: ${response.statusCode}',
+          'message': 'Failed to fetch messages: ${response.statusCode}'
         };
       }
     } catch (e) {
-      return {'success': false, 'message': 'Failed to fetch messages: $e'};
+      return {
+        'success': false,
+        'message': 'Failed to fetch messages: $e'
+      };
     }
   }
 
@@ -147,11 +155,14 @@ class ChatService {
       } else {
         return {
           'success': false,
-          'message': 'Failed to send message: ${response.statusCode}',
+          'message': 'Failed to send message: ${response.statusCode}'
         };
       }
     } catch (e) {
-      return {'success': false, 'message': 'Failed to send message: $e'};
+      return {
+        'success': false,
+        'message': 'Failed to send message: $e'
+      };
     }
   }
 
@@ -164,14 +175,14 @@ class ChatService {
       final token = await StorageService.getToken();
 
       final response = await http.put(
-        Uri.parse(
-          '${ApiConfig.baseUrl}$chatEndpoint/conversations/$conversationId/read',
-        ),
+        Uri.parse('${ApiConfig.baseUrl}$chatEndpoint/conversations/$conversationId/read'),
         headers: {
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
         },
-        body: json.encode({'userId': userId}),
+        body: json.encode({
+          'userId': userId,
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -179,13 +190,13 @@ class ChatService {
       } else {
         return {
           'success': false,
-          'message': 'Failed to mark messages as read: ${response.statusCode}',
+          'message': 'Failed to mark messages as read: ${response.statusCode}'
         };
       }
     } catch (e) {
       return {
         'success': false,
-        'message': 'Failed to mark messages as read: $e',
+        'message': 'Failed to mark messages as read: $e'
       };
     }
   }
@@ -195,15 +206,16 @@ class ChatService {
     try {
       final token = await StorageService.getToken();
       final userId = await StorageService.getUserId();
-
+      
       if (userId == null) {
-        return {'success': false, 'message': 'User ID not found'};
+        return {
+          'success': false,
+          'message': 'User ID not found'
+        };
       }
 
       final response = await http.get(
-        Uri.parse(
-          '${ApiConfig.baseUrl}$chatEndpoint/unread-count?userId=$userId',
-        ),
+        Uri.parse('${ApiConfig.baseUrl}$chatEndpoint/unread-count?userId=$userId'),
         headers: {
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
@@ -215,11 +227,14 @@ class ChatService {
       } else {
         return {
           'success': false,
-          'message': 'Failed to fetch unread count: ${response.statusCode}',
+          'message': 'Failed to fetch unread count: ${response.statusCode}'
         };
       }
     } catch (e) {
-      return {'success': false, 'message': 'Failed to fetch unread count: $e'};
+      return {
+        'success': false,
+        'message': 'Failed to fetch unread count: $e'
+      };
     }
   }
 }
