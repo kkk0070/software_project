@@ -15,6 +15,31 @@ The platform prioritizes environmental impact while providing efficient transpor
 
 ---
 
+# Auth Controller (14 tests)
+npm test -- tests/unit/controllers/shared/authController.test.js
+
+# Chat Controller (26 tests)
+npm test -- tests/unit/controllers/shared/chatController.test.js
+
+# Emergency Controller (22 tests)
+npm test -- tests/unit/controllers/shared/emergencyController.test.js
+
+# Settings Controller (28 tests)
+npm test -- tests/unit/controllers/shared/settingsController.test.js
+
+# Notification Controller (30 tests)
+npm test -- tests/unit/controllers/shared/notificationController.test.js
+
+
+# Monitoring Controller (30 tests)
+npm test -- tests/unit/controllers/shared/monitoringController.test.js
+
+# Reports Controller (28 tests)
+npm test -- tests/unit/controllers/shared/reportsController.test.js
+
+
+
+
 ## 📋 Table of Contents
 
 - [📖 Overview](#-overview)
