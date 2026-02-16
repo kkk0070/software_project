@@ -1,3 +1,5 @@
+import { createPostResponse } from '../../utils/responseHelper.js';
+
 // Get recent reports
 export const getRecentReports = async (req, res) => {
   try {
@@ -225,19 +227,23 @@ export const generateReport = async (req, res) => {
       downloadUrl: `/api/reports/download/${Date.now()}`
     };
 
-    res.json({
+    res.json(createPostResponse({
       success: true,
       message: 'Report generated successfully',
-      data: reportData
-    });
+      data: reportData,
+      requestBody: req.body
+    }));
     
   } catch (error) {
     console.error('Error generating report:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error generating report',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 

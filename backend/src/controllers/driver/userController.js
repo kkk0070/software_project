@@ -1,5 +1,6 @@
 import { knex } from '../../config/database.js';
 import bcrypt from 'bcrypt';
+import { createPostResponse } from '../../utils/responseHelper.js';
 
 // Get all users with optional filters
 export const getAllUsers = async (req, res) => {
@@ -136,18 +137,22 @@ export const createUser = async (req, res) => {
       });
     }
 
-    res.status(201).json({
+    res.status(201).json(createPostResponse({
       success: true,
       message: 'User created successfully',
-      data: newUser
-    });
+      data: newUser,
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error creating user:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error creating user',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 

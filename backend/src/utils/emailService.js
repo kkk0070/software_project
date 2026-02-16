@@ -176,7 +176,6 @@ If you have any questions or concerns, please contact our support team.
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('[SUCCESS] OTP email sent successfully:', info.messageId);
     return true;
   } catch (error) {
     // Provide more specific error messages
@@ -186,7 +185,6 @@ If you have any questions or concerns, please contact our support team.
       throw new Error('EMAIL_AUTH_FAILED');
     }
     
-    console.error('[ERROR] Error sending OTP email:', error.message);
     throw new Error('EMAIL_SEND_FAILED');
   }
 };
@@ -201,7 +199,6 @@ If you have any questions or concerns, please contact our support team.
 export const send2FAStatusEmail = async (to, userName, enabled) => {
   // Check if email is configured
   if (!isEmailConfigured()) {
-    console.log('[WARNING]  Email not configured. Skipping 2FA status notification.');
     return false;
   }
 
@@ -271,17 +268,9 @@ export const send2FAStatusEmail = async (to, userName, enabled) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('[SUCCESS] 2FA status email sent successfully:', info.messageId);
     return true;
   } catch (error) {
-    // Log specific error but don't throw (notification emails are non-critical)
-    if (error.code === 'ESOCKET' || error.code === 'ETIMEDOUT' || error.code === 'ECONNECTION') {
-      console.log('[WARNING]  Email service unreachable. Skipping 2FA status notification.');
-    } else if (error.code === 'EAUTH') {
-      console.log('[WARNING]  Email authentication failed. Check configuration.');
-    } else {
-      console.log('[WARNING]  Error sending 2FA status email:', error.message);
-    }
+    // Don't throw (notification emails are non-critical)
     return false;
   }
 };

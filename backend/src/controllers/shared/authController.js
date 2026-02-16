@@ -17,6 +17,8 @@ import { dirname } from 'path';
 import { generateOTP, storeOTP, verifyOTP, generate2FASecret } from '../../utils/otpService.js';
 // Email service for sending OTP and 2FA notifications
 import { sendOTPEmail, send2FAStatusEmail } from '../../utils/emailService.js';
+// Response helper for including request body in responses
+import { createPostResponse } from '../../utils/responseHelper.js';
 
 // Get current file path and directory (required for ES modules)
 const __filename = fileURLToPath(import.meta.url);
@@ -185,21 +187,25 @@ export const signup = async (req, res) => {
     // Generate JWT token
     const token = generateToken(newUser.id, newUser.email, newUser.role);
 
-    res.status(201).json({
+    res.status(201).json(createPostResponse({
       success: true,
       message: 'User registered successfully',
       data: {
         user: newUser,
         token
-      }
-    });
+      },
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error during signup:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error creating user',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -274,15 +280,16 @@ export const login = async (req, res) => {
       }
 
       // Don't send token yet, require OTP verification
-      return res.json({
+      return res.json(createPostResponse({
         success: true,
-        requires2FA: true,
         message: 'OTP sent to your email. Please verify to complete login.',
         data: {
           email: user.email.replace(/(.{2})(.*)(?=@)/, '$1***'), // Mask email
-          userId: user.id
-        }
-      });
+          userId: user.id,
+          requires2FA: true
+        },
+        requestBody: req.body
+      }));
     }
 
     // Remove password from response
@@ -291,21 +298,25 @@ export const login = async (req, res) => {
     // Generate JWT token
     const token = generateToken(user.id, user.email, user.role);
 
-    res.json({
+    res.json(createPostResponse({
       success: true,
       message: 'Login successful',
       data: {
         user,
         token
-      }
-    });
+      },
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error during login:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error during login',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -356,21 +367,25 @@ export const verifyLoginOTP = async (req, res) => {
     // Generate JWT token
     const token = generateToken(user.id, user.email, user.role);
 
-    res.json({
+    res.json(createPostResponse({
       success: true,
       message: 'Login successful',
       data: {
         user,
         token
-      }
-    });
+      },
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error verifying login OTP:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error verifying OTP',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -469,18 +484,22 @@ export const completeProfileSetup = async (req, res) => {
                   'status', 'verified', 'profile_setup_complete', 
                   'rating', 'total_rides', 'updated_at']);
 
-    res.json({
+    res.json(createPostResponse({
       success: true,
       message: 'Profile setup completed',
-      data: updatedUser
-    });
+      data: updatedUser,
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error completing profile setup:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error completing profile setup',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -533,31 +552,38 @@ export const request2FAOTP = async (req, res) => {
       maskedEmail = user.email[0] + '***' + user.email.substring(atIndex);
     }
 
-    res.json({
+    res.json(createPostResponse({
       success: true,
       message: 'OTP sent to your email address',
       data: {
         email: maskedEmail
-      }
-    });
+      },
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error requesting 2FA OTP:', error);
     
     // Check if this is a missing column error
     if (error.code === '42703' && error.message.includes('two_factor')) {
-      return res.status(500).json({
+      return res.status(500).json(createPostResponse({
         success: false,
         message: 'Database schema is outdated. Please run: npm run migrate-2fa',
-        error: 'Missing 2FA columns in database. Migration required.',
-        fixCommand: 'cd backend && npm run migrate-2fa'
-      });
+        data: {
+          error: 'Missing 2FA columns in database. Migration required.',
+          fixCommand: 'cd backend && npm run migrate-2fa'
+        },
+        requestBody: req.body
+      }));
     }
     
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error sending OTP',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -616,31 +642,38 @@ export const enable2FA = async (req, res) => {
       console.error('Error sending 2FA status email (continuing anyway):', emailError);
     }
 
-    res.json({
+    res.json(createPostResponse({
       success: true,
       message: 'Two-factor authentication enabled successfully',
       data: {
         two_factor_enabled: true
-      }
-    });
+      },
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error enabling 2FA:', error);
     
     // Check if this is a missing column error
     if (error.code === '42703' && error.message.includes('two_factor')) {
-      return res.status(500).json({
+      return res.status(500).json(createPostResponse({
         success: false,
         message: 'Database schema is outdated. Please run: npm run migrate-2fa',
-        error: 'Missing 2FA columns in database. Migration required.',
-        fixCommand: 'cd backend && npm run migrate-2fa'
-      });
+        data: {
+          error: 'Missing 2FA columns in database. Migration required.',
+          fixCommand: 'cd backend && npm run migrate-2fa'
+        },
+        requestBody: req.body
+      }));
     }
     
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error enabling two-factor authentication',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -691,31 +724,38 @@ export const disable2FA = async (req, res) => {
     // Send confirmation email
     await send2FAStatusEmail(user.email, user.name, false);
 
-    res.json({
+    res.json(createPostResponse({
       success: true,
       message: 'Two-factor authentication disabled successfully',
       data: {
         two_factor_enabled: false
-      }
-    });
+      },
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error disabling 2FA:', error);
     
     // Check if this is a missing column error
     if (error.code === '42703' && error.message.includes('two_factor')) {
-      return res.status(500).json({
+      return res.status(500).json(createPostResponse({
         success: false,
         message: 'Database schema is outdated. Please run: npm run migrate-2fa',
-        error: 'Missing 2FA columns in database. Migration required.',
-        fixCommand: 'cd backend && npm run migrate-2fa'
-      });
+        data: {
+          error: 'Missing 2FA columns in database. Migration required.',
+          fixCommand: 'cd backend && npm run migrate-2fa'
+        },
+        requestBody: req.body
+      }));
     }
     
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error disabling two-factor authentication',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -799,17 +839,26 @@ export const uploadPhoto = async (req, res) => {
       .returning(['id', 'name', 'email', 'phone', 'location', 'profile_photo', 
                   'role', 'status', 'verified', 'rating', 'total_rides', 'updated_at']);
 
-    res.json({
+    res.json(createPostResponse({
       success: true,
       message: 'Profile photo uploaded successfully',
-      data: updatedUser
-    });
+      data: updatedUser,
+      requestBody: req.body,
+      meta: {
+        filename: req.file?.filename,
+        size: req.file?.size,
+        mimetype: req.file?.mimetype
+      }
+    }));
   } catch (error) {
     console.error('Error uploading profile photo:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error uploading profile photo',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };

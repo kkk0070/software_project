@@ -3,6 +3,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/auth_service.dart';
+import '../../../services/chat_service.dart';
 import '../shared/notifications_screen.dart';
 import '../shared/document_upload_screen.dart';
 import '../shared/carpool_screen.dart';
@@ -29,12 +30,14 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   String _verificationStatus = 'Pending';
   bool _profileSetupComplete = false; // Default to false until loaded
   bool _isLoading = true;
+  int _unreadChatCount = 0;
   late bool isDark;
 
   @override
   void initState() {
     super.initState();
     _loadProfile();
+    _loadUnreadCount();
   }
 
   Future<void> _loadProfile() async {
@@ -51,6 +54,19 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _loadUnreadCount() async {
+    try {
+      final result = await ChatService.getUnreadCount();
+      if (result['success'] == true && result['data'] != null) {
+        setState(() {
+          _unreadChatCount = result['data']['unread_count'] ?? 0;
+        });
+      }
+    } catch (e) {
+      print('Error loading unread count: $e');
     }
   }
 
@@ -187,20 +203,55 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                   MaterialPageRoute(
                     builder: (context) => const NotificationsScreen(),
                   ),
-                );
+                ).then((_) => _loadUnreadCount());
               },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppTheme.primaryGreen.withOpacity(0.1),
-                ),
-                child: Icon(
-                  Icons.notifications_outlined,
-                  color: AppTheme.primaryGreen,
-                  size: 24,
-                ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppTheme.primaryGreen.withOpacity(0.1),
+                    ),
+                    child: Icon(
+                      Icons.notifications_outlined,
+                      color: AppTheme.primaryGreen,
+                      size: 24,
+                    ),
+                  ),
+                  if (_unreadChatCount > 0)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isDark ? AppTheme.cardDark : Colors.white,
+                            width: 2,
+                          ),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 20,
+                          minHeight: 20,
+                        ),
+                        child: Center(
+                          child: Text(
+                            _unreadChatCount > 99 ? '99+' : '$_unreadChatCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ],

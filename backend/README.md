@@ -508,11 +508,113 @@ backend/
 - [ ] Input validation middleware
 - [ ] Rate limiting
 - [ ] API documentation with Swagger
-- [ ] Unit and integration tests
+- [x] Unit and integration tests (implemented with Jest)
 - [ ] Logging with Winston
 - [ ] Caching with Redis
 - [ ] Real-time updates with Socket.io
 - [ ] File upload for driver documents
+
+## 🧪 Testing
+
+The backend includes comprehensive Jest-based testing for utilities and integration workflows.
+
+### Running Tests
+
+Tests work cross-platform (Windows, macOS, Linux) using `cross-env`:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode (re-runs on file changes)
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+### Test Structure
+
+```
+backend/tests/
+├── unit/
+│   └── utils/
+│       ├── otpService.test.js       # OTP generation and verification tests
+│       ├── emailService.test.js     # Email service tests
+│       ├── encodingUtils.test.js    # Base64 encoding/decoding tests
+│       └── encryptionUtils.test.js  # AES/RSA encryption tests
+└── integration/
+    └── backend-integration.test.js  # End-to-end workflow tests
+```
+
+### Test Coverage
+
+The test suite includes **65 tests** covering:
+
+#### Unit Tests
+- **OTP Service (11 tests)**
+  - OTP generation (6-digit random codes)
+  - OTP storage and verification
+  - Failed attempt tracking (5 attempts max)
+  - 2FA secret generation
+
+- **Email Service (5 tests)**
+  - Email configuration validation
+  - OTP email sending
+  - 2FA status notifications
+
+- **Encoding Utils (20 tests)**
+  - Base64 encoding/decoding
+  - File buffer handling
+  - Unicode and special character support
+  - Encoding overhead calculation
+
+- **Encryption Utils (19 tests)**
+  - AES-256-GCM encryption/decryption
+  - RSA key pair generation
+  - Secure key and IV generation
+  - Error handling for invalid keys
+  - Large data encryption
+
+#### Integration Tests (10 tests)
+- Complete OTP lifecycle workflows
+- Multi-layer encryption workflows
+- Encoding + Encryption pipelines
+- Error handling scenarios
+- Performance tests for large data
+
+### Test Results
+
+```bash
+Test Suites: 5 passed, 5 total
+Tests:       65 passed, 65 total
+Coverage:    ~66% overall
+  - otpService.js:     96% coverage
+  - encodingUtils.js:  70% coverage
+  - encryptionUtils.js: 58% coverage
+  - emailService.js:   62% coverage
+```
+
+### Writing New Tests
+
+Create test files in `tests/unit/` or `tests/integration/`:
+
+```javascript
+import { myFunction } from '../../../src/utils/myUtil.js';
+
+describe('My Utility', () => {
+  test('should do something', () => {
+    const result = myFunction();
+    expect(result).toBeDefined();
+  });
+});
+```
+
+### Test Configuration
+
+- **Jest Config:** `jest.config.js`
+- **Babel Config:** `babel.config.js` (for ES modules support)
+- **Setup File:** `tests/setup.js` (test environment configuration)
 
 ## 🤝 Contributing
 

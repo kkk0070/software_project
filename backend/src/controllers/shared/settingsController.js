@@ -1,4 +1,5 @@
 import { knex } from '../../config/database.js';
+import { createPostResponse } from '../../utils/responseHelper.js';
 
 // Get all settings
 export const getAllSettings = async (req, res) => {
@@ -87,18 +88,22 @@ export const createSetting = async (req, res) => {
       .insert({ key, value, category, description })
       .returning('*');
 
-    res.status(201).json({
+    res.status(201).json(createPostResponse({
       success: true,
       message: 'Setting created successfully',
-      data: setting
-    });
+      data: setting,
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error creating setting:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error creating setting',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -215,17 +220,21 @@ export const bulkUpdateSettings = async (req, res) => {
       }
     }
 
-    res.json({
+    res.json(createPostResponse({
       success: true,
       message: `${updated.length} settings updated successfully`,
-      data: updated
-    });
+      data: updated,
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error bulk updating settings:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error bulk updating settings',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };

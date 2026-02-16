@@ -84,7 +84,6 @@ export const encryptAES = (data, key, iv) => {
       authTag: authTag
     };
   } catch (error) {
-    console.error('Error in AES encryption:', error);
     throw new Error('Failed to encrypt data: ' + error.message);
   }
 };
@@ -125,7 +124,6 @@ export const decryptAES = (encryptedData, key, iv, authTag) => {
     
     return decrypted;
   } catch (error) {
-    console.error('Error in AES decryption:', error);
     throw new Error('Failed to decrypt data: ' + error.message);
   }
 };

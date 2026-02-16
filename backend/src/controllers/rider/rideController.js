@@ -2,6 +2,8 @@
 import { knex } from '../../config/database.js';
 // Socket.io service for real-time notifications
 import { sendNotificationToUser } from '../../services/socketService.js';
+// Response helper for including request body in responses
+import { createPostResponse } from '../../utils/responseHelper.js';
 
 /**
  * Get all rides with optional filtering
@@ -190,18 +192,22 @@ export const createRide = async (req, res) => {
       // Continue even if WebSocket fails - notification is still in database
     }
 
-    res.status(201).json({
+    res.status(201).json(createPostResponse({
       success: true,
       message: 'Ride created successfully and driver notified',
-      data: ride
-    });
+      data: ride,
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error creating ride:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error creating ride',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 

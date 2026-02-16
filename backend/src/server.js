@@ -217,6 +217,9 @@ if (!process.env.JWT_SECRET) {
 const app = express();
 // Get port from environment or use default 5000
 const PORT = process.env.PORT || 5000;
+// Get host from environment or use '0.0.0.0' to allow external access
+// Use '127.0.0.1' or 'localhost' to restrict to local connections only
+const HOST = process.env.HOST || '0.0.0.0';
 
 // Create HTTP server to enable Socket.io for real-time features
 const httpServer = createServer(app);
@@ -295,6 +298,11 @@ app.use((req, res, next) => {
   // Continue to next middleware
   next();
 });
+
+// Response helper middleware - adds utility functions for consistent API responses
+// This middleware includes request body in POST responses (with sensitive data filtered)
+import { responseHelperMiddleware } from './utils/responseHelper.js';
+app.use(responseHelperMiddleware);
 
 // Health check endpoint - verifies server and database are working
 app.get('/health', async (req, res) => {
@@ -406,12 +414,13 @@ app.use((err, req, res, next) => {
 });
 
 // Start the HTTP server and initialize all services
-httpServer.listen(PORT, async () => {
+httpServer.listen(PORT, HOST, async () => {
   // Display startup banner with server configuration
+  const hostDisplay = HOST === '0.0.0.0' ? '0.0.0.0 (all interfaces)' : HOST;
   console.log(`
 ╔═══════════════════════════════════════════╗
 ║   🚀 EcoRide Backend API Server          ║
-║   📡 Port: ${PORT}
+║   📡 Host: ${hostDisplay}:${PORT}
 ║   🌍 Environment: ${process.env.NODE_ENV || 'development'}
 ║   🔗 CORS Origin: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}
 ║   🔌 WebSocket: Enabled

@@ -1,4 +1,9 @@
 import { knex } from '../../config/database.js';
+import { createPostResponse } from '../../utils/responseHelper.js';
+import { sendNotificationToUser } from '../../services/socketService.js';
+
+// Constants
+const MESSAGE_PREVIEW_LENGTH = 50;
 
 // Get all conversations for a user
 export const getConversations = async (req, res) => {
@@ -79,10 +84,12 @@ export const getOrCreateConversation = async (req, res) => {
       .first();
 
     if (conversation) {
-      return res.json({
+      return res.json(createPostResponse({
         success: true,
-        data: conversation
-      });
+        message: 'Conversation already exists',
+        data: conversation,
+        requestBody: req.body
+      }));
     }
 
     // Create new conversation
@@ -94,17 +101,22 @@ export const getOrCreateConversation = async (req, res) => {
       })
       .returning('*');
 
-    res.status(201).json({
+    res.status(201).json(createPostResponse({
       success: true,
-      data: conversation
-    });
+      message: 'Conversation created successfully',
+      data: conversation,
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error creating conversation:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error creating conversation',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -152,6 +164,12 @@ export const sendMessage = async (req, res) => {
       });
     }
 
+    // Get sender and receiver information
+    const [sender, receiver] = await Promise.all([
+      knex('users').where('id', senderId).first(),
+      knex('users').where('id', receiverId).first()
+    ]);
+
     // Insert message
     const [newMessage] = await knex('messages')
       .insert({
@@ -171,17 +189,64 @@ export const sendMessage = async (req, res) => {
         updated_at: knex.fn.now()
       });
 
-    res.status(201).json({
+    // Create notification for the receiver if they are a driver
+    if (receiver && receiver.role === 'Driver') {
+      try {
+        const senderName = sender ? sender.name : 'User';
+        const notificationTitle = 'New Message';
+        const notificationMessage = `${senderName}: ${message.substring(0, MESSAGE_PREVIEW_LENGTH)}${message.length > MESSAGE_PREVIEW_LENGTH ? '...' : ''}`;
+        
+        // Insert notification into database
+        const [notification] = await knex('notifications')
+          .insert({
+            user_id: receiverId,
+            title: notificationTitle,
+            message: notificationMessage,
+            type: 'Info',
+            category: 'Message',
+            conversation_id: conversationId,
+            sender_id: senderId
+          })
+          .returning('*');
+
+        // Send real-time notification via WebSocket
+        try {
+          sendNotificationToUser(receiverId, {
+            id: notification.id,
+            title: notificationTitle,
+            message: notificationMessage,
+            type: 'Info',
+            category: 'Message',
+            conversation_id: conversationId,
+            sender_id: senderId,
+            created_at: notification.created_at
+          });
+        } catch (socketError) {
+          console.error('Error sending WebSocket notification:', socketError);
+          // Continue even if WebSocket fails
+        }
+      } catch (notificationError) {
+        console.error('Error creating notification:', notificationError);
+        // Continue even if notification creation fails
+      }
+    }
+
+    res.status(201).json(createPostResponse({
       success: true,
-      data: newMessage
-    });
+      message: 'Message sent successfully',
+      data: newMessage,
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error sending message:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error sending message',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
