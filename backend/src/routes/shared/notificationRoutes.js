@@ -5,6 +5,7 @@ import {
   broadcastNotification,
   markAsRead,
   deleteNotification,
+  deleteAllNotifications,
   getNotificationStats
 } from '../../controllers/shared/notificationController.js';
 import { getConnectedUsers, isUserConnected } from '../../services/socketService.js';
@@ -58,6 +59,7 @@ router.get('/stats', getNotificationStats);
 router.post('/', createNotification);
 router.post('/broadcast', broadcastNotification);
 router.put('/:id/read', markAsRead);
+router.delete('/all', deleteAllNotifications);
 router.delete('/:id', deleteNotification);
 
 export default router;

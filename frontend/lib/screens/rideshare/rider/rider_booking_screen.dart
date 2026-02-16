@@ -5,6 +5,7 @@ import '../../../theme/app_theme.dart';
 import '../../../services/user_service.dart';
 import '../../../services/storage_service.dart';
 import '../driver/driver_profile_detail_screen.dart';
+import '../shared/location_picker_screen.dart';
 
 /// Rider Booking Screen
 /// Features:
@@ -103,6 +104,34 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
     });
   }
 
+  // Open location picker on map
+  Future<void> _selectLocationOnMap(TextEditingController controller) async {
+    try {
+      final result = await Navigator.push<Map<String, dynamic>>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LocationPickerScreen(
+            initialLocation: controller.text.isNotEmpty ? controller.text : null,
+          ),
+        ),
+      );
+
+      if (result != null && result is Map<String, dynamic> && result['address'] != null) {
+        setState(() {
+          controller.text = result['address'] as String;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error opening location picker: ${e.toString()}'),
+          backgroundColor: AppTheme.errorRed,
+        ),
+      );
+    }
+  }
+
   // Get ride type details
   Map<String, dynamic> _getRideTypeDetails(RideType type) {
     switch (type) {
@@ -134,6 +163,15 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
           'color': AppTheme.accentPurple,
         };
     }
+  }
+
+  // Helper function to safely convert dynamic value to double
+  double _toDouble(dynamic value, double defaultValue) {
+    if (value == null) return defaultValue;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? defaultValue;
+    return defaultValue;
   }
 
   // Calculate estimated price based on distance and ride type
@@ -453,6 +491,15 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
             hintText: hint,
             hintStyle: TextStyle(color: isDark ? Colors.grey[600] : Colors.grey[500]),
             prefixIcon: Icon(icon, color: AppTheme.primaryGreen, size: 20),
+            suffixIcon: IconButton(
+              icon: const Icon(
+                FontAwesomeIcons.mapLocationDot,
+                size: 18,
+              ),
+              color: AppTheme.primaryGreen,
+              onPressed: () => _selectLocationOnMap(controller),
+              tooltip: 'Select on map',
+            ),
             filled: true,
             fillColor: isDark ? AppTheme.backgroundDark : Colors.grey[100],
             border: OutlineInputBorder(
@@ -707,7 +754,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
 
   Widget _buildDriverCard(Map<String, dynamic> driver) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final rating = driver['rating'] ?? 0.0;
+    final rating = _toDouble(driver['rating'], 4.5);
     
     return GestureDetector(
       onTap: () {

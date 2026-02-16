@@ -10,6 +10,7 @@ import { analyzeBase64Security, generateSecurityReport, getSecuritySummary } fro
 import { encryptFile, decryptFile, generateHash, getEncryptionInfo } from '../../utils/encryptionUtils.js';
 import { getActivePublicKey, getPrivateKey } from '../../utils/keyManagement.js';
 import { analyzeEncryptionSecurity, generateEncryptionReport, getEncryptionSummary } from '../../utils/encryptionSecurityAnalysis.js';
+import { createPostResponse } from '../../utils/responseHelper.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -151,7 +152,7 @@ export const uploadDocument = async (req, res) => {
       })
       .returning('*');
 
-    res.status(201).json({
+    res.status(201).json(createPostResponse({
       success: true,
       message: shouldEncrypt && encryptionMetadata ? 'Document uploaded and encrypted successfully' : 'Document uploaded successfully',
       data: {
@@ -161,8 +162,9 @@ export const uploadDocument = async (req, res) => {
           algorithm: encryptionMetadata.algorithm,
           keyId: encryptionMetadata.encryptionKeyId
         } : null
-      }
-    });
+      },
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error uploading document:', error);
     // Delete uploaded file if database insert fails
@@ -178,11 +180,14 @@ export const uploadDocument = async (req, res) => {
         console.error('Error deleting file:', unlinkError);
       }
     }
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error uploading document',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -931,8 +936,9 @@ export const demonstrateEncryption = async (req, res) => {
     console.log('[SUCCESS] DEMONSTRATION COMPLETED SUCCESSFULLY');
     console.log('═'.repeat(80) + '\n');
     
-    res.json({
+    res.json(createPostResponse({
       success: true,
+      message: 'Encryption demonstration completed successfully',
       data: {
         original: sampleData,
         encrypted: {
@@ -943,14 +949,18 @@ export const demonstrateEncryption = async (req, res) => {
         },
         decrypted: decryptedText,
         verified: isMatch
-      }
-    });
+      },
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error in encryption demonstration:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error in encryption demonstration',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };

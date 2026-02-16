@@ -1,5 +1,6 @@
 import { knex } from '../../config/database.js';
 import { sendNotificationToUser, broadcastNotificationToUsers } from '../../services/socketService.js';
+import { createPostResponse } from '../../utils/responseHelper.js';
 
 // Get all notifications with filters
 export const getAllNotifications = async (req, res) => {
@@ -80,18 +81,22 @@ export const createNotification = async (req, res) => {
       // Continue even if WebSocket fails
     }
 
-    res.status(201).json({
+    res.status(201).json(createPostResponse({
       success: true,
       message: 'Notification created successfully',
-      data: notification
-    });
+      data: notification,
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error creating notification:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error creating notification',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -153,21 +158,25 @@ export const broadcastNotification = async (req, res) => {
       // Continue even if WebSocket fails
     }
 
-    res.status(201).json({
+    res.status(201).json(createPostResponse({
       success: true,
       message: `Notification broadcast to ${notifications.length} users`,
       data: {
         count: notifications.length,
         sample: notifications[0]
-      }
-    });
+      },
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error broadcasting notification:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error broadcasting notification',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 
@@ -260,6 +269,40 @@ export const getNotificationStats = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching notification statistics',
+      error: error.message
+    });
+  }
+};
+
+// Delete all notifications for a user
+export const deleteAllNotifications = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+
+    if (!user_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    const result = await knex('notifications')
+      .where('user_id', user_id)
+      .del()
+      .returning('*');
+
+    res.json({
+      success: true,
+      message: `Deleted ${result.length} notification(s)`,
+      data: {
+        count: result.length
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting all notifications:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting notifications',
       error: error.message
     });
   }

@@ -20,7 +20,7 @@ class ApiConfig {
       try {
         if (Platform.isAndroid) {
           // Android emulator - use 10.0.2.2 to access host machine
-          return 'http://10.0.2.2:5000';
+          return 'http://10.12.151.38:5000';
         } else {
           // iOS simulator or physical device - use localhost
           // For physical devices, you may need to change this to your computer's IP

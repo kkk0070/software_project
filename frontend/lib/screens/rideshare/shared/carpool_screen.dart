@@ -3,6 +3,8 @@ import 'package:animate_do/animate_do.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../../theme/app_theme.dart';
+import 'carpool_search_screen.dart';
+import 'carpool_detail_screen.dart';
 
 /// Enhanced Carpool Screen
 /// Features:
@@ -25,11 +27,15 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
   TimeOfDay _selectedTime = TimeOfDay.now();
   final TextEditingController _pickupController = TextEditingController();
   final TextEditingController _dropoffController = TextEditingController();
+  final TextEditingController _searchPickupController = TextEditingController();
+  final TextEditingController _searchDropoffController = TextEditingController();
+  List<Map<String, dynamic>> _filteredCarpoolRequests = [];
   
   // Sample carpool requests data
   final List<Map<String, dynamic>> _carpoolRequests = [
     {
       'id': 1,
+      'driverId': 101,
       'pickup': 'Downtown Plaza',
       'dropoff': 'Airport Terminal 2',
       'date': 'Today, 2:30 PM',
@@ -38,9 +44,13 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
       'driver': 'John D.',
       'rating': 4.8,
       'carbonSaved': '2.1 kg CO₂',
+      'distance': '15.2 km',
+      'duration': '28 min',
+      'tripCount': 245,
     },
     {
       'id': 2,
+      'driverId': 102,
       'pickup': 'University Campus',
       'dropoff': 'Shopping Mall',
       'date': 'Tomorrow, 10:00 AM',
@@ -49,9 +59,13 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
       'driver': 'Sarah M.',
       'rating': 4.9,
       'carbonSaved': '1.8 kg CO₂',
+      'distance': '10.5 km',
+      'duration': '18 min',
+      'tripCount': 312,
     },
     {
       'id': 3,
+      'driverId': 103,
       'pickup': 'Tech Park',
       'dropoff': 'Central Station',
       'date': 'Today, 5:45 PM',
@@ -60,6 +74,9 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
       'driver': 'Mike R.',
       'rating': 4.7,
       'carbonSaved': '1.5 kg CO₂',
+      'distance': '12.8 km',
+      'duration': '22 min',
+      'tripCount': 189,
     },
   ];
 
@@ -67,6 +84,9 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _filteredCarpoolRequests = _carpoolRequests; // Initialize with all rides
+    _searchPickupController.addListener(_filterRides);
+    _searchDropoffController.addListener(_filterRides);
   }
 
   @override
@@ -74,7 +94,30 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
     _tabController.dispose();
     _pickupController.dispose();
     _dropoffController.dispose();
+    _searchPickupController.dispose();
+    _searchDropoffController.dispose();
     super.dispose();
+  }
+
+  void _filterRides() {
+    final pickupQuery = _searchPickupController.text.toLowerCase();
+    final dropoffQuery = _searchDropoffController.text.toLowerCase();
+    
+    setState(() {
+      if (pickupQuery.isEmpty && dropoffQuery.isEmpty) {
+        _filteredCarpoolRequests = _carpoolRequests;
+      } else {
+        _filteredCarpoolRequests = _carpoolRequests.where((ride) {
+          final pickup = ride['pickup'].toString().toLowerCase();
+          final dropoff = ride['dropoff'].toString().toLowerCase();
+          
+          final pickupMatch = pickupQuery.isEmpty || pickup.contains(pickupQuery);
+          final dropoffMatch = dropoffQuery.isEmpty || dropoff.contains(dropoffQuery);
+          
+          return pickupMatch && dropoffMatch; // AND logic - both must match
+        }).toList();
+      }
+    });
   }
 
   @override
@@ -98,6 +141,25 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.search,
+              color: isDark ? Colors.white : AppTheme.textDark,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CarpoolSearchScreen(
+                    userRole: widget.userRole,
+                  ),
+                ),
+              );
+            },
+            tooltip: 'Search Carpools',
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppTheme.primaryGreen,
@@ -155,6 +217,82 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
                   ),
                 ],
               ),
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Quick access to search carpools
+          FadeInDown(
+            delay: const Duration(milliseconds: 50),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CarpoolSearchScreen(
+                        userRole: widget.userRole,
+                      ),
+                    ),
+                  );
+                },
+                icon: Icon(
+                  Icons.search,
+                  color: AppTheme.primaryGreen,
+                  size: 20,
+                ),
+                label: Text(
+                  'Search Available Carpools',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primaryGreen,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AppTheme.primaryGreen, width: 2),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // OR divider
+          FadeInDown(
+            delay: const Duration(milliseconds: 75),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Divider(
+                    color: isDark ? Colors.grey[700] : Colors.grey[300],
+                    thickness: 1,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    'OR',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Divider(
+                    color: isDark ? Colors.grey[700] : Colors.grey[300],
+                    thickness: 1,
+                  ),
+                ),
+              ],
             ),
           ),
           
@@ -336,24 +474,166 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
   }
 
   Widget _buildAvailableRidesTab(bool isDark) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _carpoolRequests.length,
-      itemBuilder: (context, index) {
-        final request = _carpoolRequests[index];
-        return FadeInUp(
-          delay: Duration(milliseconds: 100 * index),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: isDark ? AppTheme.cardDark : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: AppTheme.primaryGreen.withOpacity(0.2),
-              ),
+    return Column(
+      children: [
+        // Pickup location search
+        Container(
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          decoration: BoxDecoration(
+            color: isDark ? AppTheme.cardDark : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
             ),
-            child: Column(
+          ),
+          child: TextField(
+            controller: _searchPickupController,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Search pickup location...',
+              hintStyle: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+              prefixIcon: Icon(
+                Icons.location_on,
+                color: AppTheme.primaryGreen,
+              ),
+              suffixIcon: _searchPickupController.text.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.clear,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                      onPressed: () {
+                        _searchPickupController.clear();
+                      },
+                    )
+                  : null,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              filled: true,
+              fillColor: isDark ? AppTheme.cardDark : Colors.white,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            ),
+          ),
+        ),
+        
+        // Drop-off location search
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
+          decoration: BoxDecoration(
+            color: isDark ? AppTheme.cardDark : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+            ),
+          ),
+          child: TextField(
+            controller: _searchDropoffController,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Search drop-off location...',
+              hintStyle: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+              prefixIcon: Icon(
+                Icons.flag,
+                color: AppTheme.primaryGreen,
+              ),
+              suffixIcon: _searchDropoffController.text.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.clear,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                      onPressed: () {
+                        _searchDropoffController.clear();
+                      },
+                    )
+                  : null,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              filled: true,
+              fillColor: isDark ? AppTheme.cardDark : Colors.white,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            ),
+          ),
+        ),
+        
+        // Info banner
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryGreen.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppTheme.primaryGreen.withOpacity(0.2),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.touch_app,
+                color: AppTheme.primaryGreen,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Tap on any carpool to view full details and chat with driver',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? Colors.grey[300] : Colors.grey[800],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        // List of carpools or empty state
+        Expanded(
+          child: _filteredCarpoolRequests.isEmpty
+              ? _buildEmptySearchState(isDark)
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: _filteredCarpoolRequests.length,
+                  itemBuilder: (context, index) {
+                    final request = _filteredCarpoolRequests[index];
+                    return FadeInUp(
+          delay: Duration(milliseconds: 100 * index),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CarpoolDetailScreen(
+                    carpoolData: request,
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: isDark ? AppTheme.cardDark : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                ),
+              ),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header with driver info
@@ -535,8 +815,70 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
               ],
             ),
           ),
+          ),
         );
       },
+    ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptySearchState(bool isDark) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search_off,
+            size: 80,
+            color: isDark ? Colors.grey[700] : Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No rides found',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              'Try adjusting your pickup or drop-off location filters',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () {
+              _searchPickupController.clear();
+              _searchDropoffController.clear();
+            },
+            icon: const Icon(Icons.clear, color: Colors.black),
+            label: const Text(
+              'Clear Filters',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryGreen,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

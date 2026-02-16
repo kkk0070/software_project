@@ -1,4 +1,5 @@
 import { knex } from '../../config/database.js';
+import { createPostResponse } from '../../utils/responseHelper.js';
 
 // Get all emergency incidents
 export const getAllIncidents = async (req, res) => {
@@ -64,18 +65,22 @@ export const createIncident = async (req, res) => {
       })
       .returning('*');
 
-    res.status(201).json({
+    res.status(201).json(createPostResponse({
       success: true,
       message: 'Incident created successfully',
-      data: incident
-    });
+      data: incident,
+      requestBody: req.body
+    }));
   } catch (error) {
     console.error('Error creating incident:', error);
-    res.status(500).json({
+    res.status(500).json(createPostResponse({
       success: false,
       message: 'Error creating incident',
-      error: error.message
-    });
+      data: {
+        error: error.message
+      },
+      requestBody: req.body
+    }));
   }
 };
 

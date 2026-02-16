@@ -2,18 +2,39 @@
 import 'package:flutter/material.dart';
 // Provider package for state management across the app
 import 'package:provider/provider.dart';
+// Firebase core for push notifications
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'firebase_options.dart';
 // Custom theme configuration for light and dark modes
 import 'theme/app_theme.dart';
 // Initial landing screen shown to users
 import 'screens/rideshare/shared/landing_screen.dart';
 // Theme provider for managing app theme state
 import 'providers/theme_provider.dart';
+// Push notification service
+import 'services/push_notification_service.dart';
 
 /// Main entry point of the EcoRide Flutter application
 /// Initializes the app and sets up the theme provider
 void main() async {
   // Ensures Flutter bindings are initialized before running async operations
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    
+    // Set up background message handler
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    
+    print('Firebase initialized successfully');
+  } catch (e) {
+    print('Error initializing Firebase: $e');
+    // Continue app initialization even if Firebase fails
+  }
   
   // Create a new instance of the theme provider to manage app theme
   final themeProvider = ThemeProvider();
@@ -32,8 +53,29 @@ void main() async {
 
 /// Root widget of the EcoRide application
 /// Sets up MaterialApp with theme support and initial screen
-class EcoRideApp extends StatelessWidget {
+class EcoRideApp extends StatefulWidget {
   const EcoRideApp({super.key});
+
+  @override
+  State<EcoRideApp> createState() => _EcoRideAppState();
+}
+
+class _EcoRideAppState extends State<EcoRideApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize push notifications after the app starts
+    _initializePushNotifications();
+  }
+
+  Future<void> _initializePushNotifications() async {
+    try {
+      await PushNotificationService.initialize();
+      print('Push notifications initialized in main app');
+    } catch (e) {
+      print('Error initializing push notifications in main: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

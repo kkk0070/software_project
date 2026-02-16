@@ -11,6 +11,7 @@ class StorageService {
   static const String _userNameKey = 'user_name';
   static const String _userRoleKey = 'user_role';
   static const String _themeModeKey = 'theme_mode';
+  static const String _fcmTokenKey = 'fcm_token';
   
   // Save authentication token
   static Future<void> saveToken(String token) async {
@@ -25,6 +26,16 @@ class StorageService {
   // Delete authentication token
   static Future<void> deleteToken() async {
     await _storage.delete(key: _tokenKey);
+  }
+  
+  // Save FCM token
+  static Future<void> saveFCMToken(String token) async {
+    await _storage.write(key: _fcmTokenKey, value: token);
+  }
+  
+  // Get FCM token
+  static Future<String?> getFCMToken() async {
+    return await _storage.read(key: _fcmTokenKey);
   }
   
   // Save user data
