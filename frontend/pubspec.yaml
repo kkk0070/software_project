@@ -70,9 +70,19 @@ dependencies:
   # Shared Preferences for theme persistence
   shared_preferences: ^2.2.2
   
-  # File Picker for documents
-  file_picker: ^6.1.1
-  image_picker: ^1.0.7
+  # Push Notifications
+  firebase_core: ^4.4.0
+  firebase_messaging: ^16.1.1
+  flutter_local_notifications: ^17.2.3
+  
+  # File Picker for documents - upgraded to v2 embedding compatible version
+  file_picker: ^8.0.0
+  # Image Picker - upgraded to ensure v2 embedding compatibility
+  image_picker: ^1.1.0
+
+  # PDF generation and sharing
+  pdf: ^3.11.3
+  printing: ^5.14.2
 
 dev_dependencies:
   flutter_test:

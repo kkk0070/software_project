@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/storage_service.dart';
 import '../../../services/chat_service.dart';
+import '../../../services/ride_service.dart';
+import '../../../providers/active_ride_provider.dart';
 import '../shared/chat_conversation_screen.dart';
 
 class DriverProfileDetailScreen extends StatefulWidget {
@@ -122,98 +125,82 @@ class _DriverProfileDetailScreenState extends State<DriverProfileDetailScreen> {
       final currentUserId = await StorageService.getUserId();
       if (currentUserId == null) {
         _showError('User not logged in');
+        setState(() => _isBooking = false);
         return;
       }
 
-      // Simulate booking API call (replace with actual implementation)
-      await Future.delayed(const Duration(seconds: 2));
+      final driverId = widget.driver['id'] as int?;
+      if (driverId == null) {
+        _showError('Driver information missing');
+        setState(() => _isBooking = false);
+        return;
+      }
+
+      // Call the real ride booking API
+      final result = await RideService.createRide(
+        riderId: currentUserId,
+        driverId: driverId,
+        pickupLocation: widget.pickupLocation!,
+        dropoffLocation: widget.destinationLocation!,
+        rideType: widget.driver['vehicle_type'] ?? 'Economy',
+        fare: 50.0,
+      );
 
       if (!mounted) return;
+      setState(() => _isBooking = false);
 
-      setState(() {
-        _isBooking = false;
-      });
+      if (result['success'] == true) {
+        // Update the global active ride state
+        final rideData = result['data'] ?? {};
+        final rideId = (rideData['id'] ?? 0) as int;
 
-      final isDark = Theme.of(context).brightness == Brightness.dark;
+        if (mounted) {
+          context.read<ActiveRideProvider>().bookRide(
+            rideId: rideId,
+            driverName: widget.driver['name'] ?? 'Driver',
+            vehicleModel: widget.driver['vehicle_model'] ?? '',
+            vehicleType: widget.driver['vehicle_type'] ?? '',
+            licensePlate: widget.driver['license_plate'] ?? '',
+            pickupLocation: widget.pickupLocation!,
+            dropoffLocation: widget.destinationLocation!,
+            // rating may arrive as a String (e.g. "0.00") from the Knex/pg
+            // driver for PostgreSQL DECIMAL columns, so parse it safely.
+            rating: double.tryParse(widget.driver['rating']?.toString() ?? '') ?? 0.0,
+          );
+        }
 
-      // Show success dialog
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: isDark ? AppTheme.cardDark : Colors.white,
-          title: Row(
-            children: [
-              Icon(
-                Icons.check_circle,
-                color: AppTheme.primaryGreen,
-                size: 32,
+        // Pop back to home so the rider sees the floating pill.
+        // RiderBookingScreen lives inside RideshareHomeScreen's IndexedStack —
+        // it is NOT a separate route, so only one pop is needed.
+        if (mounted) {
+          Navigator.of(context).pop(); // Close DriverProfileDetailScreen
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.black),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Ride booked with ${widget.driver['name'] ?? 'driver'}! Waiting for confirmation…',
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Text(
-                'Booking Confirmed!',
-                style: TextStyle(
-                  color: isDark ? Colors.white : Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Your ride with ${widget.driver['name']} has been booked successfully.',
-                style: TextStyle(
-                  color: isDark ? Colors.grey[300] : Colors.grey[700],
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isDark ? AppTheme.backgroundDark : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildBookingDetail('From', widget.pickupLocation!),
-                    const SizedBox(height: 8),
-                    _buildBookingDetail('To', widget.destinationLocation!),
-                    const SizedBox(height: 8),
-                    _buildBookingDetail('Driver', widget.driver['name']),
-                    const SizedBox(height: 8),
-                    _buildBookingDetail('Vehicle', widget.driver['vehicle_model'] ?? 'N/A'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Go back to booking screen
-              },
-              child: Text(
-                'OK',
-                style: TextStyle(
-                  color: AppTheme.primaryGreen,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+              backgroundColor: AppTheme.primaryGreen,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-          ],
-        ),
-      );
+          );
+        }
+      } else {
+        _showError(result['message'] ?? 'Failed to book ride');
+      }
     } catch (e) {
-      setState(() {
-        _isBooking = false;
-      });
+      setState(() => _isBooking = false);
       _showError('Error booking ride: $e');
     }
   }

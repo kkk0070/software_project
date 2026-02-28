@@ -4,12 +4,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/chat_service.dart';
+import '../../../services/ride_service.dart';
+import '../../../services/storage_service.dart';
 import '../shared/notifications_screen.dart';
 import '../shared/document_upload_screen.dart';
 import '../shared/carpool_screen.dart';
 import '../shared/profile_setup_screen.dart';
 import 'driver_earnings_screen.dart';
 import 'driver_online_stats_screen.dart';
+import 'driver_ride_requests_screen.dart';
 
 /// Driver Home Dashboard Screen
 /// Features:
@@ -31,6 +34,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   bool _profileSetupComplete = false; // Default to false until loaded
   bool _isLoading = true;
   int _unreadChatCount = 0;
+  int _pendingRidesCount = 0;
   late bool isDark;
 
   @override
@@ -38,6 +42,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     super.initState();
     _loadProfile();
     _loadUnreadCount();
+    _loadPendingRidesCount();
   }
 
   Future<void> _loadProfile() async {
@@ -54,6 +59,24 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _loadPendingRidesCount() async {
+    try {
+      final driverId = await StorageService.getUserId();
+      if (driverId == null) return;
+      final result = await RideService.getRides(driverId: driverId.toString(), status: 'Pending');
+      if (result['success'] == true && result['data'] != null) {
+        final rides = result['data'] as List;
+        if (mounted) {
+          setState(() {
+            _pendingRidesCount = rides.length;
+          });
+        }
+      }
+    } catch (e) {
+      // Silently fail
     }
   }
 
@@ -93,6 +116,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                   children: [
                     // Online/Offline Toggle
                     _buildStatusToggle(),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Ride Requests Banner
+                    _buildRideRequestsBanner(),
                     
                     const SizedBox(height: 16),
                     
@@ -361,6 +389,114 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRideRequestsBanner() {
+    return FadeInDown(
+      delay: const Duration(milliseconds: 150),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const DriverRideRequestsScreen(),
+            ),
+          ).then((_) => _loadPendingRidesCount());
+        },
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: _pendingRidesCount > 0
+                ? AppTheme.primaryGreen.withOpacity(0.15)
+                : (isDark ? AppTheme.cardDark : Colors.white),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: _pendingRidesCount > 0
+                  ? AppTheme.primaryGreen
+                  : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
+            ),
+          ),
+          child: Row(
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryGreen.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      FontAwesomeIcons.carSide,
+                      color: AppTheme.primaryGreen,
+                      size: 20,
+                    ),
+                  ),
+                  if (_pendingRidesCount > 0)
+                    Positioned(
+                      right: -4,
+                      top: -4,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isDark ? AppTheme.cardDark : Colors.white,
+                            width: 2,
+                          ),
+                        ),
+                        child: Text(
+                          '$_pendingRidesCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _pendingRidesCount > 0
+                          ? '$_pendingRidesCount Ride Request${_pendingRidesCount > 1 ? 's' : ''} Waiting'
+                          : 'Ride Requests',
+                      style: TextStyle(
+                        color: isDark ? Colors.white : AppTheme.textDark,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      _pendingRidesCount > 0
+                          ? 'Tap to view and respond to ride requests'
+                          : 'No pending ride requests',
+                      style: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: AppTheme.primaryGreen,
+                size: 16,
+              ),
+            ],
+          ),
         ),
       ),
     );
