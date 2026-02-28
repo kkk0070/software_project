@@ -12,6 +12,8 @@ import 'theme/app_theme.dart';
 import 'screens/rideshare/shared/landing_screen.dart';
 // Theme provider for managing app theme state
 import 'providers/theme_provider.dart';
+// Active ride provider for tracking in-progress rides
+import 'providers/active_ride_provider.dart';
 // Push notification service
 import 'services/push_notification_service.dart';
 
@@ -43,9 +45,11 @@ void main() async {
   
   // Start the Flutter application with the theme provider
   runApp(
-    // Wrap the app with ChangeNotifierProvider to make theme provider available app-wide
-    ChangeNotifierProvider.value(
-      value: themeProvider,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: themeProvider),
+        ChangeNotifierProvider(create: (_) => ActiveRideProvider()),
+      ],
       child: const EcoRideApp(),
     ),
   );

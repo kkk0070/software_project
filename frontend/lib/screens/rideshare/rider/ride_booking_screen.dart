@@ -6,6 +6,7 @@ import '../../../theme/app_theme.dart';
 import '../../../utils/user_profile_loader.dart';
 import '../../../services/user_service.dart';
 import '../../../services/storage_service.dart';
+import '../../../services/ride_service.dart';
 import '../shared/emergency_screen.dart';
 import '../shared/notifications_screen.dart';
 import '../shared/ride_pooling_screen.dart';
@@ -13,6 +14,7 @@ import '../shared/live_tracking_screen.dart';
 import '../shared/rewards_screen.dart';
 import '../shared/sustainability_dashboard_screen.dart';
 import '../shared/carpool_screen.dart';
+import '../shared/rides_history_screen.dart';
 import '../shared/profile_setup_screen.dart';
 import '../driver/driver_profile_detail_screen.dart';
 
@@ -39,16 +41,15 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
   final _searchController = TextEditingController();
   List<Map<String, dynamic>> _availableDrivers = [];
   bool _loadingDrivers = false;
-  
-  // Sample data for weekly CO2 trend chart (should be replaced with actual data)
-  static const List<FlSpot> _weeklyTrendData = [
-    FlSpot(0, 2),
-    FlSpot(1, 4),
-    FlSpot(2, 3),
-    FlSpot(3, 5),
-    FlSpot(4, 4),
-    FlSpot(5, 6),
-    FlSpot(6, 5.5),
+
+  // Rider stats
+  int _rideCount = 0;
+  int _dayStreak = 0;
+  int _badgeCount = 0;
+  bool _loadingStats = false;
+  List<FlSpot> _weeklyTrendData = const [
+    FlSpot(0, 0), FlSpot(1, 0), FlSpot(2, 0),
+    FlSpot(3, 0), FlSpot(4, 0), FlSpot(5, 0), FlSpot(6, 0),
   ];
 
   @override
@@ -56,6 +57,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
     super.initState();
     loadUserProfile();
     _loadAvailableDrivers();
+    _loadRiderStats();
   }
 
   Future<void> _loadAvailableDrivers() async {
@@ -89,6 +91,78 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
       setState(() {
         _loadingDrivers = false;
       });
+    }
+  }
+
+  /// Load rider stats: total rides, day streak, and earned badges
+  Future<void> _loadRiderStats() async {
+    setState(() => _loadingStats = true);
+    try {
+      final riderId = await StorageService.getUserId();
+      if (riderId == null) {
+        setState(() => _loadingStats = false);
+        return;
+      }
+
+      final result = await RideService.getRides(riderId: riderId.toString());
+      if (result['success'] == true && result['data'] != null) {
+        final rides = List<Map<String, dynamic>>.from(result['data']);
+        final completed = rides.where((r) => r['status'] == 'Completed').toList();
+
+        // Total rides
+        final count = completed.length;
+
+        // Day streak: count consecutive days ending today with at least one completed ride
+        // Also build a map of date -> ride count for the weekly trend
+        final rideDayCounts = <DateTime, int>{};
+        for (final r in completed) {
+          final raw = r['created_at'] ?? r['date'] ?? '';
+          if (raw.toString().isEmpty) continue;
+          try {
+            final d = DateTime.parse(raw.toString()).toLocal();
+            final day = DateTime(d.year, d.month, d.day);
+            rideDayCounts[day] = (rideDayCounts[day] ?? 0) + 1;
+          } catch (_) {
+            // skip unparseable dates
+          }
+        }
+
+        int streak = 0;
+        DateTime day = DateTime.now();
+        day = DateTime(day.year, day.month, day.day);
+        while (rideDayCounts.containsKey(day)) {
+          streak++;
+          day = day.subtract(const Duration(days: 1));
+        }
+
+        // Badges: 1 badge per milestone (10 rides = eco warrior, 25 = road champ, 50 = carpool hero)
+        int badges = 0;
+        if (count >= 10) badges++;
+        if (count >= 25) badges++;
+        if (count >= 50) badges++;
+
+        // Weekly trend: actual ride count per day for last 7 days
+        final today = DateTime.now();
+        final spots = List.generate(7, (i) {
+          final d = DateTime(today.year, today.month, today.day)
+              .subtract(Duration(days: 6 - i));
+          return FlSpot(i.toDouble(), (rideDayCounts[d] ?? 0).toDouble());
+        });
+
+        if (mounted) {
+          setState(() {
+            _rideCount = count;
+            _dayStreak = streak;
+            _badgeCount = badges;
+            _weeklyTrendData = spots;
+            _loadingStats = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _loadingStats = false);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _loadingStats = false);
     }
   }
 
@@ -180,6 +254,13 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
     );
   }
 
+  String _timeBasedGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good morning,';
+    if (hour < 17) return 'Good afternoon,';
+    return 'Good evening,';
+  }
+
   Widget _buildTopBar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return FadeInDown(
@@ -217,7 +298,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Good morning,',
+                      _timeBasedGreeting(),
                       style: TextStyle(
                         fontSize: 12,
                         color: AppTheme.primaryGreen.withOpacity(0.7),
@@ -271,29 +352,41 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
       child: Row(
         children: [
           Expanded(
-            child: _buildStatChip(
-              icon: FontAwesomeIcons.car,
-              value: '28',
-              label: 'Rides',
-              color: AppTheme.accentBlue,
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const RidesHistoryScreen()),
+              ),
+              child: _buildStatChip(
+                icon: FontAwesomeIcons.car,
+                value: _loadingStats ? '…' : '$_rideCount',
+                label: 'Rides',
+                color: AppTheme.accentBlue,
+              ),
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: _buildStatChip(
               icon: FontAwesomeIcons.fire,
-              value: '7',
+              value: _loadingStats ? '…' : '$_dayStreak',
               label: 'Day Streak',
               color: AppTheme.warningOrange,
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: _buildStatChip(
-              icon: FontAwesomeIcons.trophy,
-              value: '3',
-              label: 'Badges',
-              color: AppTheme.ecoGold,
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const RewardsScreen()),
+              ),
+              child: _buildStatChip(
+                icon: FontAwesomeIcons.trophy,
+                value: _loadingStats ? '…' : '$_badgeCount',
+                label: 'Badges',
+                color: AppTheme.ecoGold,
+              ),
             ),
           ),
         ],
