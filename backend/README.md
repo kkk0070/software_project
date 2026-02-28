@@ -66,11 +66,12 @@ Copy the example environment file:
 cp .env.example .env
 ```
 
-Edit `.env` file with your PostgreSQL credentials:
+Edit `.env` file with your PostgreSQL credentials and email settings:
 
 ```env
 # Server Configuration
 PORT=5000
+HOST=0.0.0.0
 NODE_ENV=development
 
 # Database Configuration
@@ -80,28 +81,54 @@ DB_NAME=ecoride_db
 DB_USER=postgres
 DB_PASSWORD=your_actual_password
 
-# JWT Configuration (for future auth implementation)
+# JWT Configuration
 JWT_SECRET=your_secure_random_secret_key
 JWT_EXPIRE=24h
 
 # CORS Configuration
 CORS_ORIGIN=http://localhost:5173
+
+# Email Configuration (required for 2FA OTP emails)
+# For Gmail: use an App Password - https://myaccount.google.com/apppasswords
+EMAIL_SERVICE=gmail
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASSWORD=your_app_specific_password
+EMAIL_FROM_NAME=SePro App
 ```
 
-**Important:** Replace `your_actual_password` with your PostgreSQL password.
+> **Important:** Replace `your_actual_password` with your PostgreSQL password.  
+> **Note:** If email is not configured, OTPs are printed to the server console so 2FA still works locally.
 
 ### 5. Initialize Database Tables
 
-Run the database initialization script to create tables and seed initial data:
+Run the database initialization script to create all tables and seed initial sample data:
 
 ```bash
 npm run init-db
 ```
 
 This will:
-- Create all necessary tables (users, drivers, rides, emergency_incidents, etc.)
-- Insert sample data for testing
-- Create an admin user (email: admin@ecoride.com)
+- Create all necessary tables (users, drivers, rides, emergency_incidents, notifications, chat, etc.)
+- Insert sample riders, drivers, and an admin user
+- Apply column additions for lat/lng and ride_type constraints automatically
+
+### 6. Run All Database Migrations
+
+Apply incremental schema updates (2FA fields, chat tables, encryption fields, profile photos, etc.):
+
+```bash
+npm run migrate-all
+```
+
+> This is safe to run multiple times — every migration checks `IF NOT EXISTS` before making changes.
+
+### 7. (Optional) Seed Dummy Data
+
+Populate the database with realistic sample rides, drivers, and conversations for development/testing:
+
+```bash
+npm run seed-dummy
+```
 
 ## 🚦 Running the Server
 
@@ -118,6 +145,39 @@ npm start
 ```
 
 The server will start on `http://localhost:5000` (or the port specified in `.env`).
+
+## ⚡ Complete Setup Checklist
+
+Run these commands in order before starting the server for the first time:
+
+```bash
+# 1. Go to backend folder
+cd backend
+
+# 2. Install Node.js dependencies
+npm install
+
+# 3. Create PostgreSQL database (run in psql or pgAdmin)
+#    CREATE DATABASE ecoride_db;
+
+# 4. Copy and fill in the environment file
+cp .env.example .env
+#    Then edit .env with your DB password and email credentials
+
+# 5. Create all database tables and insert sample data
+npm run init-db
+
+# 6. Apply all incremental schema migrations (2FA, chat, encryption, etc.)
+npm run migrate-all
+
+# 7. (Optional) Add more realistic sample data
+npm run seed-dummy
+
+# 8. Start the server
+npm run dev    # development — auto-restarts on changes
+# or
+npm start      # production
+```
 
 ## 📡 API Endpoints
 

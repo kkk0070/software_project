@@ -13,7 +13,7 @@ import { createPostResponse } from '../../utils/responseHelper.js';
 export const getAllRides = async (req, res) => {
   try {
     // Extract query parameters for filtering
-    const { status, ride_type, from_date, to_date } = req.query;
+    const { status, ride_type, from_date, to_date, driver_id, rider_id } = req.query;
     
     // Build complex query joining rides with users (riders/drivers) and vehicles
     let queryBuilder = knex('rides as r')
@@ -39,6 +39,16 @@ export const getAllRides = async (req, res) => {
     // Apply ride type filter (solo, carpool, etc.)
     if (ride_type && ride_type !== 'all') {
       queryBuilder = queryBuilder.where('r.ride_type', ride_type);
+    }
+
+    // Apply driver_id filter to get rides for a specific driver
+    if (driver_id) {
+      queryBuilder = queryBuilder.where('r.driver_id', driver_id);
+    }
+
+    // Apply rider_id filter to get rides for a specific rider
+    if (rider_id) {
+      queryBuilder = queryBuilder.where('r.rider_id', rider_id);
     }
 
     // Apply date range filters for analytics
@@ -133,22 +143,27 @@ export const createRide = async (req, res) => {
       ride_type, fare, distance, scheduled_time
     } = req.body;
 
+    // Build insert object — only include lat/lng fields when the caller provides
+    // actual values so Knex never sends DEFAULT for a column that may not exist
+    // in databases created before those columns were added to the schema.
+    const insertData = {
+      rider_id,
+      driver_id,
+      pickup_location,
+      dropoff_location,
+      ride_type,
+      fare,
+      distance,
+      scheduled_time,
+      status: 'Pending'
+    };
+    if (pickup_lat != null) insertData.pickup_lat = pickup_lat;
+    if (pickup_lng != null) insertData.pickup_lng = pickup_lng;
+    if (dropoff_lat != null) insertData.dropoff_lat = dropoff_lat;
+    if (dropoff_lng != null) insertData.dropoff_lng = dropoff_lng;
+
     const [ride] = await knex('rides')
-      .insert({
-        rider_id,
-        driver_id,
-        pickup_location,
-        dropoff_location,
-        pickup_lat,
-        pickup_lng,
-        dropoff_lat,
-        dropoff_lng,
-        ride_type,
-        fare,
-        distance,
-        scheduled_time,
-        status: 'Pending'
-      })
+      .insert(insertData)
       .returning('*');
 
     // Get rider and driver information
@@ -295,6 +310,112 @@ export const deleteRide = async (req, res) => {
       message: 'Error deleting ride',
       error: error.message
     });
+  }
+};
+
+// Driver accepts a ride request
+export const acceptRide = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await knex('rides')
+      .where('id', id)
+      .update({ status: 'Active', updated_at: knex.fn.now() })
+      .returning('*');
+
+    if (result.length === 0) {
+      return res.status(404).json({ success: false, message: 'Ride not found' });
+    }
+
+    // Notify rider that their ride was accepted
+    try {
+      const ride = result[0];
+      if (ride.rider_id) {
+        const [notification] = await knex('notifications')
+          .insert({
+            user_id: ride.rider_id,
+            title: 'Ride Accepted',
+            message: 'Your driver has accepted your ride request.',
+            type: 'Info',
+            category: 'Ride'
+          })
+          .returning('*');
+        sendNotificationToUser(ride.rider_id, { ...notification, ride_id: ride.id });
+      }
+    } catch (notifyError) {
+      console.error('Error sending accept notification:', notifyError);
+    }
+
+    res.json({ success: true, message: 'Ride accepted', data: result[0] });
+  } catch (error) {
+    console.error('Error accepting ride:', error);
+    res.status(500).json({ success: false, message: 'Error accepting ride', error: error.message });
+  }
+};
+
+// Driver rejects a ride request
+export const rejectRide = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await knex('rides')
+      .where('id', id)
+      .update({ status: 'Cancelled', updated_at: knex.fn.now() })
+      .returning('*');
+
+    if (result.length === 0) {
+      return res.status(404).json({ success: false, message: 'Ride not found' });
+    }
+
+    // Notify rider that their ride was rejected
+    try {
+      const ride = result[0];
+      if (ride.rider_id) {
+        const [notification] = await knex('notifications')
+          .insert({
+            user_id: ride.rider_id,
+            title: 'Ride Unavailable',
+            message: 'The driver could not accept your ride. Please book another driver.',
+            type: 'Warning',
+            category: 'Ride'
+          })
+          .returning('*');
+        sendNotificationToUser(ride.rider_id, { ...notification, ride_id: ride.id });
+      }
+    } catch (notifyError) {
+      console.error('Error sending reject notification:', notifyError);
+    }
+
+    res.json({ success: true, message: 'Ride rejected', data: result[0] });
+  } catch (error) {
+    console.error('Error rejecting ride:', error);
+    res.status(500).json({ success: false, message: 'Error rejecting ride', error: error.message });
+  }
+};
+
+// Submit a rating for a completed ride
+export const rateRide = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating, feedback, rated_by } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ success: false, message: 'Rating must be between 1 and 5' });
+    }
+
+    const result = await knex('rides')
+      .where('id', id)
+      .update({ rating, updated_at: knex.fn.now() })
+      .returning('*');
+
+    if (result.length === 0) {
+      return res.status(404).json({ success: false, message: 'Ride not found' });
+    }
+
+    res.json({ success: true, message: 'Rating submitted successfully', data: result[0] });
+  } catch (error) {
+    console.error('Error rating ride:', error);
+    res.status(500).json({ success: false, message: 'Error submitting rating', error: error.message });
   }
 };
 

@@ -64,7 +64,7 @@ const createTables = async () => {
         pickup_lng DECIMAL(11, 8),
         dropoff_lat DECIMAL(10, 8),
         dropoff_lng DECIMAL(11, 8),
-        ride_type VARCHAR(50) DEFAULT 'Solo' CHECK (ride_type IN ('Solo', 'Pool', 'EV')),
+        ride_type VARCHAR(50) DEFAULT 'Economy' CHECK (ride_type IN ('Solo', 'Pool', 'EV', 'Economy', 'Comfort', 'Premium', 'Standard')),
         status VARCHAR(50) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Active', 'Completed', 'Cancelled')),
         fare DECIMAL(10,2),
         distance DECIMAL(10,2),
@@ -79,6 +79,27 @@ const createTables = async () => {
       );
     `);
     console.log('[SUCCESS] Rides table created');
+
+    // Add lat/lng columns to rides if they were created before these columns existed
+    await client.query(`
+      ALTER TABLE rides
+        ADD COLUMN IF NOT EXISTS pickup_lat DECIMAL(10, 8),
+        ADD COLUMN IF NOT EXISTS pickup_lng DECIMAL(11, 8),
+        ADD COLUMN IF NOT EXISTS dropoff_lat DECIMAL(10, 8),
+        ADD COLUMN IF NOT EXISTS dropoff_lng DECIMAL(11, 8);
+    `);
+    console.log('[SUCCESS] Rides table lat/lng columns ensured');
+
+    // Expand ride_type CHECK constraint to include app-facing values
+    // (Economy, Comfort, Premium) in case the table was created with the old
+    // narrower constraint that only allowed Solo, Pool, EV.
+    await client.query(`
+      ALTER TABLE rides DROP CONSTRAINT IF EXISTS rides_ride_type_check;
+      ALTER TABLE rides
+        ADD CONSTRAINT rides_ride_type_check
+        CHECK (ride_type IN ('Solo', 'Pool', 'EV', 'Economy', 'Comfort', 'Premium', 'Standard'));
+    `);
+    console.log('[SUCCESS] Rides ride_type constraint updated');
 
     // Emergency incidents table
     await client.query(`
