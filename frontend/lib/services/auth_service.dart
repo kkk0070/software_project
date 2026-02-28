@@ -70,7 +70,8 @@ class AuthService {
       // Check if login was successful
       if (response.statusCode == 200 && data['success'] == true) {
         // Check if user has 2FA enabled - requires OTP verification
-        if (data['requires2FA'] == true) {
+        // requires2FA is nested inside data['data'], not at the top level
+        if (data['data']?['requires2FA'] == true) {
           return {
             'success': true,
             'requires2FA': true,
