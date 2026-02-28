@@ -618,11 +618,16 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                     );
                     
+                    // Use the actual role from the API response, not the default _selectedRole
+                    final verifiedRole = (result['user'] != null && result['user']['role'] != null)
+                        ? result['user']['role'] as String
+                        : _selectedRole;
+                    
                     // Navigate to home
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RideshareHomeScreen(userRole: _selectedRole.toLowerCase()),
+                        builder: (context) => RideshareHomeScreen(userRole: verifiedRole.toLowerCase()),
                       ),
                     );
                   } else {

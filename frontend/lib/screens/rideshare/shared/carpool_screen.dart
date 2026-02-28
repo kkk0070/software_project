@@ -30,7 +30,12 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
   final TextEditingController _searchPickupController = TextEditingController();
   final TextEditingController _searchDropoffController = TextEditingController();
   List<Map<String, dynamic>> _filteredCarpoolRequests = [];
-  
+
+  // Filter state
+  bool _filterEvOnly = false;
+  int? _filterMinSeats;   // null = any; 1, 2, 3+ values
+  String _sortBy = 'default'; // 'default' | 'price' | 'rating'
+
   // Sample carpool requests data
   final List<Map<String, dynamic>> _carpoolRequests = [
     {
@@ -47,6 +52,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
       'distance': '15.2 km',
       'duration': '28 min',
       'tripCount': 245,
+      'vehicleType': 'EV',
     },
     {
       'id': 2,
@@ -62,6 +68,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
       'distance': '10.5 km',
       'duration': '18 min',
       'tripCount': 312,
+      'vehicleType': 'EV',
     },
     {
       'id': 3,
@@ -77,6 +84,87 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
       'distance': '12.8 km',
       'duration': '22 min',
       'tripCount': 189,
+      'vehicleType': 'Hybrid',
+    },
+    {
+      'id': 4,
+      'driverId': 104,
+      'pickup': 'Green Park',
+      'dropoff': 'Business District',
+      'date': 'Today, 8:00 AM',
+      'seats': 2,
+      'price': '\$5.50',
+      'driver': 'Amy L.',
+      'rating': 5.0,
+      'carbonSaved': '2.5 kg CO₂',
+      'distance': '14.0 km',
+      'duration': '25 min',
+      'tripCount': 420,
+      'vehicleType': 'EV',
+    },
+    {
+      'id': 5,
+      'driverId': 105,
+      'pickup': 'Riverside Apartments',
+      'dropoff': 'City Center',
+      'date': 'Tomorrow, 7:30 AM',
+      'seats': 4,
+      'price': '\$4.75',
+      'driver': 'Carlos B.',
+      'rating': 4.6,
+      'carbonSaved': '1.2 kg CO₂',
+      'distance': '8.0 km',
+      'duration': '15 min',
+      'tripCount': 98,
+      'vehicleType': 'EV',
+    },
+    {
+      'id': 6,
+      'driverId': 106,
+      'pickup': 'Northside Mall',
+      'dropoff': 'South Beach',
+      'date': 'Today, 3:00 PM',
+      'seats': 2,
+      'price': '\$9.00',
+      'driver': 'Priya S.',
+      'rating': 4.8,
+      'carbonSaved': '3.0 kg CO₂',
+      'distance': '18.5 km',
+      'duration': '35 min',
+      'tripCount': 175,
+      'vehicleType': 'Hybrid',
+    },
+    {
+      'id': 7,
+      'driverId': 107,
+      'pickup': 'Old Town Square',
+      'dropoff': 'Sports Stadium',
+      'date': 'Tomorrow, 5:00 PM',
+      'seats': 3,
+      'price': '\$7.00',
+      'driver': 'David K.',
+      'rating': 4.5,
+      'carbonSaved': '1.9 kg CO₂',
+      'distance': '11.2 km',
+      'duration': '20 min',
+      'tripCount': 63,
+      'vehicleType': 'EV',
+    },
+    {
+      'id': 8,
+      'driverId': 108,
+      'pickup': 'West Side Library',
+      'dropoff': 'Airport Terminal 1',
+      'date': 'Today, 11:15 AM',
+      'seats': 1,
+      'price': '\$11.00',
+      'driver': 'Nina W.',
+      'rating': 4.9,
+      'carbonSaved': '2.8 kg CO₂',
+      'distance': '20.0 km',
+      'duration': '40 min',
+      'tripCount': 301,
+      'vehicleType': 'EV',
     },
   ];
 
@@ -102,21 +190,46 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
   void _filterRides() {
     final pickupQuery = _searchPickupController.text.toLowerCase();
     final dropoffQuery = _searchDropoffController.text.toLowerCase();
-    
+
     setState(() {
-      if (pickupQuery.isEmpty && dropoffQuery.isEmpty) {
-        _filteredCarpoolRequests = _carpoolRequests;
-      } else {
-        _filteredCarpoolRequests = _carpoolRequests.where((ride) {
-          final pickup = ride['pickup'].toString().toLowerCase();
-          final dropoff = ride['dropoff'].toString().toLowerCase();
-          
-          final pickupMatch = pickupQuery.isEmpty || pickup.contains(pickupQuery);
-          final dropoffMatch = dropoffQuery.isEmpty || dropoff.contains(dropoffQuery);
-          
-          return pickupMatch && dropoffMatch; // AND logic - both must match
-        }).toList();
+      var results = _carpoolRequests.where((ride) {
+        final pickup = ride['pickup'].toString().toLowerCase();
+        final dropoff = ride['dropoff'].toString().toLowerCase();
+
+        final pickupMatch = pickupQuery.isEmpty || pickup.contains(pickupQuery);
+        final dropoffMatch = dropoffQuery.isEmpty || dropoff.contains(dropoffQuery);
+
+        // EV filter
+        final evMatch = !_filterEvOnly ||
+            (ride['vehicleType']?.toString().toLowerCase() == 'ev');
+
+        // Min seats filter
+        final seats = ride['seats'] as int? ?? 0;
+        final seatsMatch = _filterMinSeats == null || seats >= _filterMinSeats!;
+
+        return pickupMatch && dropoffMatch && evMatch && seatsMatch;
+      }).toList();
+
+      // Sorting
+      if (_sortBy == 'price') {
+        results.sort((a, b) {
+          final pa = double.tryParse(
+                  a['price'].toString().replaceAll(RegExp(r'[^\d.]'), '')) ??
+              0;
+          final pb = double.tryParse(
+                  b['price'].toString().replaceAll(RegExp(r'[^\d.]'), '')) ??
+              0;
+          return pa.compareTo(pb);
+        });
+      } else if (_sortBy == 'rating') {
+        results.sort((a, b) {
+          final ra = (a['rating'] as num?)?.toDouble() ?? 0;
+          final rb = (b['rating'] as num?)?.toDouble() ?? 0;
+          return rb.compareTo(ra); // descending
+        });
       }
+
+      _filteredCarpoolRequests = results;
     });
   }
 
@@ -600,6 +713,65 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
             ],
           ),
         ),
+
+        // Filter chips row
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
+          child: Row(
+            children: [
+              _buildFilterChip(
+                label: '⚡ EV Only',
+                selected: _filterEvOnly,
+                isDark: isDark,
+                onSelected: (_) {
+                  _filterEvOnly = !_filterEvOnly;
+                  _filterRides();
+                },
+              ),
+              const SizedBox(width: 8),
+              _buildFilterChip(
+                label: '2+ Seats',
+                selected: _filterMinSeats == 2,
+                isDark: isDark,
+                onSelected: (_) {
+                  _filterMinSeats = _filterMinSeats == 2 ? null : 2;
+                  _filterRides();
+                },
+              ),
+              const SizedBox(width: 8),
+              _buildFilterChip(
+                label: '3+ Seats',
+                selected: _filterMinSeats == 3,
+                isDark: isDark,
+                onSelected: (_) {
+                  _filterMinSeats = _filterMinSeats == 3 ? null : 3;
+                  _filterRides();
+                },
+              ),
+              const SizedBox(width: 8),
+              _buildFilterChip(
+                label: 'Lowest Price',
+                selected: _sortBy == 'price',
+                isDark: isDark,
+                onSelected: (_) {
+                  _sortBy = _sortBy == 'price' ? 'default' : 'price';
+                  _filterRides();
+                },
+              ),
+              const SizedBox(width: 8),
+              _buildFilterChip(
+                label: 'Top Rated',
+                selected: _sortBy == 'rating',
+                isDark: isDark,
+                onSelected: (_) {
+                  _sortBy = _sortBy == 'rating' ? 'default' : 'rating';
+                  _filterRides();
+                },
+              ),
+            ],
+          ),
+        ),
         
         // List of carpools or empty state
         Expanded(
@@ -782,6 +954,17 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
                       isDark: isDark,
                       color: AppTheme.primaryGreen,
                     ),
+                    if ((request['vehicleType'] ?? '').toString().isNotEmpty)
+                      _buildInfoChip(
+                        icon: request['vehicleType'] == 'EV'
+                            ? FontAwesomeIcons.bolt
+                            : FontAwesomeIcons.carSide,
+                        label: request['vehicleType'],
+                        isDark: isDark,
+                        color: request['vehicleType'] == 'EV'
+                            ? AppTheme.accentBlue
+                            : AppTheme.warningOrange,
+                      ),
                   ],
                 ),
                 
@@ -821,6 +1004,38 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
     ),
         ),
       ],
+    );
+  }
+
+  Widget _buildFilterChip({
+    required String label,
+    required bool selected,
+    required bool isDark,
+    required ValueChanged<bool> onSelected,
+  }) {
+    return FilterChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: selected
+              ? Colors.black
+              : (isDark ? Colors.grey[300] : Colors.grey[800]),
+        ),
+      ),
+      selected: selected,
+      onSelected: onSelected,
+      selectedColor: AppTheme.primaryGreen,
+      backgroundColor: isDark ? AppTheme.cardDark : Colors.grey[200],
+      checkmarkColor: Colors.black,
+      side: BorderSide(
+        color: selected
+            ? AppTheme.primaryGreen
+            : (isDark ? Colors.grey[600]! : Colors.grey[400]!),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     );
   }
 

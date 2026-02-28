@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../theme/app_theme.dart';
 
@@ -34,6 +35,41 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
     },
   ];
 
+  /// Export rides history as CSV and copy to clipboard
+  void _downloadHistory() {
+    if (_rides.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No ride history to export'),
+          backgroundColor: AppTheme.warningOrange,
+        ),
+      );
+      return;
+    }
+
+    // Build CSV content
+    final buffer = StringBuffer();
+    buffer.writeln('Date,From,To,Driver,Fare,Rating,Status');
+    for (final ride in _rides) {
+      buffer.writeln(
+        '"${ride['date']}","${ride['from']}","${ride['to']}",'
+        '"${ride['driver']}","${ride['fare']}","${ride['rating']}","${ride['status']}"',
+      );
+    }
+    final csvContent = buffer.toString();
+
+    // Copy to clipboard
+    Clipboard.setData(ClipboardData(text: csvContent)).then((_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ride history copied to clipboard as CSV'),
+          backgroundColor: AppTheme.successGreen,
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -53,6 +89,14 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
           ),
         ),
         centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            tooltip: 'Download History',
+            onPressed: _downloadHistory,
+            color: colorScheme.primary,
+          ),
+        ],
       ),
       body: _rides.isEmpty
           ? _buildEmptyState(context)
