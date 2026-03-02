@@ -7,6 +7,7 @@ import 'package:printing/printing.dart';
 import '../../../theme/app_theme.dart';
 import 'rewards_screen.dart';
 import 'green_route_screen.dart';
+import 'heatmap_screen.dart';
 import 'eco_leaderboard_screen.dart';
 import 'impact_history_screen.dart';
 
@@ -524,6 +525,10 @@ class _SustainabilityDashboardScreenState
         const SizedBox(height: 12),
         _buildActionButton(context, 'Green Routes', FontAwesomeIcons.route, () {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const GreenRouteScreen()));
+        }),
+        const SizedBox(height: 12),
+        _buildActionButton(context, 'Demand Heatmap', FontAwesomeIcons.fireFlameSimple, () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const HeatmapScreen()));
         }),
         const SizedBox(height: 12),
         _buildActionButton(context, 'Eco Leaderboard', FontAwesomeIcons.rankingStar, () {
