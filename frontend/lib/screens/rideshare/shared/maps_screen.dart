@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/maps_utils.dart';
+import '../driver/driver_navigation_screen.dart';
 
 /// Google Maps API key.
 /// Must match the key used in:
@@ -79,6 +80,7 @@ class _MapsScreenState extends State<MapsScreen> {
   // Route data
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
+  List<LatLng> _routePoints = [];
 
   // Route info (distance / duration from Directions API)
   String? _routeDistance;
@@ -420,6 +422,7 @@ class _MapsScreenState extends State<MapsScreen> {
     setState(() {
       _markers = markers;
       _polylines = polylines;
+      _routePoints = routePoints;
       _routeDistance = distance;
       _routeDuration = duration;
       _routeDistanceKm = effectiveDistanceKm;
@@ -519,6 +522,7 @@ class _MapsScreenState extends State<MapsScreen> {
       _destinationController.clear();
       _markers = {};
       _polylines = {};
+      _routePoints = [];
       _routeError = null;
       _routeDistance = null;
       _routeDuration = null;
@@ -939,6 +943,39 @@ class _MapsScreenState extends State<MapsScreen> {
                               ],
                             ),
                           ],
+                        ),
+                      ),
+                    ],
+
+                    // Navigate button – shown after shortest distance is displayed
+                    if (_routeDistance != null && _routeDuration != null) ...[
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => DriverNavigationScreen(
+                                  routePoints: _routePoints,
+                                  distance: _routeDistance,
+                                  duration: _routeDuration,
+                                  fromName: _fromController.text,
+                                  destinationName: _destinationController.text,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.navigation, size: 20),
+                          label: const Text('Start Navigation'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue[700],
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                         ),
                       ),
                     ],
