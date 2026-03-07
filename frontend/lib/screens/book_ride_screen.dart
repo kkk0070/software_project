@@ -1234,7 +1234,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                 builder: (context) => const Center(child: CircularProgressIndicator()),
               );
 
-              final riderId = int.tryParse(await StorageService.getUserId() ?? '1') ?? 1;
+              final riderId = await StorageService.getUserId() ?? 1;
               final fareValue = double.tryParse(_calculateEstimatedPrice().replaceAll('\$', '')) ?? 0.0;
               final result = await RideService.createRide(
                 riderId: riderId,

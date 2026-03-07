@@ -402,8 +402,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         onChanged: onChanged,
         activeColor: AppTheme.primaryGreen,
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildSelectTile(
     String title,
