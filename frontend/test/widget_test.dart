@@ -8,23 +8,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:provider/provider.dart';
+import 'package:sepro/providers/theme_provider.dart';
+import 'package:sepro/providers/active_ride_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sepro/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const EcoRideApp());
+  setUp(() {
+    // Mock SharedPreferences for ThemeProvider and other services
+    SharedPreferences.setMockInitialValues({});
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('Landing screen smoke test', (WidgetTester tester) async {
+    // Build our app with required providers and trigger a frame.
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
+          ChangeNotifierProvider(create: (_) => ActiveRideProvider()),
+        ],
+        child: const EcoRideApp(),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    // Initial pump to trigger initState and start animations
     await tester.pump();
+    
+    // pumpAndSettle might hang if there are infinite animations, 
+    // but LandingScreen uses animate_do which should finish.
+    // If it hangs, we'll use multiple pump() calls instead.
+    await tester.pump(const Duration(seconds: 1));
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that 'EcoRide' exists.
+    expect(find.text('EcoRide'), findsWidgets);
+    
+    // Verify that 'Get Started' button exists.
+    expect(find.text('Get Started'), findsOneWidget);
   });
 }
