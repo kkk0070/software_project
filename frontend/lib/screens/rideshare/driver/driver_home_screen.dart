@@ -177,7 +177,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.8),
+          color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,7 +188,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppTheme.primaryGreen.withOpacity(0.3),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
@@ -209,7 +209,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.primaryGreen.withOpacity(0.7),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.7),
                       letterSpacing: 1.5,
                     ),
                   ),
@@ -241,7 +241,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppTheme.primaryGreen.withOpacity(0.1),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                     ),
                     child: Icon(
                       Icons.notifications_outlined,
@@ -297,13 +297,13 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
           color: isDark ? AppTheme.cardDark : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppTheme.primaryGreen.withOpacity(0.2),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.2),
             width: 1,
           ),
           boxShadow: _isOnline
               ? [
                   BoxShadow(
-                    color: AppTheme.primaryGreen.withOpacity(0.3),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                     blurRadius: 15,
                     spreadRadius: 0,
                   ),
@@ -337,7 +337,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                           boxShadow: _isOnline
                               ? [
                                   BoxShadow(
-                                    color: AppTheme.primaryGreen.withOpacity(0.5),
+                                    color: AppTheme.primaryGreen.withValues(alpha: 0.5),
                                     blurRadius: 8,
                                     spreadRadius: 2,
                                   ),
@@ -351,7 +351,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: _isOnline ? AppTheme.primaryGreen.withOpacity(0.8) : Colors.grey,
+                          color: _isOnline ? AppTheme.primaryGreen.withValues(alpha: 0.8) : Colors.grey,
                         ),
                       ),
                     ],
@@ -410,7 +410,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: _pendingRidesCount > 0
-                ? AppTheme.primaryGreen.withOpacity(0.15)
+                ? AppTheme.primaryGreen.withValues(alpha: 0.15)
                 : (isDark ? AppTheme.cardDark : Colors.white),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
@@ -428,7 +428,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.2),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -600,10 +600,10 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppTheme.primaryGreen.withOpacity(0.1),
+          color: AppTheme.primaryGreen.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppTheme.primaryGreen.withOpacity(0.2),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.2),
           ),
         ),
         child: Column(
@@ -624,7 +624,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.primaryGreen.withOpacity(0.9),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.9),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -646,7 +646,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               child: LinearProgressIndicator(
                 value: 0.98,
                 minHeight: 8,
-                backgroundColor: Colors.white.withOpacity(0.2),
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
                 valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryGreen),
               ),
             ),
@@ -700,7 +700,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               color: isDark ? Colors.grey[900] : Colors.grey[300],
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppTheme.primaryGreen.withOpacity(0.2),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
               ),
             ),
             child: ClipRRect(
@@ -734,10 +734,10 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                       height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppTheme.primaryGreen.withOpacity(0.4),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.4),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primaryGreen.withOpacity(0.3),
+                            color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                             blurRadius: 40,
                             spreadRadius: 10,
                           ),
@@ -753,10 +753,10 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                       height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppTheme.primaryGreen.withOpacity(0.3),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primaryGreen.withOpacity(0.2),
+                            color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                             blurRadius: 50,
                             spreadRadius: 15,
                           ),
@@ -772,14 +772,14 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                       height: 60,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppTheme.primaryGreen.withOpacity(0.6),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.6),
                         border: Border.all(
                           color: AppTheme.primaryGreen,
                           width: 2,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primaryGreen.withOpacity(0.4),
+                            color: AppTheme.primaryGreen.withValues(alpha: 0.4),
                             blurRadius: 30,
                             spreadRadius: 5,
                           ),
@@ -794,7 +794,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
+                        color: Colors.black.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
@@ -808,7 +808,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                               color: AppTheme.primaryGreen,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.primaryGreen.withOpacity(0.5),
+                                  color: AppTheme.primaryGreen.withValues(alpha: 0.5),
                                   blurRadius: 8,
                                   spreadRadius: 2,
                                 ),
@@ -894,7 +894,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppTheme.primaryGreen.withOpacity(0.2),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.2),
             ),
             child: Icon(
               icon,
@@ -951,10 +951,10 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.orange.withOpacity(0.1),
+            color: Colors.orange.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.orange.withOpacity(0.3),
+              color: Colors.orange.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -963,7 +963,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.2),
+                  color: Colors.orange.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -1023,10 +1023,10 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppTheme.primaryGreen.withOpacity(0.1),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: AppTheme.primaryGreen.withOpacity(0.3),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -1035,7 +1035,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -1097,8 +1097,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppTheme.primaryGreen.withOpacity(0.8),
-                AppTheme.primaryGreen.withOpacity(0.6),
+                AppTheme.primaryGreen.withValues(alpha: 0.8),
+                AppTheme.primaryGreen.withValues(alpha: 0.6),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -1106,7 +1106,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.primaryGreen.withOpacity(0.3),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                 blurRadius: 15,
                 spreadRadius: 0,
               ),
@@ -1117,7 +1117,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -1144,7 +1144,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                       'Create schedules & manage requests',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],

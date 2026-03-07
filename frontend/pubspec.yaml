@@ -84,6 +84,7 @@ dependencies:
   pdf: ^3.11.3
   printing: ^5.14.2
 
+  http_parser: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -162,7 +162,7 @@ class _CarpoolSearchScreenState extends State<CarpoolSearchScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -175,10 +175,10 @@ class _CarpoolSearchScreenState extends State<CarpoolSearchScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.1),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -248,7 +248,7 @@ class _CarpoolSearchScreenState extends State<CarpoolSearchScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   elevation: 0,
-                  disabledBackgroundColor: AppTheme.primaryGreen.withOpacity(0.5),
+                  disabledBackgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.5),
                 ),
                 child: _isSearching
                     ? SizedBox(
@@ -346,7 +346,7 @@ class _CarpoolSearchScreenState extends State<CarpoolSearchScreen> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppTheme.primaryGreen.withOpacity(0.1),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.1),
               ),
               child: Icon(
                 Icons.search,
@@ -393,7 +393,7 @@ class _CarpoolSearchScreenState extends State<CarpoolSearchScreen> {
                 height: 100,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                 ),
                 child: Icon(
                   Icons.search_off,
@@ -469,11 +469,11 @@ class _CarpoolSearchScreenState extends State<CarpoolSearchScreen> {
           color: isDark ? AppTheme.cardDark : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppTheme.primaryGreen.withOpacity(0.2),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.2),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -490,7 +490,7 @@ class _CarpoolSearchScreenState extends State<CarpoolSearchScreen> {
                   height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.primaryGreen.withOpacity(0.2),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                   ),
                   child: Icon(
                     Icons.person,
@@ -670,7 +670,7 @@ class _CarpoolSearchScreenState extends State<CarpoolSearchScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: (color ?? (isDark ? Colors.grey[800] : Colors.grey[200]))!.withOpacity(0.3),
+        color: (color ?? (isDark ? Colors.grey[800] : Colors.grey[200]))!.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

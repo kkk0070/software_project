@@ -60,7 +60,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
             FaIcon(
               FontAwesomeIcons.mapLocationDot,
               size: 80,
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             const SizedBox(height: 24),
             Text(
@@ -79,7 +79,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             ),
@@ -154,7 +154,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -173,7 +173,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 Container(
                   width: 1,
                   height: 40,
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                 ),
                 Expanded(
                   child: _buildHeaderStat('€2,450', 'Budget'),
@@ -181,7 +181,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 Container(
                   width: 1,
                   height: 40,
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                 ),
                 Expanded(
                   child: _buildHeaderStat('45 kg', 'CO₂ Est.'),
@@ -267,7 +267,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -290,7 +290,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
             label,
             style: TextStyle(
               fontSize: 11,
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             textAlign: TextAlign.center,
           ),
@@ -365,7 +365,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -404,13 +404,13 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
               padding: const EdgeInsets.only(top: 4),
               child: Row(
                 children: [
-                  Icon(Icons.access_time, size: 14, color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                  Icon(Icons.access_time, size: 14, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                   const SizedBox(width: 4),
                   Text(
                     '${activities.length} activities',
                     style: TextStyle(
                       fontSize: 12,
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -479,7 +479,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     Icon(
                       Icons.location_on,
                       size: 12,
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                     const SizedBox(width: 4),
                     Expanded(
@@ -487,7 +487,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         location,
                         style: TextStyle(
                           fontSize: 12,
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ),

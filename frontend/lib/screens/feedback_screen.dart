@@ -132,7 +132,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(
                             color: isDark
-                                ? Colors.white.withOpacity(0.1)
+                                ? Colors.white.withValues(alpha: 0.1)
                                 : Colors.transparent,
                           ),
                         ),
@@ -204,7 +204,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(
                             color: isDark
-                                ? Colors.white.withOpacity(0.1)
+                                ? Colors.white.withValues(alpha: 0.1)
                                 : Colors.transparent,
                           ),
                         ),
@@ -223,7 +223,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                               ),
                               const SizedBox(height: 12),
                               DropdownButtonFormField<String>(
-                                value: _selectedCategory,
+                                initialValue: _selectedCategory,
                                 style: TextStyle(
                                   color: isDark ? Colors.white : AppTheme.textDark,
                                 ),
@@ -267,7 +267,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(
                             color: isDark
-                                ? Colors.white.withOpacity(0.1)
+                                ? Colors.white.withValues(alpha: 0.1)
                                 : Colors.transparent,
                           ),
                         ),
@@ -359,7 +359,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(
                             color: isDark
-                                ? Colors.white.withOpacity(0.1)
+                                ? Colors.white.withValues(alpha: 0.1)
                                 : Colors.transparent,
                           ),
                         ),
@@ -453,7 +453,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.withOpacity(0.05)
+                              ? Colors.white.withValues(alpha: 0.05)
                               : AppTheme.backgroundLight,
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -611,7 +611,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
+              ? Colors.white.withValues(alpha: 0.1)
               : AppTheme.dividerGrey,
         ),
       ),

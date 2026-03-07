@@ -280,7 +280,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.primaryGreen.withOpacity(0.35),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.35),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -404,12 +404,12 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppTheme.primaryGreen.withOpacity(0.1),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.1),
               ),
               child: Icon(
                 FontAwesomeIcons.comments,
                 size: 36,
-                color: AppTheme.primaryGreen.withOpacity(0.6),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 20),
@@ -560,7 +560,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.07),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.07),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -675,9 +675,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               shape: BoxShape.circle,
-              border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+              border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
             ),
             child: Icon(icon, color: color, size: 26),
           ),
@@ -703,8 +703,8 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.3)
-                : Colors.grey.withOpacity(0.15),
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.grey.withValues(alpha: 0.15),
             blurRadius: 12,
             offset: const Offset(0, -3),
           ),
@@ -790,7 +790,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                       ? null
                       : [
                           BoxShadow(
-                            color: AppTheme.primaryGreen.withOpacity(0.4),
+                            color: AppTheme.primaryGreen.withValues(alpha: 0.4),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -850,7 +850,7 @@ class _InputIconButton extends StatelessWidget {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: color, size: 22),

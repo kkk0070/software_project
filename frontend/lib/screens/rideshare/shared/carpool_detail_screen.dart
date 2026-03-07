@@ -110,7 +110,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -129,7 +129,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
                   height: 64,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.primaryGreen.withOpacity(0.2),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                   ),
                   child: Icon(
                     Icons.person,
@@ -162,7 +162,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryGreen.withOpacity(0.2),
+                            color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -262,7 +262,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -289,7 +289,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                 ),
                 child: Icon(
                   Icons.location_on,
@@ -342,7 +342,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppTheme.errorRed.withOpacity(0.2),
+                  color: AppTheme.errorRed.withValues(alpha: 0.2),
                 ),
                 child: Icon(
                   Icons.flag,
@@ -390,7 +390,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -439,7 +439,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.1),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -484,7 +484,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -553,7 +553,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
           height: 36,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppTheme.primaryGreen.withOpacity(0.1),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.1),
           ),
           child: Icon(
             icon,
@@ -606,7 +606,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 0,
-                disabledBackgroundColor: AppTheme.primaryGreen.withOpacity(0.5),
+                disabledBackgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.5),
               ),
               child: _isAccepting
                   ? SizedBox(
@@ -770,7 +770,7 @@ class _CarpoolDetailScreenState extends State<CarpoolDetailScreen> {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppTheme.primaryGreen.withOpacity(0.2),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
               ),
               child: Icon(
                 Icons.check_circle,

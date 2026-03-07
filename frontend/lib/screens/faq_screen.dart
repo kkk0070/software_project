@@ -320,7 +320,7 @@ class _FAQScreenState extends State<FAQScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: gradient.colors.first.withOpacity(0.3),
+            color: gradient.colors.first.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -364,7 +364,7 @@ class _FAQScreenState extends State<FAQScreen> {
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
+              ? Colors.white.withValues(alpha: 0.1)
               : Colors.transparent,
         ),
       ),
@@ -385,7 +385,7 @@ class _FAQScreenState extends State<FAQScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.1),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const FaIcon(
@@ -419,7 +419,7 @@ class _FAQScreenState extends State<FAQScreen> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.white.withOpacity(0.05)
+                        ? Colors.white.withValues(alpha: 0.05)
                         : AppTheme.backgroundLight,
                     borderRadius: BorderRadius.circular(8),
                   ),

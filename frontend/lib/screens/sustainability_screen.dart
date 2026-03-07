@@ -45,7 +45,7 @@ class SustainabilityScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const FaIcon(
@@ -82,7 +82,7 @@ class SustainabilityScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Row(
@@ -142,7 +142,7 @@ class SustainabilityScreen extends StatelessWidget {
                                 horizontalInterval: 2,
                                 getDrawingHorizontalLine: (value) {
                                   return FlLine(
-                                    color: AppTheme.textLight.withOpacity(0.1),
+                                    color: AppTheme.textLight.withValues(alpha: 0.1),
                                     strokeWidth: 1,
                                   );
                                 },
@@ -210,7 +210,7 @@ class SustainabilityScreen extends StatelessWidget {
                                   dotData: const FlDotData(show: true),
                                   belowBarData: BarAreaData(
                                     show: true,
-                                    color: AppTheme.primaryGreen.withOpacity(0.2),
+                                    color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                                   ),
                                 ),
                               ],
@@ -335,8 +335,8 @@ class SustainabilityScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppTheme.accentBlue.withOpacity(0.1),
-                      AppTheme.primaryGreen.withOpacity(0.1),
+                      AppTheme.accentBlue.withValues(alpha: 0.1),
+                      AppTheme.primaryGreen.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -454,7 +454,7 @@ class _ComparisonItem extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.2),
+            color: color.withValues(alpha: 0.2),
             shape: BoxShape.circle,
           ),
           child: FaIcon(icon, color: color, size: 24),

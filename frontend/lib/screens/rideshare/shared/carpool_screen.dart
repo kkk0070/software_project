@@ -304,10 +304,10 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.1),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -686,10 +686,10 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
           margin: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppTheme.primaryGreen.withOpacity(0.1),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: AppTheme.primaryGreen.withOpacity(0.2),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.2),
             ),
           ),
           child: Row(
@@ -802,7 +802,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
                 color: isDark ? AppTheme.cardDark : Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -816,7 +816,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
                       height: 48,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppTheme.primaryGreen.withOpacity(0.2),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                       ),
                       child: Icon(
                         Icons.person,
@@ -1230,7 +1230,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: (color ?? (isDark ? Colors.grey[800] : Colors.grey[200]))!.withOpacity(0.3),
+        color: (color ?? (isDark ? Colors.grey[800] : Colors.grey[200]))!.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -1322,7 +1322,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppTheme.primaryGreen.withOpacity(0.2),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
               ),
               child: Icon(
                 Icons.check_circle,
@@ -1397,7 +1397,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppTheme.primaryGreen.withOpacity(0.2),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
               ),
               child: Icon(
                 Icons.check_circle,

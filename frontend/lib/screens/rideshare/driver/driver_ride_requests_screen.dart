@@ -204,10 +204,10 @@ class _DriverRideRequestsScreenState extends State<DriverRideRequestsScreen> {
       decoration: BoxDecoration(
         color: isDark ? AppTheme.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.3)),
+        border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryGreen.withOpacity(0.1),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -220,7 +220,7 @@ class _DriverRideRequestsScreenState extends State<DriverRideRequestsScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.primaryGreen.withOpacity(0.1),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Row(
@@ -232,7 +232,7 @@ class _DriverRideRequestsScreenState extends State<DriverRideRequestsScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryGreen.withOpacity(0.2),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(

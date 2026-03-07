@@ -348,7 +348,7 @@ class _AuthScreenState extends State<AuthScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryGreen.withOpacity(0.2) : (isDark ? AppTheme.cardDark : Colors.white),
+          color: isSelected ? AppTheme.primaryGreen.withValues(alpha: 0.2) : (isDark ? AppTheme.cardDark : Colors.white),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? AppTheme.primaryGreen : (isDark ? Colors.grey[800]! : Colors.grey[300]!),
@@ -537,7 +537,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 decoration: InputDecoration(
                   counterText: '',
                   filled: true,
-                  fillColor: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[200],
+                  fillColor: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey[200],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,

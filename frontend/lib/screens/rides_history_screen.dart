@@ -85,7 +85,7 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen>
                     horizontal: 16,
                     vertical: 8,
                   ),
-                  color: AppTheme.primaryGreen.withOpacity(0.1),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                   child: Row(
                     children: [
                       if (_filterType != 'All')
@@ -395,7 +395,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 80, color: AppTheme.textLight.withOpacity(0.5)),
+            Icon(icon, size: 80, color: AppTheme.textLight.withValues(alpha: 0.5)),
             const SizedBox(height: 16),
             Text(
               message,
@@ -451,7 +451,7 @@ class _RideDetailsSheet extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AppTheme.textLight.withOpacity(0.3),
+                        color: AppTheme.textLight.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -522,7 +522,7 @@ class _RideDetailsSheet extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppTheme.successGreen.withOpacity(0.1),
+                        color: AppTheme.successGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(

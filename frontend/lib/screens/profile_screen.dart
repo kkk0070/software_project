@@ -97,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> with UserProfileLoader {
                             border: Border.all(color: Colors.white, width: 4),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
+                                color: Colors.black.withValues(alpha: 0.2),
                                 blurRadius: 10,
                                 offset: const Offset(0, 5),
                               ),
@@ -167,7 +167,7 @@ class _ProfileScreenState extends State<ProfileScreen> with UserProfileLoader {
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.25),
+                        color: Colors.white.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Row(
@@ -258,7 +258,7 @@ class _ProfileScreenState extends State<ProfileScreen> with UserProfileLoader {
                         borderRadius: BorderRadius.circular(12),
                         side: BorderSide(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
+                              ? Colors.white.withValues(alpha: 0.1)
                               : Colors.transparent,
                         ),
                       ),
@@ -331,7 +331,7 @@ class _ProfileScreenState extends State<ProfileScreen> with UserProfileLoader {
                         borderRadius: BorderRadius.circular(12),
                         side: BorderSide(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
+                              ? Colors.white.withValues(alpha: 0.1)
                               : Colors.transparent,
                         ),
                       ),
@@ -396,7 +396,7 @@ class _ProfileScreenState extends State<ProfileScreen> with UserProfileLoader {
                         borderRadius: BorderRadius.circular(12),
                         side: BorderSide(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
+                              ? Colors.white.withValues(alpha: 0.1)
                               : Colors.transparent,
                         ),
                       ),
@@ -443,7 +443,7 @@ class _ProfileScreenState extends State<ProfileScreen> with UserProfileLoader {
                         borderRadius: BorderRadius.circular(12),
                         side: BorderSide(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
+                              ? Colors.white.withValues(alpha: 0.1)
                               : Colors.transparent,
                         ),
                       ),
@@ -634,7 +634,7 @@ class _StatBox extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
+              ? Colors.white.withValues(alpha: 0.1)
               : Colors.transparent,
         ),
       ),
@@ -745,7 +745,7 @@ class _SettingsSwitchTile extends StatelessWidget {
       ),
       value: value,
       onChanged: onChanged,
-      activeColor: AppTheme.primaryGreen,
+      activeThumbColor: AppTheme.primaryGreen,
     );
   }
 }

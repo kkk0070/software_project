@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../theme/app_theme.dart';
 
 class StatCard extends StatelessWidget {
@@ -33,7 +32,7 @@ class StatCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: cardColor.withOpacity(0.1),
+                    color: cardColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: cardColor, size: 24),
@@ -104,8 +103,8 @@ class AchievementBadge extends StatelessWidget {
               height: 60,
               decoration: BoxDecoration(
                 color: isUnlocked
-                    ? AppTheme.primaryGreen.withOpacity(0.1)
-                    : AppTheme.textLight.withOpacity(0.1),
+                    ? AppTheme.primaryGreen.withValues(alpha: 0.1)
+                    : AppTheme.textLight.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -175,9 +174,9 @@ class QuickActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: buttonColor.withOpacity(0.1),
+          color: buttonColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: buttonColor.withOpacity(0.3)),
+          border: Border.all(color: buttonColor.withValues(alpha: 0.3)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

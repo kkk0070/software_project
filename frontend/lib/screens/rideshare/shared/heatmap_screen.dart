@@ -60,8 +60,8 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
           circleId: CircleId('demand_$i'),
           center: p.position,
           radius: 300 + p.intensity * 500, // 300–800 metres
-          fillColor: _heatColor(p.intensity).withOpacity(0.45),
-          strokeColor: _heatColor(p.intensity).withOpacity(0.7),
+          fillColor: _heatColor(p.intensity).withValues(alpha: 0.45),
+          strokeColor: _heatColor(p.intensity).withValues(alpha: 0.7),
           strokeWidth: 1,
           consumeTapEvents: true,
           onTap: () => _showDemandInfo(p),
@@ -194,12 +194,12 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? AppTheme.cardDark.withOpacity(0.93)
-                      : Colors.white.withOpacity(0.93),
+                      ? AppTheme.cardDark.withValues(alpha: 0.93)
+                      : Colors.white.withValues(alpha: 0.93),
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -279,7 +279,7 @@ class _DemandBar extends StatelessWidget {
       child: LinearProgressIndicator(
         value: intensity,
         minHeight: 8,
-        backgroundColor: Colors.grey.withOpacity(0.2),
+        backgroundColor: Colors.grey.withValues(alpha: 0.2),
         valueColor: AlwaysStoppedAnimation<Color>(color),
       ),
     );

@@ -138,13 +138,13 @@ class _WalletScreenState extends State<WalletScreen> {
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [AppTheme.primaryGreen, AppTheme.primaryGreen.withOpacity(0.8)],
+                          colors: [AppTheme.primaryGreen, AppTheme.primaryGreen.withValues(alpha: 0.8)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
-                          BoxShadow(color: AppTheme.primaryGreen.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4)),
+                          BoxShadow(color: AppTheme.primaryGreen.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4)),
                         ]
                       ),
                       child: Column(

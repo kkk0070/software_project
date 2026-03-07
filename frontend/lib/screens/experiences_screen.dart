@@ -135,7 +135,7 @@ class _ExperiencesScreenState extends State<ExperiencesScreen> {
             selectedCategory = label;
           });
         },
-        selectedColor: AppTheme.experienceRed.withOpacity(0.2),
+        selectedColor: AppTheme.experienceRed.withValues(alpha: 0.2),
         checkmarkColor: AppTheme.experienceRed,
       ),
     );
@@ -294,7 +294,7 @@ class _ExperiencesScreenState extends State<ExperiencesScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

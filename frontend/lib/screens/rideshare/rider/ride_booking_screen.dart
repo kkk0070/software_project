@@ -7,7 +7,6 @@ import '../../../utils/user_profile_loader.dart';
 import '../../../services/user_service.dart';
 import '../../../services/storage_service.dart';
 import '../../../services/ride_service.dart';
-import '../shared/emergency_screen.dart';
 import '../shared/notifications_screen.dart';
 import '../shared/ride_pooling_screen.dart';
 import '../shared/live_tracking_screen.dart';
@@ -267,7 +266,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.8),
+          color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -301,7 +300,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                       _timeBasedGreeting(),
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppTheme.primaryGreen.withOpacity(0.7),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -331,7 +330,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+                  color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
                 ),
                 child: Icon(
                   Icons.notifications_outlined,
@@ -404,10 +403,10 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -447,11 +446,11 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
       child: Container(
         height: 56,
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.1),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -526,12 +525,12 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: AppTheme.primaryGreen.withOpacity(0.2),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.2),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
+                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -591,7 +590,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.2),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -620,7 +619,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                         dotData: const FlDotData(show: false),
                         belowBarData: BarAreaData(
                           show: true,
-                          color: AppTheme.primaryGreen.withOpacity(0.15),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.15),
                         ),
                       ),
                     ],
@@ -766,7 +765,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
+          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: Colors.transparent,
@@ -779,7 +778,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
               height: 48,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppTheme.primaryGreen.withOpacity(0.1),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.1),
               ),
               child: Icon(
                 icon,
@@ -844,10 +843,10 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
+              color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppTheme.ecoGold.withOpacity(0.2),
+                color: AppTheme.ecoGold.withValues(alpha: 0.2),
               ),
             ),
             child: Column(
@@ -859,7 +858,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                       height: 48,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppTheme.ecoGold.withOpacity(0.2),
+                        color: AppTheme.ecoGold.withValues(alpha: 0.2),
                       ),
                       child: Icon(
                         FontAwesomeIcons.users,
@@ -907,7 +906,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                   child: LinearProgressIndicator(
                     value: 0.7,
                     minHeight: 8,
-                    backgroundColor: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.1),
+                    backgroundColor: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.1),
                     valueColor: AlwaysStoppedAnimation<Color>(AppTheme.ecoGold),
                   ),
                 ),
@@ -938,10 +937,10 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF0EA5E9).withOpacity(0.1),
+              color: const Color(0xFF0EA5E9).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: const Color(0xFF0EA5E9).withOpacity(0.2),
+                color: const Color(0xFF0EA5E9).withValues(alpha: 0.2),
               ),
             ),
             child: Row(
@@ -951,7 +950,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                   height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFF0EA5E9).withOpacity(0.2),
+                    color: const Color(0xFF0EA5E9).withValues(alpha: 0.2),
                   ),
                   child: const Icon(
                     Icons.lightbulb,
@@ -991,10 +990,10 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.primaryGreen.withOpacity(0.1),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppTheme.primaryGreen.withOpacity(0.2),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
               ),
             ),
             child: Row(
@@ -1004,7 +1003,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                   height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.primaryGreen.withOpacity(0.2),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                   ),
                   child: Icon(
                     Icons.wb_sunny,
@@ -1096,7 +1095,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -1106,7 +1105,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
             ),
             child: Icon(
               icon,
@@ -1188,7 +1187,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
+                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
@@ -1251,7 +1250,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
           color: isDark ? AppTheme.cardDark : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppTheme.primaryGreen.withOpacity(0.2),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.2),
           ),
         ),
         child: Column(
@@ -1264,7 +1263,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                   height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.primaryGreen.withOpacity(0.2),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                   ),
                   child: Icon(
                     FontAwesomeIcons.user,
@@ -1334,7 +1333,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.2),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -1370,8 +1369,8 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppTheme.primaryGreen.withOpacity(0.8),
-                AppTheme.primaryGreen.withOpacity(0.6),
+                AppTheme.primaryGreen.withValues(alpha: 0.8),
+                AppTheme.primaryGreen.withValues(alpha: 0.6),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -1379,7 +1378,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.primaryGreen.withOpacity(0.3),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                 blurRadius: 15,
                 spreadRadius: 0,
               ),
@@ -1390,7 +1389,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -1417,7 +1416,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                       'Schedule & join eco-friendly carpools',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -1451,10 +1450,10 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppTheme.primaryGreen.withOpacity(0.1),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: AppTheme.primaryGreen.withOpacity(0.3),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -1463,7 +1462,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(

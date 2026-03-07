@@ -283,7 +283,7 @@ class _GreenRouteScreenState extends State<GreenRouteScreen> {
     return Polyline(
       polylineId: PolylineId(r.id),
       points: points,
-      color: isSelected ? r.color : r.color.withOpacity(0.35),
+      color: isSelected ? r.color : r.color.withValues(alpha: 0.35),
       width: isSelected ? 5 : 3,
       patterns: index == 0
           ? [] // eco = solid
@@ -430,11 +430,11 @@ class _GreenRouteScreenState extends State<GreenRouteScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? r.color.withOpacity(0.1)
+              ? r.color.withValues(alpha: 0.1)
               : (isDark ? AppTheme.cardDark : Colors.white),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? r.color : Colors.grey.withOpacity(0.2),
+            color: isSelected ? r.color : Colors.grey.withValues(alpha: 0.2),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -445,7 +445,7 @@ class _GreenRouteScreenState extends State<GreenRouteScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: r.color.withOpacity(0.15),
+                color: r.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(r.icon, color: r.color, size: 18),
@@ -475,7 +475,7 @@ class _GreenRouteScreenState extends State<GreenRouteScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryGreen.withOpacity(0.15),
+                            color: AppTheme.primaryGreen.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text(

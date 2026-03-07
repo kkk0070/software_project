@@ -130,7 +130,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
           color: isDark ? null : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: AppTheme.primaryGreen.withOpacity(isDark ? 0.2 : 0.3),
+            color: AppTheme.primaryGreen.withValues(alpha: isDark ? 0.2 : 0.3),
             width: 1,
           ),
         ),
@@ -142,7 +142,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.primaryGreen.withOpacity(0.7),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.7),
                 letterSpacing: 1,
               ),
             ),
@@ -164,7 +164,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryGreen.withOpacity(0.15),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -241,7 +241,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1a3a25) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(isDark ? 0.2 : 0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: isDark ? 0.2 : 0.3), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +251,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: color.withOpacity(0.6),
+              color: color.withValues(alpha: 0.6),
               letterSpacing: 0.5,
             ),
           ),
@@ -270,7 +270,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: color, size: 16),
@@ -382,7 +382,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
         color: isDark ? const Color(0xFF1a3a25) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppTheme.primaryGreen.withOpacity(isDark ? 0.1 : 0.2),
+          color: AppTheme.primaryGreen.withValues(alpha: isDark ? 0.1 : 0.2),
           width: 1,
         ),
       ),
@@ -501,7 +501,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

@@ -189,8 +189,8 @@ class _BookRideScreenState extends State<BookRideScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppTheme.primaryGreen.withOpacity(0.8),
-                      AppTheme.accentBlue.withOpacity(0.6),
+                      AppTheme.primaryGreen.withValues(alpha: 0.8),
+                      AppTheme.accentBlue.withValues(alpha: 0.6),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -218,7 +218,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: Colors.white.withValues(alpha: 0.2),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const FaIcon(
@@ -232,7 +232,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                                 height: 2,
                                 margin: const EdgeInsets.symmetric(horizontal: 8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -248,7 +248,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: Colors.white.withValues(alpha: 0.2),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const FaIcon(
@@ -263,7 +263,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -474,7 +474,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
-                                color: AppTheme.primaryGreen.withOpacity(0.1),
+                                color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -555,7 +555,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                      color: theme.colorScheme.onSurface.withOpacity(0.3)),
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
@@ -590,7 +590,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                      color: theme.colorScheme.onSurface.withOpacity(0.3)),
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
@@ -631,7 +631,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 4,
-                      shadowColor: AppTheme.primaryGreen.withOpacity(0.5),
+                      shadowColor: AppTheme.primaryGreen.withValues(alpha: 0.5),
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -753,10 +753,10 @@ class _BookRideScreenState extends State<BookRideScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppTheme.successGreen.withOpacity(0.1),
+                      color: AppTheme.successGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppTheme.successGreen.withOpacity(0.3)),
+                        color: AppTheme.successGreen.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
@@ -783,7 +783,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                                 '~${(_estimatedDistance * 0.15).toStringAsFixed(1)} kg CO₂ by pooling this ride',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: AppTheme.successGreen.withOpacity(0.7),
+                                  color: AppTheme.successGreen.withValues(alpha: 0.7),
                                 ),
                               ),
                             ],
@@ -814,7 +814,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? details['color'].withOpacity(0.15)
+              ? details['color'].withValues(alpha: 0.15)
               : (isDark ? AppTheme.cardDark : Colors.white),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -871,7 +871,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppTheme.primaryGreen.withOpacity(0.1)
+              ? AppTheme.primaryGreen.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -921,15 +921,15 @@ class _BookRideScreenState extends State<BookRideScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            details['color'].withOpacity(0.2),
-            details['color'].withOpacity(0.05),
+            details['color'].withValues(alpha: 0.2),
+            details['color'].withValues(alpha: 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: details['color'].withOpacity(0.3),
+          color: details['color'].withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -965,7 +965,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AppTheme.successGreen.withOpacity(0.2),
+                              color: AppTheme.successGreen.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text(
@@ -1066,7 +1066,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -1141,7 +1141,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.1),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
@@ -1199,7 +1199,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.1),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -1234,7 +1234,7 @@ class _BookRideScreenState extends State<BookRideScreen> {
                 builder: (context) => const Center(child: CircularProgressIndicator()),
               );
 
-              final riderId = int.tryParse(await StorageService.getUserId() ?? '1') ?? 1;
+              final riderId = await StorageService.getUserId() ?? 1;
               final fareValue = double.tryParse(_calculateEstimatedPrice().replaceAll('\$', '')) ?? 0.0;
               final result = await RideService.createRide(
                 riderId: riderId,
@@ -1374,7 +1374,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
+      ..color = Colors.white.withValues(alpha: 0.3)
       ..strokeWidth = 1;
 
     const spacing = 30.0;
