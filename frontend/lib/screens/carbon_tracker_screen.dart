@@ -122,7 +122,7 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primaryGreen.withOpacity(0.3),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                           blurRadius: 12,
                           offset: const Offset(0, 6),
                         ),
@@ -160,7 +160,7 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
                             Container(
                               width: 1,
                               height: 40,
-                              color: Colors.white.withOpacity(0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                             ),
                             _buildStat('🚗', '450 km', 'Driving Saved'),
                           ],
@@ -240,7 +240,7 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
                                   dotData: FlDotData(show: true),
                                   belowBarData: BarAreaData(
                                     show: true,
-                                    color: AppTheme.primaryGreen.withOpacity(0.2),
+                                    color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                                   ),
                                 ),
                               ],
@@ -292,8 +292,8 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          AppTheme.lightGreen.withOpacity(0.2),
-                          AppTheme.primaryGreen.withOpacity(0.1),
+                          AppTheme.lightGreen.withValues(alpha: 0.2),
+                          AppTheme.primaryGreen.withValues(alpha: 0.1),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(20),
@@ -358,7 +358,7 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
                     gradient: AppTheme.ecoGradient,
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.primaryGreen.withOpacity(0.3),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -401,7 +401,7 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
@@ -439,7 +439,7 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryGreen.withOpacity(0.3),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -472,7 +472,7 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Text(
@@ -507,7 +507,7 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -562,7 +562,7 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isToday 
-            ? AppTheme.primaryGreen.withOpacity(0.1)
+            ? AppTheme.primaryGreen.withValues(alpha: 0.1)
             : (isDark ? Colors.grey[800] : Colors.grey[50]),
         borderRadius: BorderRadius.circular(12),
         border: isToday 
@@ -626,7 +626,7 @@ class _CarbonTrackerScreenState extends State<CarbonTrackerScreen> {
             decoration: BoxDecoration(
               color: isToday
                   ? AppTheme.primaryGreen
-                  : AppTheme.primaryGreen.withOpacity(0.15),
+                  : AppTheme.primaryGreen.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(

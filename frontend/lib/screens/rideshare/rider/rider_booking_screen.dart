@@ -116,7 +116,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
         ),
       );
 
-      if (result != null && result is Map<String, dynamic> && result['address'] != null) {
+      if (result != null && result['address'] != null) {
         setState(() {
           controller.text = result['address'] as String;
         });
@@ -227,11 +227,11 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
                     color: isDark ? AppTheme.cardDark : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: AppTheme.primaryGreen.withOpacity(0.3),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.primaryGreen.withOpacity(0.1),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -264,7 +264,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
                               color: isDark ? AppTheme.backgroundDark : Colors.grey[100],
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: AppTheme.primaryGreen.withOpacity(0.3),
+                                color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Icon(
@@ -338,7 +338,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 4,
-                      shadowColor: AppTheme.primaryGreen.withOpacity(0.5),
+                      shadowColor: AppTheme.primaryGreen.withValues(alpha: 0.5),
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -552,7 +552,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: isSelected
-              ? (details['color'] as Color).withOpacity(0.2)
+              ? (details['color'] as Color).withValues(alpha: 0.2)
               : (isDark ? AppTheme.cardDark : Colors.white),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -604,7 +604,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
         color: isDark ? AppTheme.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: (details['color'] as Color).withOpacity(0.3),
+          color: (details['color'] as Color).withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -636,7 +636,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: (details['color'] as Color).withOpacity(0.2),
+              color: (details['color'] as Color).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
@@ -777,11 +777,11 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
           color: isDark ? AppTheme.cardDark : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppTheme.primaryGreen.withOpacity(0.2),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.2),
           ),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primaryGreen.withOpacity(0.05),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -799,8 +799,8 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
                       colors: [
-                        AppTheme.primaryGreen.withOpacity(0.3),
-                        AppTheme.primaryGreen.withOpacity(0.1),
+                        AppTheme.primaryGreen.withValues(alpha: 0.3),
+                        AppTheme.primaryGreen.withValues(alpha: 0.1),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -863,7 +863,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.amber.withOpacity(0.2),
+                          color: Colors.amber.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -919,7 +919,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryGreen.withOpacity(0.2),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -962,7 +962,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.1),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(

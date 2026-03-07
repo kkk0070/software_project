@@ -77,7 +77,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.primaryGreen.withOpacity(0.3),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -112,7 +112,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 12,
-                      backgroundColor: Colors.white.withOpacity(0.3),
+                      backgroundColor: Colors.white.withValues(alpha: 0.3),
                       valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   ),
@@ -163,9 +163,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: item['checked'] 
-              ? AppTheme.primaryGreen.withOpacity(0.3) 
+              ? AppTheme.primaryGreen.withValues(alpha: 0.3) 
               : (isDark 
-                  ? Colors.white.withOpacity(0.1) 
+                  ? Colors.white.withValues(alpha: 0.1) 
                   : Colors.grey.shade200),
         ),
       ),
@@ -198,7 +198,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
         secondary: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: _getCategoryColor(item['category']).withOpacity(0.1),
+            color: _getCategoryColor(item['category']).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(

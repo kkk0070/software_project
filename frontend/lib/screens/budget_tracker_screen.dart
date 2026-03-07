@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:fl_chart/fl_chart.dart';
 import '../theme/app_theme.dart';
 
 class BudgetTrackerScreen extends StatelessWidget {
@@ -36,7 +35,7 @@ class BudgetTrackerScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.primaryGreen.withOpacity(0.3),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     ),
@@ -68,7 +67,7 @@ class BudgetTrackerScreen extends StatelessWidget {
                         Container(
                           width: 1,
                           height: 40,
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                         ),
                         _buildBudgetStat('Remaining', '\$2,660', Icons.account_balance_wallet),
                       ],
@@ -272,7 +271,7 @@ class BudgetTrackerScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppTheme.primaryGreen.withOpacity(0.1),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(

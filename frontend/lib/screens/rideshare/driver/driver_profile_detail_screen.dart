@@ -275,7 +275,7 @@ class _DriverProfileDetailScreenState extends State<DriverProfileDetailScreen> {
                     height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppTheme.primaryGreen.withOpacity(0.2),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                       border: Border.all(
                         color: AppTheme.primaryGreen,
                         width: 3,
@@ -335,7 +335,7 @@ class _DriverProfileDetailScreenState extends State<DriverProfileDetailScreen> {
                       margin: const EdgeInsets.only(top: 12),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryGreen.withOpacity(0.2),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
@@ -506,7 +506,7 @@ class _DriverProfileDetailScreenState extends State<DriverProfileDetailScreen> {
             height: 40,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppTheme.primaryGreen.withOpacity(0.2),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.2),
             ),
             child: Icon(
               icon,

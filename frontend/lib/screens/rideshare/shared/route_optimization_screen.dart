@@ -115,7 +115,7 @@ class RouteOptimizationScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 24),
@@ -162,15 +162,15 @@ class RouteOptimizationScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: active
-            ? AppTheme.primaryGreen.withOpacity(0.2)
+            ? AppTheme.primaryGreen.withValues(alpha: 0.2)
             : (isDark ? AppTheme.cardDark : Colors.white),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: active
               ? AppTheme.primaryGreen
               : (isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.grey.withOpacity(0.3)),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.grey.withValues(alpha: 0.3)),
         ),
       ),
       child: Row(

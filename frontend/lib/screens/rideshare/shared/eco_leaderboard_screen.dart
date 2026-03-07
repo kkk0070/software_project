@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../theme/app_theme.dart';
 
 /// Eco Leaderboard Screen – shows top green riders
@@ -146,7 +145,7 @@ class _EcoLeaderboardScreenState extends State<EcoLeaderboardScreen> {
               const SizedBox(height: 4),
               CircleAvatar(
                 radius: 22,
-                backgroundColor: colors[i].withOpacity(0.2),
+                backgroundColor: colors[i].withValues(alpha: 0.2),
                 child: Text(
                   entry.name.substring(0, 1),
                   style: TextStyle(color: colors[i], fontWeight: FontWeight.bold, fontSize: 18),
@@ -164,9 +163,9 @@ class _EcoLeaderboardScreenState extends State<EcoLeaderboardScreen> {
               Container(
                 height: heights[i],
                 decoration: BoxDecoration(
-                  color: colors[i].withOpacity(0.2),
+                  color: colors[i].withValues(alpha: 0.2),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                  border: Border.all(color: colors[i].withOpacity(0.4)),
+                  border: Border.all(color: colors[i].withValues(alpha: 0.4)),
                 ),
                 child: Center(
                   child: Text(
@@ -189,11 +188,11 @@ class _EcoLeaderboardScreenState extends State<EcoLeaderboardScreen> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: isMe
-            ? AppTheme.primaryGreen.withOpacity(0.12)
+            ? AppTheme.primaryGreen.withValues(alpha: 0.12)
             : (isDark ? AppTheme.cardDark : Colors.white),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isMe ? AppTheme.primaryGreen : (isDark ? Colors.white10 : Colors.black.withOpacity(0.06)),
+          color: isMe ? AppTheme.primaryGreen : (isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06)),
           width: isMe ? 1.5 : 1,
         ),
       ),
@@ -213,7 +212,7 @@ class _EcoLeaderboardScreenState extends State<EcoLeaderboardScreen> {
           const SizedBox(width: 10),
           CircleAvatar(
             radius: 16,
-            backgroundColor: AppTheme.primaryGreen.withOpacity(0.15),
+            backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
             child: Text(entry.name.substring(0, 1), style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 13)),
           ),
           const SizedBox(width: 10),

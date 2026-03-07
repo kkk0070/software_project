@@ -208,7 +208,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> with UserProfileL
             border: Border.all(color: Colors.white, width: 4),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),
@@ -354,7 +354,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> with UserProfileL
                             borderRadius: BorderRadius.circular(12),
                             side: BorderSide(
                               color: isDark
-                                  ? Colors.white.withOpacity(0.1)
+                                  ? Colors.white.withValues(alpha: 0.1)
                                   : Colors.transparent,
                             ),
                           ),

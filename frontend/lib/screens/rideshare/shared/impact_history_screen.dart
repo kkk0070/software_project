@@ -157,9 +157,9 @@ class _ImpactHistoryScreenState extends State<ImpactHistoryScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -186,14 +186,14 @@ class _ImpactHistoryScreenState extends State<ImpactHistoryScreen> {
       decoration: BoxDecoration(
         color: isDark ? AppTheme.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.06)),
+        border: Border.all(color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: ride.color.withOpacity(0.12),
+              color: ride.color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(ride.icon, color: ride.color, size: 20),
@@ -212,7 +212,7 @@ class _ImpactHistoryScreenState extends State<ImpactHistoryScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                       decoration: BoxDecoration(
-                        color: ride.color.withOpacity(0.12),
+                        color: ride.color.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(ride.vehicle, style: TextStyle(color: ride.color, fontSize: 10, fontWeight: FontWeight.w600)),
@@ -230,7 +230,7 @@ class _ImpactHistoryScreenState extends State<ImpactHistoryScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: scoreColor.withOpacity(0.12),
+                  color: scoreColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text('${ride.ecoScore}', style: TextStyle(color: scoreColor, fontWeight: FontWeight.bold, fontSize: 14)),

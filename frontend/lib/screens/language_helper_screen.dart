@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:animate_do/animate_do.dart';
 import '../theme/app_theme.dart';
 
@@ -59,7 +58,7 @@ class _LanguageHelperScreenState extends State<LanguageHelperScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.infoBlue.withOpacity(0.3),
+              color: AppTheme.infoBlue.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -95,7 +94,7 @@ class _LanguageHelperScreenState extends State<LanguageHelperScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
@@ -202,7 +201,7 @@ class _LanguageHelperScreenState extends State<LanguageHelperScreen> {
       child: ChoiceChip(
         label: Text(label),
         selected: isSelected,
-        selectedColor: AppTheme.infoBlue.withOpacity(0.2),
+        selectedColor: AppTheme.infoBlue.withValues(alpha: 0.2),
         onSelected: (selected) {},
       ),
     );
@@ -241,7 +240,7 @@ class _LanguageHelperScreenState extends State<LanguageHelperScreen> {
             selectedCategory = label;
           });
         },
-        selectedColor: AppTheme.infoBlue.withOpacity(0.2),
+        selectedColor: AppTheme.infoBlue.withValues(alpha: 0.2),
         checkmarkColor: AppTheme.infoBlue,
       ),
     );
@@ -330,7 +329,7 @@ class _LanguageHelperScreenState extends State<LanguageHelperScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

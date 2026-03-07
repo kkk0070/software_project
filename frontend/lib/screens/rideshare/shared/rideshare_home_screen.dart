@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:sepro/screens/rideshare/driver/driver_earnings_screen.dart';
 import '../../../theme/app_theme.dart';
 import '../../../providers/active_ride_provider.dart';
 import '../driver/driver_home_screen.dart';
 import '../rider/ride_booking_screen.dart';
 import '../rider/rider_booking_screen.dart';
-import 'rides_history_screen.dart';
 import 'maps_screen.dart';
 import 'chat_list_screen.dart';
 import 'user_profile_screen.dart';
@@ -80,8 +78,8 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
                 boxShadow: [
                   BoxShadow(
                     color: isDark
-                        ? Colors.black.withOpacity(0.3)
-                        : Colors.grey.withOpacity(0.2),
+                        ? Colors.black.withValues(alpha: 0.3)
+                        : Colors.grey.withValues(alpha: 0.2),
                     blurRadius: 20,
                     offset: const Offset(0, -5),
                   ),
@@ -140,7 +138,7 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
                                   colors: _currentIndex == 2
                                       ? [
                                           AppTheme.primaryGreen,
-                                          AppTheme.primaryGreen.withOpacity(0.8)
+                                          AppTheme.primaryGreen.withValues(alpha: 0.8)
                                         ]
                                       : isDark
                                           ? [Colors.grey[800]!, Colors.grey[700]!]
@@ -155,7 +153,7 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
                                             : isDark
                                                 ? Colors.black
                                                 : Colors.grey)
-                                        .withOpacity(0.4),
+                                        .withValues(alpha: 0.4),
                                     blurRadius: 15,
                                     spreadRadius: 2,
                                   ),
@@ -276,10 +274,10 @@ class _ActiveRidePill extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? AppTheme.cardDark : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: statusColor.withOpacity(0.4), width: 1.5),
+          border: Border.all(color: statusColor.withValues(alpha: 0.4), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: statusColor.withOpacity(0.25),
+              color: statusColor.withValues(alpha: 0.25),
               blurRadius: 12,
               offset: const Offset(0, -2),
             ),
@@ -295,7 +293,7 @@ class _ActiveRidePill extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.15),
+                color: statusColor.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -404,7 +402,7 @@ class _PulsingDotState extends State<_PulsingDot>
           color: widget.color,
           boxShadow: [
             BoxShadow(
-              color: widget.color.withOpacity(0.5),
+              color: widget.color.withValues(alpha: 0.5),
               blurRadius: 6,
               spreadRadius: 1,
             ),

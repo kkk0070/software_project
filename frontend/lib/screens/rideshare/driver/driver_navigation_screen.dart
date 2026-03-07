@@ -439,10 +439,10 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: (isDark ? AppTheme.cardDark : Colors.white).withOpacity(0.97),
+                  color: (isDark ? AppTheme.cardDark : Colors.white).withValues(alpha: 0.97),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 12),
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 12),
                   ],
                 ),
                 child: Row(
@@ -540,7 +540,7 @@ class _DriverNavigationScreenState extends State<DriverNavigationScreen>
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 12,
                       offset: const Offset(0, -4),
                     ),

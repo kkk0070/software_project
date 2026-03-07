@@ -150,7 +150,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryGreen.withOpacity(0.15),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -294,12 +294,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
             height: 90,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppTheme.primaryGreen.withOpacity(0.1),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.1),
             ),
             child: Icon(
               FontAwesomeIcons.comments,
               size: 40,
-              color: AppTheme.primaryGreen.withOpacity(0.5),
+              color: AppTheme.primaryGreen.withValues(alpha: 0.5),
             ),
           ),
           const SizedBox(height: 20),
@@ -363,11 +363,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
             borderRadius: BorderRadius.circular(16),
             border: hasUnread
                 ? Border.all(
-                    color: AppTheme.primaryGreen.withOpacity(0.4), width: 1.2)
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.4), width: 1.2)
                 : null,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.15 : 0.05),
+                color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -384,9 +384,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     height: 52,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: avatarColor.withOpacity(0.2),
+                      color: avatarColor.withValues(alpha: 0.2),
                       border: Border.all(
-                          color: avatarColor.withOpacity(0.4), width: 2),
+                          color: avatarColor.withValues(alpha: 0.4), width: 2),
                     ),
                     child: Center(
                       child: Text(

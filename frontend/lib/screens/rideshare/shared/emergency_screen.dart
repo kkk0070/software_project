@@ -29,7 +29,7 @@ class EmergencyScreen extends StatelessWidget {
                 width: 200,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: AppTheme.errorRed.withOpacity(0.2),
+                  color: AppTheme.errorRed.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(color: AppTheme.errorRed, width: 4),
                 ),
@@ -77,7 +77,7 @@ class EmergencyScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.3)),
+        border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

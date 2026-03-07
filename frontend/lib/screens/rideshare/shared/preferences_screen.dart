@@ -151,14 +151,14 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.grey.withOpacity(0.2),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.grey.withValues(alpha: 0.2),
         ),
         boxShadow: isDark
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -172,7 +172,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.2),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -257,15 +257,15 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppTheme.primaryGreen.withOpacity(0.2)
+              ? AppTheme.primaryGreen.withValues(alpha: 0.2)
               : (isDark
                   ? AppTheme.backgroundDark
-                  : Colors.grey.withOpacity(0.1)),
+                  : Colors.grey.withValues(alpha: 0.1)),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
                 ? AppTheme.primaryGreen
-                : (isDark ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.3)),
+                : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.3)),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -310,14 +310,14 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.grey.withOpacity(0.2),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.grey.withValues(alpha: 0.2),
         ),
         boxShadow: isDark
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -327,7 +327,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         secondary: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppTheme.primaryGreen.withOpacity(0.2),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
@@ -351,7 +351,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           ),
         ),
         value: value,
-        activeColor: AppTheme.primaryGreen,
+        activeThumbColor: AppTheme.primaryGreen,
         onChanged: onChanged,
       ),
     );

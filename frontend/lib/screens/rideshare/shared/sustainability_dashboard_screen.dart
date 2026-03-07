@@ -357,7 +357,7 @@ class _SustainabilityDashboardScreenState
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [data.accentColor, data.accentColor.withOpacity(0.6)],
+          colors: [data.accentColor, data.accentColor.withValues(alpha: 0.6)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -380,7 +380,7 @@ class _SustainabilityDashboardScreenState
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.15),
+                    color: Colors.black.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Row(
@@ -400,7 +400,7 @@ class _SustainabilityDashboardScreenState
             '${data.ecoScore}',
             style: const TextStyle(color: Colors.black, fontSize: 48, fontWeight: FontWeight.bold),
           ),
-          Text(data.rankText, style: TextStyle(color: Colors.black.withOpacity(0.7), fontSize: 14)),
+          Text(data.rankText, style: TextStyle(color: Colors.black.withValues(alpha: 0.7), fontSize: 14)),
         ],
       ),
     );
@@ -416,7 +416,7 @@ class _SustainabilityDashboardScreenState
       decoration: BoxDecoration(
         color: isDark ? AppTheme.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: (isDark ? Colors.white : Colors.black).withOpacity(0.1)),
+        border: Border.all(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -440,7 +440,7 @@ class _SustainabilityDashboardScreenState
                   show: true,
                   drawVerticalLine: false,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: (isDark ? Colors.white : Colors.black).withOpacity(0.05),
+                    color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05),
                     strokeWidth: 1,
                   ),
                 ),
@@ -468,7 +468,7 @@ class _SustainabilityDashboardScreenState
                     color: data.accentColor,
                     barWidth: 3,
                     dotData: const FlDotData(show: false),
-                    belowBarData: BarAreaData(show: true, color: data.accentColor.withOpacity(0.15)),
+                    belowBarData: BarAreaData(show: true, color: data.accentColor.withValues(alpha: 0.15)),
                   ),
                 ],
               ),
@@ -497,7 +497,7 @@ class _SustainabilityDashboardScreenState
       decoration: BoxDecoration(
         color: isDark ? AppTheme.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: (isDark ? Colors.white : Colors.black).withOpacity(0.1)),
+        border: Border.all(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -551,7 +551,7 @@ class _SustainabilityDashboardScreenState
         decoration: BoxDecoration(
           color: isDark ? AppTheme.cardDark : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: (isDark ? Colors.white : Colors.black).withOpacity(0.1)),
+          border: Border.all(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1)),
         ),
         child: Row(
           children: [

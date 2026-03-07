@@ -188,8 +188,8 @@ class _RideRatingScreenState extends State<RideRatingScreen> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark
-                      ? Colors.white.withOpacity(0.1)
-                      : Colors.grey.withOpacity(0.3),
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.grey.withValues(alpha: 0.3),
                 ),
               ),
               child: TextField(

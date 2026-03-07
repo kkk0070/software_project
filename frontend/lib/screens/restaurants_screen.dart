@@ -116,8 +116,8 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                   showVeganOnly = value;
                 });
               },
-              activeColor: Colors.white,
-              activeTrackColor: Colors.white.withOpacity(0.5),
+              activeThumbColor: Colors.white,
+              activeTrackColor: Colors.white.withValues(alpha: 0.5),
             ),
           ],
         ),
@@ -166,7 +166,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
             selectedCuisine = label;
           });
         },
-        selectedColor: AppTheme.foodOrange.withOpacity(0.2),
+        selectedColor: AppTheme.foodOrange.withValues(alpha: 0.2),
         checkmarkColor: AppTheme.foodOrange,
       ),
     );
@@ -300,7 +300,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -355,7 +355,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppTheme.successGreen.withOpacity(0.1),
+                              color: AppTheme.successGreen.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(

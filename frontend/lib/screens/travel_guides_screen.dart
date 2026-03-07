@@ -67,7 +67,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen> {
               'Local experts ready to make your trip unforgettable',
               style: TextStyle(
                 fontSize: 14,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 16),
@@ -129,7 +129,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen> {
             selectedSpecialization = label;
           });
         },
-        selectedColor: AppTheme.guideGreen.withOpacity(0.2),
+        selectedColor: AppTheme.guideGreen.withValues(alpha: 0.2),
         checkmarkColor: AppTheme.guideGreen,
       ),
     );
@@ -261,7 +261,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -281,7 +281,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen> {
                     children: [
                       CircleAvatar(
                         radius: 40,
-                        backgroundColor: AppTheme.guideGreen.withOpacity(0.2),
+                        backgroundColor: AppTheme.guideGreen.withValues(alpha: 0.2),
                         child: Text(
                           (guide['name'] as String)[0],
                           style: const TextStyle(
@@ -366,7 +366,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen> {
                             Icon(
                               Icons.location_on,
                               size: 14,
-                              color: theme.colorScheme.onSurface.withOpacity(0.6),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -416,7 +416,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen> {
                 guide['bio'] as String,
                 style: TextStyle(
                   fontSize: 13,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -428,7 +428,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen> {
                   FaIcon(
                     FontAwesomeIcons.language,
                     size: 14,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -462,7 +462,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.guideGreen.withOpacity(0.1),
+                            color: AppTheme.guideGreen.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -491,7 +491,7 @@ class _TravelGuidesScreenState extends State<TravelGuidesScreen> {
                         'Starting from',
                         style: TextStyle(
                           fontSize: 11,
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                       Text(

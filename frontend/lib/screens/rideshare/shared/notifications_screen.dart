@@ -373,13 +373,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> with WidgetsB
           color: notification.read
               ? (isDark ? AppTheme.cardDark : Colors.white)
               : (isDark
-                  ? AppTheme.cardDark.withOpacity(0.95)
+                  ? AppTheme.cardDark.withValues(alpha: 0.95)
                   : Colors.white),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: notification.read
-                ? (isDark ? Colors.grey[800]! : colorScheme.outline.withOpacity(0.1))
-              : AppTheme.primaryGreen.withOpacity(0.3),
+                ? (isDark ? Colors.grey[800]! : colorScheme.outline.withValues(alpha: 0.1))
+              : AppTheme.primaryGreen.withValues(alpha: 0.3),
           width: notification.read ? 1 : 2,
         ),
       ),
@@ -389,7 +389,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> with WidgetsB
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -419,7 +419,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> with WidgetsB
                 Text(
                   timeAgo,
                   style: TextStyle(
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                     fontSize: 10,
                   ),
                 ),

@@ -206,7 +206,7 @@ class AuthService {
       if (location != null) body['location'] = location;
       
       // Add driver-specific fields if role is Driver
-      if (role?.toLowerCase() == 'driver') {
+      if (role.toLowerCase() == 'driver') {
         if (vehicleType != null) body['vehicle_type'] = vehicleType;
         if (vehicleModel != null) body['vehicle_model'] = vehicleModel;
         if (licensePlate != null) body['license_plate'] = licensePlate;

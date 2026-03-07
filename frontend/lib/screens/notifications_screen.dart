@@ -110,10 +110,10 @@ class NotificationsScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: isRead 
             ? (isDark ? AppTheme.cardDark : Colors.white)
-            : AppTheme.primaryGreen.withOpacity(0.05),
+            : AppTheme.primaryGreen.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isRead ? (isDark ? Colors.grey[800]! : Colors.grey.shade200) : AppTheme.primaryGreen.withOpacity(0.3),
+          color: isRead ? (isDark ? Colors.grey[800]! : Colors.grey.shade200) : AppTheme.primaryGreen.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -122,7 +122,7 @@ class NotificationsScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(

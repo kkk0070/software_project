@@ -210,8 +210,8 @@ class _TransportationScreenState extends State<TransportationScreen> {
                   showEcoOptionsOnly = value;
                 });
               },
-              activeColor: Colors.white,
-              activeTrackColor: Colors.white.withOpacity(0.5),
+              activeThumbColor: Colors.white,
+              activeTrackColor: Colors.white.withValues(alpha: 0.5),
             ),
           ],
         ),
@@ -431,7 +431,7 @@ class _TransportationScreenState extends State<TransportationScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -459,7 +459,7 @@ class _TransportationScreenState extends State<TransportationScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.successGreen.withOpacity(0.1),
+                      color: AppTheme.successGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(

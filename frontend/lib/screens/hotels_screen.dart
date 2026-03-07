@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:animate_do/animate_do.dart';
 import '../theme/app_theme.dart';
 
@@ -171,8 +170,8 @@ class _HotelsScreenState extends State<HotelsScreen> {
                   showEcoFriendlyOnly = value;
                 });
               },
-              activeColor: Colors.white,
-              activeTrackColor: Colors.white.withOpacity(0.5),
+              activeThumbColor: Colors.white,
+              activeTrackColor: Colors.white.withValues(alpha: 0.5),
             ),
           ],
         ),
@@ -224,7 +223,7 @@ class _HotelsScreenState extends State<HotelsScreen> {
             selectedFilter = label;
           });
         },
-        selectedColor: theme.primaryColor.withOpacity(0.2),
+        selectedColor: theme.primaryColor.withValues(alpha: 0.2),
         checkmarkColor: theme.primaryColor,
       ),
     );
@@ -343,7 +342,7 @@ class _HotelsScreenState extends State<HotelsScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

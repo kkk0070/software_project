@@ -327,7 +327,7 @@ class _MapsScreenState extends State<MapsScreen> {
             }).toList();
             distanceKm = (data['distance_km'] as num).toDouble();
             distance =
-                '${distanceKm!.toStringAsFixed(1)} km';
+                '${distanceKm.toStringAsFixed(1)} km';
             duration =
                 '${(data['time_min'] as num).toStringAsFixed(0)} min';
           }
@@ -756,11 +756,11 @@ class _MapsScreenState extends State<MapsScreen> {
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor.withOpacity(0.97),
+                  color: Theme.of(context).cardColor.withValues(alpha: 0.97),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
+                      color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -828,7 +828,7 @@ class _MapsScreenState extends State<MapsScreen> {
                           Container(
                             width: 2,
                             height: 16,
-                            color: Colors.grey.withOpacity(0.4),
+                            color: Colors.grey.withValues(alpha: 0.4),
                           ),
                         ],
                       ),
@@ -899,10 +899,10 @@ class _MapsScreenState extends State<MapsScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryGreen.withOpacity(0.1),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: AppTheme.primaryGreen.withOpacity(0.3)),
+                              color: AppTheme.primaryGreen.withValues(alpha: 0.3)),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -926,7 +926,7 @@ class _MapsScreenState extends State<MapsScreen> {
                                 width: 1,
                                 height: 16,
                                 color:
-                                    AppTheme.primaryGreen.withOpacity(0.3)),
+                                    AppTheme.primaryGreen.withValues(alpha: 0.3)),
                             Row(
                               children: [
                                 const Icon(Icons.access_time,
@@ -987,10 +987,10 @@ class _MapsScreenState extends State<MapsScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: Colors.orange.withOpacity(0.1),
+                          color: Colors.orange.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: Colors.orange.withOpacity(0.4)),
+                              color: Colors.orange.withValues(alpha: 0.4)),
                         ),
                         child: Row(
                           children: [
@@ -1014,7 +1014,7 @@ class _MapsScreenState extends State<MapsScreen> {
                                     '${_emissionData!['category']}  •  '
                                     '${(_emissionData!['emission_factor_kg_per_km'] as num).toStringAsFixed(3)} kg/km',
                                     style: TextStyle(
-                                      color: Colors.orange.withOpacity(0.8),
+                                      color: Colors.orange.withValues(alpha: 0.8),
                                       fontSize: 11,
                                     ),
                                   ),
@@ -1041,10 +1041,10 @@ class _MapsScreenState extends State<MapsScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: aqiColor.withOpacity(0.12),
+                            color: aqiColor.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                                color: aqiColor.withOpacity(0.5)),
+                                color: aqiColor.withValues(alpha: 0.5)),
                           ),
                           child: Row(
                             children: [
@@ -1118,10 +1118,10 @@ class _MapsScreenState extends State<MapsScreen> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: AppTheme.errorRed.withOpacity(0.1),
+                          color: AppTheme.errorRed.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppTheme.errorRed.withOpacity(0.3),
+                            color: AppTheme.errorRed.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
@@ -1155,7 +1155,7 @@ class _MapsScreenState extends State<MapsScreen> {
           if (_isLoading)
             Container(
               color:
-                  Theme.of(context).scaffoldBackgroundColor.withOpacity(0.8),
+                  Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
               child: const Center(
                 child: CircularProgressIndicator(
                   color: AppTheme.primaryGreen,
@@ -1264,7 +1264,7 @@ class _VehicleSelector extends StatelessWidget {
                     border: Border.all(
                       color: isSelected
                           ? AppTheme.primaryGreen
-                          : Colors.grey.withOpacity(0.3),
+                          : Colors.grey.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -1361,7 +1361,7 @@ class _SearchBarWithSuggestions extends StatelessWidget {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide:
-                  BorderSide(color: Colors.grey.withOpacity(0.2)),
+                  BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -1378,7 +1378,7 @@ class _SearchBarWithSuggestions extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.12),
+                  color: Colors.black.withValues(alpha: 0.12),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -1390,7 +1390,7 @@ class _SearchBarWithSuggestions extends StatelessWidget {
               itemCount: suggestions.length > 5 ? 5 : suggestions.length,
               separatorBuilder: (_, __) => Divider(
                 height: 1,
-                color: Colors.grey.withOpacity(0.2),
+                color: Colors.grey.withValues(alpha: 0.2),
               ),
               itemBuilder: (context, i) {
                 return InkWell(

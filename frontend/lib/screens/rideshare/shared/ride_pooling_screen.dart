@@ -41,7 +41,7 @@ class RidePoolingScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? AppTheme.cardDark : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: recommended ? AppTheme.primaryGreen : (isDark ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.3)), width: recommended ? 2 : 1),
+          border: Border.all(color: recommended ? AppTheme.primaryGreen : (isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.3)), width: recommended ? 2 : 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

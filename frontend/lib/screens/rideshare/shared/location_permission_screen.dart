@@ -75,7 +75,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
       decoration: BoxDecoration(
         color: isDark ? AppTheme.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: (isDark ? Colors.white : Colors.black).withOpacity(0.1)),
+        border: Border.all(color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -92,7 +92,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppTheme.primaryGreen,
+            activeThumbColor: AppTheme.primaryGreen,
           ),
         ],
       ),

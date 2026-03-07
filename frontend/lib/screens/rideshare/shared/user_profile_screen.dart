@@ -108,7 +108,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primaryGreen.withOpacity(0.4),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.4),
                           blurRadius: 20,
                         ),
                       ],
@@ -140,7 +140,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.2),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: AppTheme.primaryGreen),
                     ),
@@ -289,7 +289,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
                             color: isDark ? AppTheme.cardDark : Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.3),
+                              color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.3),
                             ),
                           ),
                           child: const Center(
@@ -392,7 +392,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
         color: isDark ? AppTheme.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.3),
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.3),
         ),
       ),
       child: ListTile(
@@ -401,8 +401,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: isDestructive
-                ? AppTheme.errorRed.withOpacity(0.2)
-                : AppTheme.primaryGreen.withOpacity(0.2),
+                ? AppTheme.errorRed.withValues(alpha: 0.2)
+                : AppTheme.primaryGreen.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
@@ -442,14 +442,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
         color: isDark ? AppTheme.cardDark : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.3),
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.3),
         ),
       ),
       child: SwitchListTile(
         secondary: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppTheme.primaryGreen.withOpacity(0.2),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(10),
           ),
           child: const Icon(
@@ -475,7 +475,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
           ),
         ),
         value: _twoFactorEnabled,
-        activeColor: AppTheme.primaryGreen,
+        activeThumbColor: AppTheme.primaryGreen,
         onChanged: (value) {
           if (value) {
             _enable2FA();
@@ -556,7 +556,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
                 decoration: InputDecoration(
                   counterText: '',
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.1),
+                  fillColor: Colors.white.withValues(alpha: 0.1),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -690,7 +690,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.1),
+                fillColor: Colors.white.withValues(alpha: 0.1),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
