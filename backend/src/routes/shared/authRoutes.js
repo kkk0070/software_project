@@ -11,7 +11,10 @@ import {
   disable2FA,
   get2FAStatus,
   uploadProfilePhoto,
-  uploadPhoto
+  uploadPhoto,
+  getSessions,
+  logoutDevice,
+  deactivateAccount
 } from '../../controllers/shared/authController.js';
 import { authenticateToken } from '../../middleware/authMiddleware.js';
 import { otpRateLimiter, twoFactorRateLimiter, uploadRateLimiter } from '../../middleware/rateLimiter.js';
@@ -36,5 +39,10 @@ router.get('/2fa/status', authenticateToken, get2FAStatus);
 router.post('/2fa/request-otp', authenticateToken, request2FAOTP);
 router.post('/2fa/enable', authenticateToken, enable2FA);
 router.post('/2fa/disable', authenticateToken, twoFactorRateLimiter, disable2FA);
+
+// Device Sessions and Account Management routes
+router.get('/sessions', authenticateToken, getSessions);
+router.delete('/sessions/:id', authenticateToken, logoutDevice);
+router.post('/deactivate', authenticateToken, deactivateAccount);
 
 export default router;

@@ -107,18 +107,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-    - assests/
-    - assests/stitch_live_ride_tracking_safety (2)/
-    - assests/stitch_live_ride_tracking_safety (3)/
-    - assests/stitch_live_ride_tracking_safety (4)/
-    - assests/stitch_live_ride_tracking_safety (5)/
-    - assests/stitch_live_ride_tracking_safety (6)/
-    - assests/stitch_live_ride_tracking_safety (7)/
-    - assests/stitch_live_ride_tracking_safety (8)/
-    - assests/stitch_live_ride_tracking_safety (9)/
-    - assests/stitch_live_ride_tracking_safety (10)/
-    - assests/stitch_live_ride_tracking_safety (11)/
+  # assets:
+  #   - images/a_dot_burr.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

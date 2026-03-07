@@ -18,6 +18,7 @@ import notificationRoutes from './routes/shared/notificationRoutes.js';
 import settingsRoutes from './routes/shared/settingsRoutes.js';
 import reportsRoutes from './routes/shared/reportsRoutes.js';
 import chatRoutes from './routes/shared/chatRoutes.js';
+import paymentRoutes from './routes/shared/paymentRoutes.js';
 // PostgreSQL connection pool for database operations
 import pool from './config/database.js';
 // Encryption key management utilities
@@ -33,7 +34,7 @@ dotenv.config();
 const runMigrations = async () => {
   // Get a database client from the connection pool
   const client = await pool.connect();
-  
+
   try {
     console.log('[INFO] Running automatic database migrations...');
 
@@ -63,46 +64,46 @@ const runMigrations = async () => {
       WHERE table_name = 'documents' 
         AND column_name IN ('is_encrypted', 'encryption_key_id', 'encrypted_key', 'encryption_iv', 'encryption_auth_tag', 'encryption_algorithm')
     `);
-    
+
     // Extract column names from the query result into an array
     const existingColumns = columnCheck.rows.map(row => row.column_name);
-    
+
     // Add is_encrypted column to track whether a document is encrypted
     if (!existingColumns.includes('is_encrypted')) {
       await client.query(`ALTER TABLE documents ADD COLUMN is_encrypted BOOLEAN DEFAULT false`);
       console.log('[SUCCESS] Added is_encrypted column');
     }
-    
+
     // Add encryption_key_id to reference which key was used to encrypt the document
     if (!existingColumns.includes('encryption_key_id')) {
       await client.query(`ALTER TABLE documents ADD COLUMN encryption_key_id VARCHAR(255) REFERENCES encryption_keys(key_id)`);
       console.log('[SUCCESS] Added encryption_key_id column');
     }
-    
+
     // Add encrypted_key to store the encrypted symmetric key (hybrid encryption)
     if (!existingColumns.includes('encrypted_key')) {
       await client.query(`ALTER TABLE documents ADD COLUMN encrypted_key TEXT`);
       console.log('[SUCCESS] Added encrypted_key column');
     }
-    
+
     // Add encryption_iv to store the initialization vector for AES encryption
     if (!existingColumns.includes('encryption_iv')) {
       await client.query(`ALTER TABLE documents ADD COLUMN encryption_iv TEXT`);
       console.log('[SUCCESS] Added encryption_iv column');
     }
-    
+
     // Add encryption_auth_tag for authenticated encryption (GCM mode)
     if (!existingColumns.includes('encryption_auth_tag')) {
       await client.query(`ALTER TABLE documents ADD COLUMN encryption_auth_tag TEXT`);
       console.log('[SUCCESS] Added encryption_auth_tag column');
     }
-    
+
     // Add encryption_algorithm to track which algorithm was used (e.g., AES-256-GCM)
     if (!existingColumns.includes('encryption_algorithm')) {
       await client.query(`ALTER TABLE documents ADD COLUMN encryption_algorithm VARCHAR(50)`);
       console.log('[SUCCESS] Added encryption_algorithm column');
     }
-    
+
     // Add file_hash to verify document integrity and detect tampering
     if (!existingColumns.includes('file_hash')) {
       await client.query(`ALTER TABLE documents ADD COLUMN file_hash VARCHAR(64)`);
@@ -114,15 +115,15 @@ const runMigrations = async () => {
       CREATE INDEX IF NOT EXISTS idx_documents_encryption_key 
       ON documents(encryption_key_id)
     `);
-    
+
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_encryption_keys_key_id 
       ON encryption_keys(key_id)
     `);
-    
+
     // Create chat-related tables for real-time messaging between riders and drivers
     console.log('[INFO] Creating chat tables...');
-    
+
     // Conversations table stores chat sessions between riders and drivers for specific rides
     // Each conversation links a rider, driver, and optionally a ride
     await client.query(`
@@ -161,23 +162,23 @@ const runMigrations = async () => {
       CREATE INDEX IF NOT EXISTS idx_messages_conversation 
       ON messages(conversation_id);
     `);
-    
+
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_messages_sender 
       ON messages(sender_id);
     `);
-    
+
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_conversations_rider 
       ON conversations(rider_id);
     `);
-    
+
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_conversations_driver 
       ON conversations(driver_id);
     `);
     console.log('[SUCCESS] Chat indexes created');
-    
+
     console.log('[SUCCESS] Database migrations completed\n');
   } catch (error) {
     // Log detailed error information if migrations fail
@@ -233,14 +234,14 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, Postman, curl, etc.)
     if (!origin) return callback(null, true);
-    
+
     // Whitelist of allowed origins for security
     const allowedOrigins = [
       'http://localhost:5173',  // Admin dashboard development server
       /^http:\/\/localhost:[3-9]\d{3}$/,  // Any localhost port from 3000-9999
       /^http:\/\/127\.0\.0\.1:[3-9]\d{3}$/,  // Same for 127.0.0.1
     ];
-    
+
     // Check if the request origin matches any allowed pattern
     const isAllowed = allowedOrigins.some(pattern => {
       if (typeof pattern === 'string') {
@@ -252,7 +253,7 @@ const corsOptions = {
       }
       return false;
     });
-    
+
     // Determine if we're in development mode
     const isDevelopment = process.env.NODE_ENV === 'development';
     if (isAllowed) {
@@ -335,10 +336,10 @@ app.get('/api/security-demo', (req, res) => {
     const analysis = analyzeBase64Security();
     // Get summarized security metrics
     const summary = getSecuritySummary();
-    
+
     // Print detailed security report to server console
     console.log(generateSecurityReport());
-    
+
     // Return analysis results to client
     res.json({
       success: true,
@@ -371,6 +372,7 @@ app.use('/api/notifications', notificationRoutes); // Push notifications
 app.use('/api/settings', settingsRoutes);     // User settings and preferences
 app.use('/api/reports', reportsRoutes);       // Reporting and analytics
 app.use('/api/chat', chatRoutes);             // Real-time chat messaging
+app.use('/api/payments', paymentRoutes);      // Payments and wallet
 
 // Root endpoint - API documentation and available endpoints
 app.get('/', (req, res) => {
@@ -389,7 +391,8 @@ app.get('/', (req, res) => {
       notifications: '/api/notifications',
       settings: '/api/settings',
       reports: '/api/reports',
-      chat: '/api/chat'
+      chat: '/api/chat',
+      payments: '/api/payments'
     }
   });
 });
@@ -426,14 +429,14 @@ httpServer.listen(PORT, HOST, async () => {
 ║   🔌 WebSocket: Enabled
 ╚═══════════════════════════════════════════╝
   `);
-  
+
   try {
     // Step 1: Run database migrations to ensure schema is up-to-date
     await runMigrations();
-    
+
     // Step 2: Initialize encryption key management system
     await initializeKeyManagement();
-    
+
     // Step 3: Initialize Socket.io for real-time notifications and chat
     initializeSocketIO(httpServer);
     console.log('[SUCCESS] Real-time notifications enabled via WebSocket');

@@ -689,4 +689,90 @@ class AuthService {
       };
     }
   }
+
+  // Get active device sessions
+  static Future<Map<String, dynamic>> getSessions() async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'No authentication token found'};
+      }
+
+      final response = await http.get(
+        Uri.parse('${ApiConfig.authUrl}/sessions'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(ApiConfig.connectionTimeout);
+
+      final data = _safeJsonDecode(response);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        return {'success': true, 'sessions': data['data']};
+      } else {
+        return {'success': false, 'message': data['message'] ?? 'Failed to fetch sessions'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
+    }
+  }
+
+  // Revoke a specific device session
+  static Future<Map<String, dynamic>> revokeSession(String sessionId) async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'No authentication token found'};
+      }
+
+      final response = await http.delete(
+        Uri.parse('${ApiConfig.authUrl}/sessions/$sessionId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(ApiConfig.connectionTimeout);
+
+      final data = _safeJsonDecode(response);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        return {'success': true, 'message': data['message'] ?? 'Session revoked'};
+      } else {
+        return {'success': false, 'message': data['message'] ?? 'Failed to revoke session'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
+    }
+  }
+
+  // Deactivate account
+  static Future<Map<String, dynamic>> deactivateAccount() async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'No authentication token found'};
+      }
+
+      final response = await http.post(
+        Uri.parse('${ApiConfig.authUrl}/deactivate'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(ApiConfig.connectionTimeout);
+
+      final data = _safeJsonDecode(response);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        // Log out immediately upon deactivation
+        await logout();
+        return {'success': true, 'message': data['message'] ?? 'Account deactivated'};
+      } else {
+        return {'success': false, 'message': data['message'] ?? 'Failed to deactivate account'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
+    }
+  }
 }

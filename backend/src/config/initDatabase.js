@@ -26,11 +26,19 @@ const createTables = async () => {
         two_factor_enabled BOOLEAN DEFAULT false,
         two_factor_secret VARCHAR(255),
         joined_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        deactivated_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
     console.log('[SUCCESS] Users table created');
+
+    // Make sure deactivated_at exists if the table was previously created
+    await client.query(`
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS deactivated_at TIMESTAMP;
+    `);
+    console.log('[SUCCESS] Users table missing columns ensured');
 
     // Drivers table (additional driver-specific info)
     await client.query(`
@@ -193,6 +201,62 @@ const createTables = async () => {
     `);
     console.log('[SUCCESS] Documents table created');
 
+    // Device Sessions table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS device_sessions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        refresh_token TEXT NOT NULL,
+        device_info VARCHAR(255),
+        ip_address VARCHAR(50),
+        last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] Device Sessions table created');
+
+    // Wallets table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS wallets (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+        balance DECIMAL(10,2) DEFAULT 0.00,
+        currency VARCHAR(10) DEFAULT 'USD',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] Wallets table created');
+
+    // Payment Methods table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS payment_methods (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        provider_method_id VARCHAR(255),
+        last4 VARCHAR(4),
+        brand VARCHAR(50),
+        is_default BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] Payment Methods table created');
+
+    // Transactions table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS transactions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        ride_id INTEGER REFERENCES rides(id) ON DELETE SET NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        type VARCHAR(20) CHECK (type IN ('Credit', 'Debit')),
+        status VARCHAR(20) DEFAULT 'Completed' CHECK (status IN ('Pending', 'Completed', 'Failed')),
+        description TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] Transactions table created');
+
     console.log('[COMPLETE] All tables created successfully!');
   } catch (error) {
     console.error('[ERROR] Error creating tables:', error);
@@ -228,12 +292,13 @@ const seedInitialData = async () => {
       console.log('   [KEY] Password: admin123\n');
 
       // Insert sample riders
-      await client.query(`
+      const riderUsers = await client.query(`
         INSERT INTO users (name, email, password, phone, location, role, status, verified, rating, total_rides)
         VALUES 
           ('John Doe', 'john@example.com', $1, '+1234567890', 'New York, NY', 'Rider', 'Active', true, 4.8, 45),
           ('Mike Johnson', 'mike@example.com', $1, '+1234567892', 'Chicago, IL', 'Rider', 'Suspended', false, 3.5, 12),
           ('Tom Brown', 'tom@example.com', $1, '+1234567894', 'Phoenix, AZ', 'Rider', 'Active', true, 4.7, 78)
+        RETURNING id
       `, [defaultPasswordHash]);
       console.log('[SUCCESS] Sample riders created (password: password123)');
 
@@ -268,6 +333,15 @@ const seedInitialData = async () => {
         }
       }
       console.log('[SUCCESS] Driver details added');
+
+      // Initialize default wallets for these sample users
+      const allSampleUsers = [...riderUsers.rows, ...drivers, adminCheck.rows.length === 0 ? {id: 1} : null].filter(Boolean); // Very rough, admin user is likely 1
+      for (const user of allSampleUsers) {
+        await client.query(`
+          INSERT INTO wallets (user_id, balance) VALUES ($1, 100.00) ON CONFLICT DO NOTHING
+        `, [user.id]);
+      }
+      console.log('[SUCCESS] Initialized sample user wallets with $100.00 each');
 
       // Insert sample settings
       await client.query(`

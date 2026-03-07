@@ -4,6 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import '../theme/app_theme.dart';
 import '../services/user_service.dart';
 import '../services/storage_service.dart';
+import '../services/ride_service.dart';
 
 class BookRideScreen extends StatefulWidget {
   const BookRideScreen({super.key});
@@ -123,7 +124,11 @@ class _BookRideScreenState extends State<BookRideScreen> {
     
     // Apply pooling discount
     if (_isPooled) {
-      return '\$${(totalPrice * 0.7).toStringAsFixed(2)}';
+      double poolFare = totalPrice * 0.7;
+      if (_passengers > 1) {
+        poolFare = poolFare / _passengers;
+      }
+      return '\$${poolFare.toStringAsFixed(2)}';
     }
     return '\$${totalPrice.toStringAsFixed(2)}';
   }
@@ -1222,14 +1227,44 @@ class _BookRideScreenState extends State<BookRideScreen> {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Ride booked with ${driver['name']}!'),
-                  backgroundColor: AppTheme.successGreen,
-                ),
+            onPressed: () async {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(child: CircularProgressIndicator()),
               );
+
+              final riderId = int.tryParse(await StorageService.getUserId() ?? '1') ?? 1;
+              final fareValue = double.tryParse(_calculateEstimatedPrice().replaceAll('\$', '')) ?? 0.0;
+              final result = await RideService.createRide(
+                riderId: riderId,
+                driverId: driver['id'] is String ? int.tryParse(driver['id']) ?? 1 : driver['id'],
+                pickupLocation: _pickupController.text,
+                dropoffLocation: _dropController.text,
+                fare: fareValue,
+                rideType: _isPooled ? 'Pool' : _getRideTypeDetails(_selectedRideType)['name'],
+                passengerCount: _passengers,
+              );
+
+              if (!mounted) return;
+              Navigator.pop(context); // Close loading dialog
+              Navigator.pop(context); // Close confirmation dialog
+
+              if (result['success'] == true) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Ride booked with ${driver['name']}!'),
+                    backgroundColor: AppTheme.successGreen,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(result['message'] ?? 'Failed to book ride'),
+                    backgroundColor: AppTheme.errorRed,
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryGreen,

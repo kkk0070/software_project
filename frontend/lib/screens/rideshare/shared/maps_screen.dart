@@ -20,7 +20,7 @@ import '../driver/driver_navigation_screen.dart';
 /// Replace this placeholder with your actual key from Google Cloud Console.
 /// Do NOT commit a real API key here without first restricting it in the Cloud
 /// Console (by HTTP referrer, Android fingerprint, or iOS bundle ID).
-const String _kMapsApiKey = 'YOUR_API_KEY_HERE';
+const String _kMapsApiKey = 'AIzaSyDrpIN_Stxm5qFtWu8YjvShd3PNK8OMcMY';
 
 /// Base URL of the local ML route server (ml/server.py).
 /// Start it with: cd ml && python server.py

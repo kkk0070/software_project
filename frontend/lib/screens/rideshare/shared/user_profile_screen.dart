@@ -11,6 +11,9 @@ import 'document_upload_screen.dart';
 import 'landing_screen.dart';
 import 'preferences_screen.dart';
 import '../driver/driver_earnings_screen.dart';
+import '../../active_devices_screen.dart';
+import '../../deactivate_account_screen.dart';
+import '../../wallet_screen.dart';
 
 /// 3️⃣ User Profile Page
 /// Features:
@@ -198,6 +201,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
                       );
                     },
                   ),
+                  _buildMenuItem(
+                    context,
+                    icon: FontAwesomeIcons.wallet,
+                    title: 'Wallet & Payments',
+                    subtitle: 'Manage your payment methods and balance',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const WalletScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   // History menu item for drivers only - positioned below Documents
                   if (userRole?.toLowerCase() == 'driver')
                     _buildMenuItem(
@@ -234,6 +251,34 @@ class _UserProfileScreenState extends State<UserProfileScreen> with UserProfileL
                     title: 'Privacy & Security',
                     subtitle: 'Data privacy settings',
                     onTap: () {},
+                  ),
+                  _buildMenuItem(
+                    context,
+                    icon: FontAwesomeIcons.desktop,
+                    title: 'Active Devices',
+                    subtitle: 'Manage logged-in sessions',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ActiveDevicesScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildMenuItem(
+                    context,
+                    icon: FontAwesomeIcons.userMinus,
+                    title: 'Deactivate Account',
+                    subtitle: 'Temporarily disable your account',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DeactivateAccountScreen(),
+                        ),
+                      );
+                    },
                   ),
                   // 2FA Toggle
                   _loading2FAStatus

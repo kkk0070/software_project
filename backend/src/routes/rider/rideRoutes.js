@@ -8,6 +8,7 @@ import {
   getRideStats,
   acceptRide,
   rejectRide,
+  completeRide,
   rateRide
 } from '../../controllers/rider/rideController.js';
 
@@ -20,6 +21,7 @@ router.post('/', createRide);
 router.put('/:id', updateRide);
 router.put('/:id/accept', acceptRide);
 router.put('/:id/reject', rejectRide);
+router.post('/:id/complete', completeRide);
 router.post('/:id/rate', rateRide);
 router.delete('/:id', deleteRide);
 

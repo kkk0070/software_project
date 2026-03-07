@@ -50,6 +50,7 @@ class RideService {
     required String dropoffLocation,
     double? fare,
     String? rideType,
+    int? passengerCount,
   }) async {
     try {
       final response = await http.post(
@@ -62,6 +63,7 @@ class RideService {
           'dropoff_location': dropoffLocation,
           if (fare != null) 'fare': fare,
           if (rideType != null) 'ride_type': rideType,
+          if (passengerCount != null) 'passenger_count': passengerCount,
           'status': 'Pending',
         }),
       ).timeout(ApiConfig.connectionTimeout);

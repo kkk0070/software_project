@@ -4,6 +4,7 @@ import { knex } from '../../config/database.js';
 import bcrypt from 'bcrypt';
 // JSON Web Token library for authentication tokens
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 // File upload handling middleware
 import multer from 'multer';
 // Path utilities for file system operations
@@ -50,18 +51,18 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   // Whitelist of allowed image MIME types
   const allowedMimetypes = ['image/jpeg', 'image/jpg', 'image/png'];
-  
+
   // Check MIME type first (most reliable security check)
   if (!allowedMimetypes.includes(file.mimetype)) {
     return cb(new Error('Only JPG and PNG image files are allowed!'));
   }
-  
+
   // Also check file extension as an additional security layer
   const ext = path.extname(file.originalname).toLowerCase();
   if (!['.jpg', '.jpeg', '.png'].includes(ext)) {
     return cb(new Error('Only .jpg, .jpeg and .png extensions are allowed!'));
   }
-  
+
   // File passed validation, accept it
   cb(null, true);
 };
@@ -77,7 +78,7 @@ const generateToken = (userId, email, role) => {
   if (!process.env.JWT_SECRET) {
     throw new Error('JWT_SECRET is not configured in environment variables');
   }
-  
+
   return jwt.sign(
     { id: userId, email, role },
     process.env.JWT_SECRET,
@@ -123,7 +124,7 @@ export const signup = async (req, res) => {
       .select('id')
       .where('email', email)
       .first();
-      
+
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -142,7 +143,7 @@ export const signup = async (req, res) => {
     const saltAndHash = hashParts[3];
     const salt = saltAndHash.substring(0, 22); // First 22 characters are the salt
     const hash = saltAndHash.substring(22);     // Remaining 31 characters are the hash
-    
+
     console.log('\n[ENCRYPTING] Password Hashing Details (User Registration):');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log(`👤 User Email: ${email}`);
@@ -164,8 +165,8 @@ export const signup = async (req, res) => {
         role: role || 'Rider'
       })
       .returning([
-        'id', 'name', 'email', 'phone', 'location', 'role', 
-        'status', 'verified', 'profile_setup_complete', 'rating', 
+        'id', 'name', 'email', 'phone', 'location', 'role',
+        'status', 'verified', 'profile_setup_complete', 'rating',
         'total_rides', 'created_at'
       ]);
 
@@ -262,7 +263,7 @@ export const login = async (req, res) => {
       // Generate and send OTP
       const otp = generateOTP();
       storeOTP(user.email, otp, 10);
-      
+
       // Try to send OTP via email, but don't fail if email service is not configured
       try {
         await sendOTPEmail(user.email, otp, user.name);
@@ -298,12 +299,22 @@ export const login = async (req, res) => {
     // Generate JWT token
     const token = generateToken(user.id, user.email, user.role);
 
+    // Track active device session
+    const refreshToken = crypto.randomBytes(40).toString('hex');
+    await knex('device_sessions').insert({
+      user_id: user.id,
+      refresh_token: refreshToken,
+      device_info: req.headers['user-agent'] || 'Unknown Device',
+      ip_address: req.ip || req.connection?.remoteAddress || 'Unknown IP'
+    });
+
     res.json(createPostResponse({
       success: true,
       message: 'Login successful',
       data: {
         user,
-        token
+        token,
+        refreshToken
       },
       requestBody: req.body
     }));
@@ -335,7 +346,7 @@ export const verifyLoginOTP = async (req, res) => {
 
     // Verify OTP
     const verification = verifyOTP(email, otp);
-    
+
     if (!verification.success) {
       return res.status(400).json({
         success: false,
@@ -367,12 +378,22 @@ export const verifyLoginOTP = async (req, res) => {
     // Generate JWT token
     const token = generateToken(user.id, user.email, user.role);
 
+    // Track active device session
+    const refreshToken = crypto.randomBytes(40).toString('hex');
+    await knex('device_sessions').insert({
+      user_id: user.id,
+      refresh_token: refreshToken,
+      device_info: req.headers['user-agent'] || 'Unknown Device',
+      ip_address: req.ip || req.connection?.remoteAddress || 'Unknown IP'
+    });
+
     res.json(createPostResponse({
       success: true,
       message: 'Login successful',
       data: {
         user,
-        token
+        token,
+        refreshToken
       },
       requestBody: req.body
     }));
@@ -395,11 +416,11 @@ export const getProfile = async (req, res) => {
     const userId = req.user.id;
 
     const user = await knex('users')
-      .select('u.id', 'u.name', 'u.email', 'u.phone', 'u.location', 'u.profile_photo', 
-              'u.role', 'u.status', 'u.verified', 'u.profile_setup_complete', 
-              'u.rating', 'u.total_rides', 'u.created_at', 'u.updated_at',
-              'd.vehicle_type', 'd.vehicle_model', 'd.license_plate', 'd.available',
-              'd.license_number', 'd.vehicle_year', 'd.earnings', 'd.verification_status')
+      .select('u.id', 'u.name', 'u.email', 'u.phone', 'u.location', 'u.profile_photo',
+        'u.role', 'u.status', 'u.verified', 'u.profile_setup_complete',
+        'u.rating', 'u.total_rides', 'u.created_at', 'u.updated_at',
+        'd.vehicle_type', 'd.vehicle_model', 'd.license_plate', 'd.available',
+        'd.license_number', 'd.vehicle_year', 'd.earnings', 'd.verification_status')
       .from('users as u')
       .leftJoin('drivers as d', 'u.id', 'd.user_id')
       .where('u.id', userId)
@@ -434,7 +455,7 @@ export const updateProfile = async (req, res) => {
 
     // Build update object dynamically
     const updates = {};
-    
+
     if (name !== undefined) updates.name = name;
     if (phone !== undefined) updates.phone = phone;
     if (location !== undefined) updates.location = location;
@@ -451,8 +472,8 @@ export const updateProfile = async (req, res) => {
     const [updatedUser] = await knex('users')
       .where('id', userId)
       .update(updates)
-      .returning(['id', 'name', 'email', 'phone', 'location', 'role', 
-                  'status', 'verified', 'rating', 'total_rides', 'updated_at']);
+      .returning(['id', 'name', 'email', 'phone', 'location', 'role',
+        'status', 'verified', 'rating', 'total_rides', 'updated_at']);
 
     res.json({
       success: true,
@@ -480,9 +501,9 @@ export const completeProfileSetup = async (req, res) => {
         profile_setup_complete: true,
         updated_at: knex.fn.now()
       })
-      .returning(['id', 'name', 'email', 'phone', 'location', 'role', 
-                  'status', 'verified', 'profile_setup_complete', 
-                  'rating', 'total_rides', 'updated_at']);
+      .returning(['id', 'name', 'email', 'phone', 'location', 'role',
+        'status', 'verified', 'profile_setup_complete',
+        'rating', 'total_rides', 'updated_at']);
 
     res.json(createPostResponse({
       success: true,
@@ -513,7 +534,7 @@ export const request2FAOTP = async (req, res) => {
       .select('id', 'name', 'email', 'two_factor_enabled')
       .where('id', userId)
       .first();
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -523,7 +544,7 @@ export const request2FAOTP = async (req, res) => {
 
     // Generate OTP
     const otp = generateOTP();
-    
+
     // Store OTP with 10 minutes expiry
     storeOTP(user.email, otp, 10);
 
@@ -562,7 +583,7 @@ export const request2FAOTP = async (req, res) => {
     }));
   } catch (error) {
     console.error('Error requesting 2FA OTP:', error);
-    
+
     // Check if this is a missing column error
     if (error.code === '42703' && error.message.includes('two_factor')) {
       return res.status(500).json(createPostResponse({
@@ -575,7 +596,7 @@ export const request2FAOTP = async (req, res) => {
         requestBody: req.body
       }));
     }
-    
+
     res.status(500).json(createPostResponse({
       success: false,
       message: 'Error sending OTP',
@@ -605,7 +626,7 @@ export const enable2FA = async (req, res) => {
       .select('id', 'name', 'email', 'two_factor_enabled')
       .where('id', userId)
       .first();
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -615,7 +636,7 @@ export const enable2FA = async (req, res) => {
 
     // Verify OTP
     const verification = verifyOTP(user.email, otp);
-    
+
     if (!verification.success) {
       return res.status(400).json({
         success: false,
@@ -652,7 +673,7 @@ export const enable2FA = async (req, res) => {
     }));
   } catch (error) {
     console.error('Error enabling 2FA:', error);
-    
+
     // Check if this is a missing column error
     if (error.code === '42703' && error.message.includes('two_factor')) {
       return res.status(500).json(createPostResponse({
@@ -665,7 +686,7 @@ export const enable2FA = async (req, res) => {
         requestBody: req.body
       }));
     }
-    
+
     res.status(500).json(createPostResponse({
       success: false,
       message: 'Error enabling two-factor authentication',
@@ -695,7 +716,7 @@ export const disable2FA = async (req, res) => {
       .select('id', 'name', 'email', 'password', 'two_factor_enabled')
       .where('id', userId)
       .first();
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -734,7 +755,7 @@ export const disable2FA = async (req, res) => {
     }));
   } catch (error) {
     console.error('Error disabling 2FA:', error);
-    
+
     // Check if this is a missing column error
     if (error.code === '42703' && error.message.includes('two_factor')) {
       return res.status(500).json(createPostResponse({
@@ -747,7 +768,7 @@ export const disable2FA = async (req, res) => {
         requestBody: req.body
       }));
     }
-    
+
     res.status(500).json(createPostResponse({
       success: false,
       message: 'Error disabling two-factor authentication',
@@ -768,7 +789,7 @@ export const get2FAStatus = async (req, res) => {
       .select('two_factor_enabled')
       .where('id', userId)
       .first();
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -784,7 +805,7 @@ export const get2FAStatus = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching 2FA status:', error);
-    
+
     // Check if this is a missing column error
     if (error.code === '42703' && error.message.includes('two_factor')) {
       return res.status(500).json({
@@ -794,7 +815,7 @@ export const get2FAStatus = async (req, res) => {
         fixCommand: 'cd backend && npm run migrate-2fa'
       });
     }
-    
+
     res.status(500).json({
       success: false,
       message: 'Error fetching 2FA status',
@@ -821,7 +842,7 @@ export const uploadPhoto = async (req, res) => {
       .select('profile_photo')
       .where('id', userId)
       .first();
-      
+
     if (oldProfile?.profile_photo) {
       const oldPhotoPath = path.join(__dirname, '../..', oldProfile.profile_photo);
       if (fs.existsSync(oldPhotoPath)) {
@@ -836,8 +857,8 @@ export const uploadPhoto = async (req, res) => {
         profile_photo: photoUrl,
         updated_at: knex.fn.now()
       })
-      .returning(['id', 'name', 'email', 'phone', 'location', 'profile_photo', 
-                  'role', 'status', 'verified', 'rating', 'total_rides', 'updated_at']);
+      .returning(['id', 'name', 'email', 'phone', 'location', 'profile_photo',
+        'role', 'status', 'verified', 'rating', 'total_rides', 'updated_at']);
 
     res.json(createPostResponse({
       success: true,
@@ -860,5 +881,92 @@ export const uploadPhoto = async (req, res) => {
       },
       requestBody: req.body
     }));
+  }
+};
+
+// Get active device sessions for the user
+export const getSessions = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const sessions = await knex('device_sessions')
+      .select('id', 'device_info', 'ip_address', 'last_active', 'created_at')
+      .where('user_id', userId)
+      .orderBy('last_active', 'desc');
+
+    res.json({
+      success: true,
+      data: sessions
+    });
+  } catch (error) {
+    console.error('Error fetching sessions:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching device sessions',
+      error: error.message
+    });
+  }
+};
+
+// Logout a specific device session
+export const logoutDevice = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const deleted = await knex('device_sessions')
+      .where({ id, user_id: userId })
+      .del();
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: 'Session not found or already revoked'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Device session revoked successfully'
+    });
+  } catch (error) {
+    console.error('Error revoking session:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error revoking device session',
+      error: error.message
+    });
+  }
+};
+
+// Deactivate user account
+export const deactivateAccount = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Set account status to Deactivated
+    await knex('users')
+      .where('id', userId)
+      .update({
+        status: 'Deactivated',
+        deactivated_at: knex.fn.now(),
+        updated_at: knex.fn.now()
+      });
+
+    // Remove all active sessions to log out from all devices
+    await knex('device_sessions')
+      .where('user_id', userId)
+      .del();
+
+    res.json({
+      success: true,
+      message: 'Account successfully deactivated'
+    });
+  } catch (error) {
+    console.error('Error deactivating account:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deactivating account',
+      error: error.message
+    });
   }
 };

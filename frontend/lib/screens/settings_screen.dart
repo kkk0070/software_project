@@ -3,6 +3,8 @@ import 'package:animate_do/animate_do.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../providers/theme_provider.dart';
+import 'active_devices_screen.dart';
+import 'deactivate_account_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -76,10 +78,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isDark,
             ),
           ),
+          FadeInUp(
+            delay: const Duration(milliseconds: 225),
+            child: _buildSettingsTile(
+              'Active Devices',
+              'Manage your logged-in sessions',
+              Icons.devices,
+              () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const ActiveDevicesScreen()));
+              },
+              isDark,
+            ),
+          ),
+          FadeInUp(
+            delay: const Duration(milliseconds: 250),
+            child: _buildSettingsTile(
+              'Deactivate Account',
+              'Temporarily disable your account',
+              Icons.warning_amber,
+              () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const DeactivateAccountScreen()));
+              },
+              isDark,
+            ),
+          ),
 
           // App Settings
           FadeInDown(
-            delay: const Duration(milliseconds: 250),
+            delay: const Duration(milliseconds: 275),
             child: _buildSectionHeader('App Settings', isDark),
           ),
           FadeInUp(
@@ -270,7 +296,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ],
       ),
-      child: ListTile(
+      child: Semantics(
+        button: true,
+        label: title,
+        hint: subtitle,
+        child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -304,6 +334,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         onTap: onTap,
       ),
+      ),
     );
   }
 
@@ -335,7 +366,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ],
       ),
-      child: SwitchListTile(
+      child: Semantics(
+        toggled: value,
+        label: title,
+        hint: subtitle,
+        child: SwitchListTile(
         secondary: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -397,7 +432,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ],
       ),
-      child: ListTile(
+      child: Semantics(
+        button: true,
+        label: title,
+        hint: 'Current value: $value',
+        child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -436,6 +475,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
         onTap: onTap,
+      ),
       ),
     );
   }

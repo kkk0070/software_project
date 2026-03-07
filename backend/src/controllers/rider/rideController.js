@@ -14,7 +14,7 @@ export const getAllRides = async (req, res) => {
   try {
     // Extract query parameters for filtering
     const { status, ride_type, from_date, to_date, driver_id, rider_id } = req.query;
-    
+
     // Build complex query joining rides with users (riders/drivers) and vehicles
     let queryBuilder = knex('rides as r')
       .select(
@@ -67,7 +67,7 @@ export const getAllRides = async (req, res) => {
 
     // Execute the query
     const result = await queryBuilder;
-    
+
     // Return rides with count for pagination
     res.json({
       success: true,
@@ -92,7 +92,7 @@ export const getRideById = async (req, res) => {
   try {
     // Extract ride ID from URL parameters
     const { id } = req.params;
-    
+
     // Query ride with joined information, return only first match
     const ride = await knex('rides as r')
       .select(
@@ -140,8 +140,15 @@ export const createRide = async (req, res) => {
     const {
       rider_id, driver_id, pickup_location, dropoff_location,
       pickup_lat, pickup_lng, dropoff_lat, dropoff_lng,
-      ride_type, fare, distance, scheduled_time
+      ride_type, fare, distance, scheduled_time, passenger_count
     } = req.body;
+
+    // Apply fare splitting logic for Pool rides
+    let finalFare = fare;
+    if (ride_type === 'Pool' && passenger_count && passenger_count > 1) {
+      const poolDiscount = 0.30;
+      finalFare = (fare * (1 - poolDiscount)) / passenger_count;
+    }
 
     // Build insert object — only include lat/lng fields when the caller provides
     // actual values so Knex never sends DEFAULT for a column that may not exist
@@ -152,7 +159,7 @@ export const createRide = async (req, res) => {
       pickup_location,
       dropoff_location,
       ride_type,
-      fare,
+      fare: finalFare,
       distance,
       scheduled_time,
       status: 'Pending'
@@ -231,7 +238,7 @@ export const updateRide = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      status, driver_id, fare, distance, duration, 
+      status, driver_id, fare, distance, duration,
       carbon_saved, rating, started_at, completed_at
     } = req.body;
 
@@ -390,6 +397,78 @@ export const rejectRide = async (req, res) => {
   } catch (error) {
     console.error('Error rejecting ride:', error);
     res.status(500).json({ success: false, message: 'Error rejecting ride', error: error.message });
+  }
+};
+
+// Driver completes a ride request
+export const completeRide = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const ride = await knex('rides').where('id', id).first();
+
+    if (!ride) {
+      return res.status(404).json({ success: false, message: 'Ride not found' });
+    }
+
+    if (ride.status === 'Completed') {
+      return res.status(400).json({ success: false, message: 'Ride is already completed' });
+    }
+
+    // Process payment by deducting from wallet
+    if (ride.rider_id && ride.fare > 0) {
+      await knex.transaction(async (trx) => {
+        const [wallet] = await trx('wallets')
+          .where('user_id', ride.rider_id)
+          .decrement('balance', ride.fare)
+          .returning('*');
+
+        // Record transaction
+        await trx('transactions').insert({
+          user_id: ride.rider_id,
+          ride_id: ride.id,
+          amount: ride.fare,
+          type: 'Debit',
+          status: 'Completed',
+          description: `Fare payment for ride #${ride.id}`
+        });
+
+        // Add funds to driver wallet
+        if (ride.driver_id) {
+          await trx('wallets')
+            .where('user_id', ride.driver_id)
+            .increment('balance', ride.fare * 0.8) // Agent platform takes 20% cut mock
+        }
+      });
+    }
+
+    const result = await knex('rides')
+      .where('id', id)
+      .update({ status: 'Completed', completed_at: knex.fn.now(), updated_at: knex.fn.now() })
+      .returning('*');
+
+    // Notify rider that their ride was completed
+    try {
+      if (ride.rider_id) {
+        const [notification] = await knex('notifications')
+          .insert({
+            user_id: ride.rider_id,
+            title: 'Ride Completed',
+            message: `Your ride has been completed. $${ride.fare} was charged to your wallet.`,
+            type: 'Success',
+            category: 'Ride'
+          })
+          .returning('*');
+        sendNotificationToUser(ride.rider_id, { ...notification, ride_id: ride.id });
+      }
+    } catch (notifyError) {
+      console.error('Error sending completion notification:', notifyError);
+    }
+
+    res.json({ success: true, message: 'Ride completed and payment processed', data: result[0] });
+  } catch (error) {
+    console.error('Error completing ride:', error);
+    res.status(500).json({ success: false, message: 'Error completing ride', error: error.message });
   }
 };
 
