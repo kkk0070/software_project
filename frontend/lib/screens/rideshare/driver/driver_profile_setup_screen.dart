@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/auth_service.dart';
-import 'driver_navigation_screen.dart';
+import '../shared/rideshare_home_screen.dart';
 import '../shared/document_upload_screen.dart';
 
 /// Driver Profile Setup Screen
@@ -316,7 +316,7 @@ class _DriverProfileSetupScreenState extends State<DriverProfileSetupScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const DriverNavigationScreen(),
+        builder: (context) => RideshareHomeScreen(userRole: 'driver'),
       ),
     );
   }

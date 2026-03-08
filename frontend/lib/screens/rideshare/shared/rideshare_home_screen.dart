@@ -11,6 +11,7 @@ import 'chat_list_screen.dart';
 import 'user_profile_screen.dart';
 import 'sustainability_dashboard_screen.dart';
 import 'live_tracking_screen.dart';
+import 'rides_history_screen.dart';
 
 /// Main navigation screen for the ride-sharing platform
 class RideshareHomeScreen extends StatefulWidget {
@@ -43,7 +44,7 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
             const RiderBookingScreen(), // Book for rider
             const MapsScreen(),
             const ChatListScreen(),
-            const UserProfileScreen(),
+            const RidesHistoryScreen(),
           ];
   }
 
@@ -113,8 +114,8 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
                             index: 3,
                           ),
                           _buildNavItem(
-                            icon: FontAwesomeIcons.user,
-                            label: 'Profile',
+                            icon: isDriver ? FontAwesomeIcons.user : FontAwesomeIcons.clockRotateLeft,
+                            label: isDriver ? 'Profile' : 'History',
                             index: 4,
                           ),
                         ],

@@ -73,6 +73,7 @@ class _MapsScreenState extends State<MapsScreen> {
   bool _showFromSuggestions = false;
   bool _showDestSuggestions = false;
   Timer? _debounceTimer;
+  bool _isPanelExpanded = true;
 
   bool _isRouteLoading = false;
   String? _routeError;
@@ -790,15 +791,31 @@ class _MapsScreenState extends State<MapsScreen> {
                         if (_polylines.isNotEmpty)
                           GestureDetector(
                             onTap: _clearRoute,
-                            child: const Icon(
-                              Icons.close,
-                              color: Colors.grey,
-                              size: 20,
+                            child: const Padding(
+                              padding: EdgeInsets.only(right: 12),
+                              child: Icon(
+                                Icons.close,
+                                color: Colors.grey,
+                                size: 20,
+                              ),
                             ),
                           ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isPanelExpanded = !_isPanelExpanded;
+                            });
+                          },
+                          child: Icon(
+                            _isPanelExpanded ? Icons.expand_less : Icons.expand_more,
+                            color: isDark ? Colors.white : Colors.black,
+                            size: 24,
+                          ),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    if (_isPanelExpanded) ...[
+                      const SizedBox(height: 12),
 
                     // From search bar + suggestions
                     _SearchBarWithSuggestions(
@@ -1144,6 +1161,7 @@ class _MapsScreenState extends State<MapsScreen> {
                           ],
                         ),
                       ),
+                    ],
                     ],
                   ],
                 ),

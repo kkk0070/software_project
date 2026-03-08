@@ -4,8 +4,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/user_service.dart';
 import '../../../services/storage_service.dart';
+import '../../../services/ride_service.dart';
 import '../driver/driver_profile_detail_screen.dart';
 import '../shared/location_picker_screen.dart';
+import '../shared/payment_screen.dart';
+import '../shared/user_profile_screen.dart';
 
 /// Rider Booking Screen
 /// Features:
@@ -36,10 +39,40 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
   bool _showDrivers = false;
   RideType _selectedRideType = RideType.economy;
 
+  // New features state
+  bool _isShared = false;
+  int _riderCount = 1;
+  double _calculatedDistanceKm = 0.0;
+  static const double _perKmRate = 12.0;
+  List<Map<String, dynamic>> _activeRides = [];
+
   @override
   void initState() {
     super.initState();
     _loadAvailableDrivers();
+    _loadActiveRides();
+  }
+
+  Future<void> _loadActiveRides() async {
+    try {
+      final riderId = await StorageService.getUserId();
+      if (riderId == null) return;
+      
+      final result = await RideService.getRides(
+        riderId: riderId.toString(),
+        status: 'Active',
+      );
+      
+      if (result['success'] == true && result['data'] != null) {
+        if (mounted) {
+          setState(() {
+            _activeRides = List<Map<String, dynamic>>.from(result['data']);
+          });
+        }
+      }
+    } catch (e) {
+      // Silently fail
+    }
   }
 
   @override
@@ -96,6 +129,9 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
 
     setState(() {
       _showDrivers = true;
+      // Simulate distance calculation for demonstration
+      _calculatedDistanceKm = (_pickupController.text.length + _destinationController.text.length) * 0.4;
+      if (_calculatedDistanceKm < 2.0) _calculatedDistanceKm = 2.5;
     });
 
     // Scroll to show drivers
@@ -174,13 +210,33 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
     return defaultValue;
   }
 
-  // Calculate estimated price based on distance and ride type
-  String _calculateEstimatedPrice() {
-    // Simulated calculation - in real app, this would be based on actual distance
-    // TODO: Integrate with GPS/Maps API to calculate real distance-based pricing
+  // Calculate pricing breakdown
+  Map<String, dynamic> _calculateFareDetails() {
     final details = _getRideTypeDetails(_selectedRideType);
-    final estimatedPrice = _basePrice * details['priceMultiplier'];
-    return '\$${estimatedPrice.toStringAsFixed(2)}';
+    
+    // Simulate distance if not yet calculated via search button, but both inputs have text
+    double dist = _calculatedDistanceKm > 0.0 
+      ? _calculatedDistanceKm 
+      : ((_pickupController.text.length + _destinationController.text.length) * 0.4);
+    if (dist < 2.0) dist = 2.5;
+
+    // Total Fare = Base Fare + (Distance × Per Km Rate) * multiplier
+    double baseFareCalculated = _basePrice + (dist * _perKmRate);
+    double totalFare = baseFareCalculated * details['priceMultiplier'];
+    
+    // Divide if shared
+    double farePerRider = _isShared ? (totalFare / _riderCount) : totalFare;
+
+    return {
+      'distance': dist,
+      'totalFare': totalFare,
+      'farePerRider': farePerRider,
+    };
+  }
+
+  String _calculateEstimatedPrice() {
+    final fareDetails = _calculateFareDetails();
+    return '\$${fareDetails['farePerRider'].toStringAsFixed(2)}';
   }
 
   @override
@@ -192,6 +248,26 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
       appBar: AppBar(
         backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
         elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+              );
+            },
+            borderRadius: BorderRadius.circular(20),
+            child: CircleAvatar(
+              backgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
+              child: Icon(
+                Icons.person,
+                color: isDark ? Colors.white : Colors.black,
+                size: 20,
+              ),
+            ),
+          ),
+        ),
         title: Text(
           'Book a Ride',
           style: TextStyle(
@@ -219,6 +295,11 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (_activeRides.isNotEmpty) ...[
+                _buildActiveRidesSection(isDark),
+                const SizedBox(height: 24),
+              ],
+              
               // Location Input Section
               FadeInDown(
                 child: Container(
@@ -367,7 +448,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Available Drivers',
+                        'Available Drivers (${_availableDrivers.length})',
                         style: TextStyle(
                           color: isDark ? Colors.white : AppTheme.textDark,
                           fontSize: 20,
@@ -597,6 +678,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
   Widget _buildEstimateCard() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final details = _getRideTypeDetails(_selectedRideType);
+    final fareDetails = _calculateFareDetails();
     
     return Container(
       padding: const EdgeInsets.all(16),
@@ -607,55 +689,131 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
           color: (details['color'] as Color).withValues(alpha: 0.3),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          // Price estimate
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Estimated Fare',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 12,
-                ),
+                'Distance',
+                style: TextStyle(color: Colors.grey[600], fontSize: 13),
               ),
-              const SizedBox(height: 4),
               Text(
-                _calculateEstimatedPrice(),
+                '${fareDetails['distance'].toStringAsFixed(1)} km',
                 style: TextStyle(
                   color: isDark ? Colors.white : AppTheme.textDark,
-                  fontSize: 24,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          // ETA estimate
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: (details['color'] as Color).withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  FontAwesomeIcons.clock,
-                  color: details['color'],
-                  size: 16,
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total Fare',
+                style: TextStyle(color: Colors.grey[600], fontSize: 13),
+              ),
+              Text(
+                '\$${fareDetails['totalFare'].toStringAsFixed(2)}',
+                style: TextStyle(
+                  color: isDark ? Colors.white : AppTheme.textDark,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  details['eta'],
-                  style: TextStyle(
-                    color: details['color'],
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+              ),
+            ],
+          ),
+          const Divider(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Price estimate
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _isShared ? 'Fare per rider' : 'Your Fare',
+                    style: TextStyle(
+                      color: AppTheme.primaryGreen,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '\$${fareDetails['farePerRider'].toStringAsFixed(2)}',
+                    style: TextStyle(
+                      color: isDark ? Colors.white : AppTheme.textDark,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              // ETA estimate
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: (details['color'] as Color).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ],
+                child: Column(
+                  children: [
+                    Icon(
+                      FontAwesomeIcons.clock,
+                      color: details['color'],
+                      size: 16,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      details['eta'],
+                      style: TextStyle(
+                        color: details['color'],
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // Navigate to Payment Page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentScreen(
+                      amount: fareDetails['farePerRider'],
+                      pickup: _pickupController.text,
+                      dropoff: _destinationController.text,
+                      driverName: _availableDrivers.isNotEmpty ? _availableDrivers.first['name'] ?? 'Assigned Driver' : 'Assigned Driver',
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryGreen,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text(
+                'Pay Now',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ],
@@ -973,6 +1131,151 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildActiveRidesSection(bool isDark) {
+    return FadeInDown(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(FontAwesomeIcons.carOn, color: AppTheme.primaryGreen, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Active Rides',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : AppTheme.textDark,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ..._activeRides.map((ride) => _buildActiveRideCard(ride, isDark)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActiveRideCard(Map<String, dynamic> ride, bool isDark) {
+    final driverName = ride['driver_name'] ?? 'Driver';
+    final vehicleModel = ride['vehicle_model'] ?? 'Standard Car';
+    final licensePlate = ride['license_plate'] ?? '';
+    final pickup = ride['pickup_location'] ?? 'Unknown pickup';
+    final dropoff = ride['dropoff_location'] ?? 'Unknown drop-off';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryGreen.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryGreen.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(FontAwesomeIcons.carSide, color: AppTheme.primaryGreen, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      driverName,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : AppTheme.textDark,
+                      ),
+                    ),
+                    Text(
+                      '$vehicleModel${licensePlate.isNotEmpty ? ' • $licensePlate' : ''}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGreen,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  'On the way',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(FontAwesomeIcons.locationDot, color: AppTheme.primaryGreen, size: 14),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  pickup,
+                  style: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontSize: 13,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(FontAwesomeIcons.flagCheckered, color: AppTheme.accentBlue, size: 14),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  dropoff,
+                  style: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    fontSize: 13,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
