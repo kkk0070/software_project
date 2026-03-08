@@ -10,6 +10,7 @@ import '../shared/notifications_screen.dart';
 import '../shared/document_upload_screen.dart';
 import '../shared/carpool_screen.dart';
 import '../shared/profile_setup_screen.dart';
+import '../shared/user_profile_screen.dart';
 import 'driver_earnings_screen.dart';
 import 'driver_online_stats_screen.dart';
 import 'driver_ride_requests_screen.dart';
@@ -182,22 +183,30 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppTheme.primaryGreen.withValues(alpha: 0.3),
-                  width: 2,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+                );
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
+                    width: 2,
+                  ),
                 ),
-              ),
-              child: CircleAvatar(
-                backgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
-                child: Icon(
-                  Icons.person,
-                  color: isDark ? Colors.white : Colors.black,
-                  size: 20,
+                child: CircleAvatar(
+                  backgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
+                  child: Icon(
+                    Icons.person,
+                    color: isDark ? Colors.white : Colors.black,
+                    size: 20,
+                  ),
                 ),
               ),
             ),

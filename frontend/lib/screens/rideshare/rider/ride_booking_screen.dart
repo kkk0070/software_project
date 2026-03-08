@@ -15,6 +15,7 @@ import '../shared/sustainability_dashboard_screen.dart';
 import '../shared/carpool_screen.dart';
 import '../shared/rides_history_screen.dart';
 import '../shared/profile_setup_screen.dart';
+import '../shared/user_profile_screen.dart';
 import '../driver/driver_profile_detail_screen.dart';
 
 /// Rider Home Dashboard Screen
@@ -273,22 +274,30 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
           children: [
             Row(
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppTheme.primaryGreen,
-                      width: 2,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+                    );
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppTheme.primaryGreen,
+                        width: 2,
+                      ),
                     ),
-                  ),
-                  child: CircleAvatar(
-                    backgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
-                    child: Icon(
-                      Icons.person,
-                      color: isDark ? Colors.white : Colors.black87,
-                      size: 20,
+                    child: CircleAvatar(
+                      backgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
+                      child: Icon(
+                        Icons.person,
+                        color: isDark ? Colors.white : Colors.black87,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ),

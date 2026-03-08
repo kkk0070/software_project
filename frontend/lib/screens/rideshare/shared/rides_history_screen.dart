@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../theme/app_theme.dart';
+import '../../../services/ride_service.dart';
+import '../../../services/storage_service.dart';
 
 class RidesHistoryScreen extends StatefulWidget {
   const RidesHistoryScreen({super.key});
@@ -11,29 +13,42 @@ class RidesHistoryScreen extends StatefulWidget {
 }
 
 class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
-  // Sample data - replace with actual API call
-  final List<Map<String, dynamic>> _rides = [
-    {
-      'id': 1,
-      'date': '2024-01-15',
-      'from': 'Downtown',
-      'to': 'Airport',
-      'fare': 45.00,
-      'status': 'Completed',
-      'driver': 'John Doe',
-      'rating': 4.8,
-    },
-    {
-      'id': 2,
-      'date': '2024-01-10',
-      'from': 'Home',
-      'to': 'Office',
-      'fare': 25.00,
-      'status': 'Completed',
-      'driver': 'Jane Smith',
-      'rating': 5.0,
-    },
-  ];
+  List<Map<String, dynamic>> _rides = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    try {
+      final userId = await StorageService.getUserId();
+      if (userId == null) {
+        if (mounted) setState(() => _isLoading = false);
+        return;
+      }
+      
+      final result = await RideService.getRides(
+        riderId: userId.toString(), // Might need to check role later, assumed rider for now
+        status: 'Completed',
+      );
+      
+      if (result['success'] == true && result['data'] != null) {
+        if (mounted) {
+          setState(() {
+            _rides = List<Map<String, dynamic>>.from(result['data']);
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   /// Export rides history as CSV and copy to clipboard
   void _downloadHistory() {
@@ -98,16 +113,18 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
           ),
         ],
       ),
-      body: _rides.isEmpty
-          ? _buildEmptyState(context)
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _rides.length,
-              itemBuilder: (context, index) {
-                final ride = _rides[index];
-                return _buildRideCard(context, ride);
-              },
-            ),
+      body: _isLoading 
+          ? const Center(child: CircularProgressIndicator()) 
+          : _rides.isEmpty
+              ? _buildEmptyState(context)
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _rides.length,
+                  itemBuilder: (context, index) {
+                    final ride = _rides[index];
+                    return _buildRideCard(context, ride);
+                  },
+                ),
     );
   }
 
@@ -146,6 +163,16 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
 
   Widget _buildRideCard(BuildContext context, Map<String, dynamic> ride) {
     final colorScheme = Theme.of(context).colorScheme;
+    final date = ride['created_at'] != null 
+        ? DateTime.parse(ride['created_at']).toLocal().toString().split(' ')[0] 
+        : 'Unknown Date';
+    final from = ride['pickup_location'] ?? 'Unknown location';
+    final to = ride['dropoff_location'] ?? 'Unknown destination';
+    final status = ride['status'] ?? 'Completed';
+    final driverName = ride['driver_name'] ?? 'Driver';
+    final rating = ride['rating'] ?? 5.0;
+    final fare = ride['fare'] != null ? double.tryParse(ride['fare'].toString()) ?? 0.0 : 0.0;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -163,7 +190,7 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                ride['date'],
+                date,
                 style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
                   fontSize: 12,
@@ -176,7 +203,7 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  ride['status'],
+                  status,
                   style: TextStyle(
                     color: colorScheme.primary,
                     fontSize: 12,
@@ -197,7 +224,7 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  ride['from'],
+                  from,
                   style: TextStyle(
                     color: colorScheme.onSurface,
                     fontSize: 16,
@@ -218,7 +245,7 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  ride['to'],
+                  to,
                   style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 16,
@@ -242,7 +269,7 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    ride['driver'],
+                    driverName,
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 14,
@@ -259,7 +286,7 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    ride['rating'].toString(),
+                    rating.toString(),
                     style: TextStyle(
                       color: colorScheme.onSurface,
                       fontSize: 14,
@@ -269,7 +296,7 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> {
                 ],
               ),
               Text(
-                '\$${ride['fare'].toStringAsFixed(2)}',
+                '\$${fare.toStringAsFixed(2)}',
                 style: TextStyle(
                   color: colorScheme.primary,
                   fontSize: 18,
