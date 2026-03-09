@@ -1,7 +1,6 @@
 databases:
   - name: ecoride-db
     databaseName: ecoride_db
-    user: postgres
     plan: free
 
 services:
