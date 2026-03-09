@@ -26,11 +26,12 @@ services:
         value: 10000
 
   # Admin Dashboard (Vite Static Site)
-  - type: static
+  - type: web
     name: ecoride-admin
+    runtime: static
     rootDir: admin
     buildCommand: npm install && npm run build
-    publishDir: dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         fromService:
