@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rider Home Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-card {
+            background: rgba(28, 39, 31, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 84, 67, 0.5);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen pb-24">
+<!-- Top App Bar -->
+<nav class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full border-2 border-primary p-0.5">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="User profile portrait smiling" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCEuW8hwU45sh7NILiRkKferNVWEsOgFYq4kmOU2TekYf_KrQuX5r-N6Pl-o6uGlxTWWEn-cCmYgqaOhaFBlKfLPp-XButojnvP8ZtVMqFm8T4F_NNbVwiPVDjLiaVBlNB8i_FYiOrntX5jKZpPJRmUBYLgen5lw1PF3-DXNJFE6_mPodvXavik4e05gcIOBSCOwOK0yIoL89N2liC-_9uhbDHJCGyRDO3Ly_taPzOt6iokyKeyVaaOozWarNRtSv62rz0iF-WXqD1n');">
+</div>
+</div>
+<div>
+<p class="text-xs text-slate-500 dark:text-primary/70 font-medium">Good morning,</p>
+<h2 class="text-lg font-bold leading-tight tracking-tight">Alex Rivera</h2>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="size-10 flex items-center justify-center rounded-full bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-white">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</nav>
+<main class="max-w-md mx-auto px-4 space-y-6">
+<!-- Search Bar -->
+<div class="pt-2">
+<div class="relative group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-primary">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="w-full h-14 pl-12 pr-12 rounded-full border-none bg-white dark:bg-white/10 shadow-lg focus:ring-2 focus:ring-primary text-base font-medium placeholder:text-slate-400 dark:placeholder:text-slate-500" placeholder="Where to?" type="text"/>
+<div class="absolute inset-y-0 right-4 flex items-center text-slate-400">
+<span class="material-symbols-outlined">map</span>
+</div>
+</div>
+</div>
+<!-- Carbon Savings Card -->
+<div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#1c271f] to-[#111813] border border-primary/20 p-5 shadow-2xl">
+<div class="absolute top-0 right-0 -mt-4 -mr-4 size-24 bg-primary/10 rounded-full blur-2xl"></div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-primary text-xs font-bold uppercase tracking-widest mb-1">Impact Tracker</p>
+<h3 class="text-3xl font-bold text-white">12.4 <span class="text-lg font-normal text-slate-400">kg CO2</span></h3>
+</div>
+<div class="bg-primary/20 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">eco</span>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-slate-400">Monthly Goal Progress</span>
+<span class="text-primary font-bold">80%</span>
+</div>
+<div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 80%"></div>
+</div>
+<p class="text-xs text-slate-500 pt-1">You've saved the equivalent of 2 trees planted this month!</p>
+</div>
+</div>
+<!-- Quick Actions Grid -->
+<section>
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-bold">Quick Actions</h3>
+<button class="text-primary text-sm font-medium">View All</button>
+</div>
+<div class="grid grid-cols-3 gap-3">
+<button class="flex flex-col items-center gap-3 p-4 rounded-2xl bg-white dark:bg-white/5 border border-transparent hover:border-primary/30 transition-all group">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
+<span class="material-symbols-outlined">electric_car</span>
+</div>
+<span class="text-sm font-bold">Green EV</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 rounded-2xl bg-white dark:bg-white/5 border border-transparent hover:border-primary/30 transition-all group">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<span class="text-sm font-bold">Eco Pool</span>
+</button>
+<button class="flex flex-col items-center gap-3 p-4 rounded-2xl bg-white dark:bg-white/5 border border-transparent hover:border-primary/30 transition-all group">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
+<span class="material-symbols-outlined">calendar_today</span>
+</div>
+<span class="text-sm font-bold">Schedule</span>
+</button>
+</div>
+</section>
+<!-- Weather-based Eco Tip -->
+<div class="rounded-2xl p-4 bg-sky-500/10 border border-sky-500/20 flex gap-4 items-center">
+<div class="size-12 shrink-0 bg-sky-500/20 rounded-full flex items-center justify-center text-sky-400">
+<span class="material-symbols-outlined text-3xl">light_mode</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-sm text-sky-400">Perfect day to walk!</h4>
+<p class="text-sm text-slate-400 leading-snug">It's 22°C outside. Walking to your next 1km stop saves 0.5kg of CO2.</p>
+</div>
+<button class="text-sky-400">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<!-- Recent Destinations -->
+<section class="pb-8">
+<h3 class="text-lg font-bold mb-4">Recent Destinations</h3>
+<div class="space-y-3">
+<div class="flex items-center gap-4 p-3 rounded-xl bg-white dark:bg-white/5">
+<div class="size-10 rounded-full bg-slate-200 dark:bg-white/10 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined">work</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-sm">Tech Central Hub</h4>
+<p class="text-xs text-slate-500">124 Innovation Way, SF</p>
+</div>
+<span class="text-xs font-medium text-primary">15 min</span>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-xl bg-white dark:bg-white/5">
+<div class="size-10 rounded-full bg-slate-200 dark:bg-white/10 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined">home</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-sm">Home</h4>
+<p class="text-xs text-slate-500">45 Green Gardens, SF</p>
+</div>
+<span class="text-xs font-medium text-primary">8 min</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 inset-x-0 bg-white/80 dark:bg-background-dark/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 px-6 py-3 flex justify-between items-center safe-area-bottom">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined font-variation-fill">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-medium">Activity</span>
+</button>
+<div class="relative -mt-10">
+<button class="size-14 rounded-full bg-primary shadow-lg shadow-primary/40 flex items-center justify-center text-black">
+<span class="material-symbols-outlined text-3xl font-bold">add</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-[10px] font-medium">Wallet</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rider Sustainability Stats</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#06f957",
+                        "background-light": "#f5f8f6",
+                        "background-dark": "#0a0f0b",
+                        "card-dark": "#16221a",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(6, 249, 87, 0.3);
+        }
+        .chart-bar {
+            transition: height 0.3s ease;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen">
+<!-- Top Navigation -->
+<div class="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pb-2 justify-between border-b border-primary/10">
+<div class="flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-slate-900 dark:text-white cursor-pointer">arrow_back_ios_new</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center font-display">Sustainability</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex size-12 cursor-pointer items-center justify-end rounded-full bg-transparent text-slate-900 dark:text-white">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+<main class="max-w-md mx-auto pb-24">
+<!-- Profile & Primary Impact -->
+<div class="flex p-6 @container">
+<div class="flex w-full flex-col gap-6 items-center">
+<div class="relative">
+<!-- Progress Ring Simulation -->
+<div class="absolute inset-0 rounded-full border-4 border-primary/20 scale-110"></div>
+<div class="absolute inset-0 rounded-full border-t-4 border-primary scale-110 rotate-45 neon-glow"></div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-32 w-32 border-4 border-background-dark" data-alt="User profile avatar in circular frame" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBHagmu2xZUFLHEfr45uCqP6Lpk8wqn4PhwgX8F4dOL_abhwYyxy7a_Il-laQl3iB3UNFbHk474GFJrl2A-8rQJ2RZAAbo9DhVnLinugf4aK0Ao1EdoxDX1WLjlxONu0w_xflkjRL98eaQhFeQ9Nv1vCNd6yvsrR-77IHLOYTLO9Uzi7NEC6KTH00IfeuWAJtxXF2QQ9mrtB0KYW8pZdXSkqMBKHRDHmhkyKcvvi46eZwgxlZHDkw7iYGImgB_PYsmg8TBgi9ZeaYTH");'>
+</div>
+</div>
+<div class="flex flex-col items-center justify-center space-y-1">
+<p class="text-slate-900 dark:text-white text-3xl font-bold tracking-tight text-center font-display">124 kg CO2 Saved</p>
+<div class="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-primary text-sm">energy_savings_leaf</span>
+<p class="text-primary text-sm font-bold uppercase tracking-wider">Eco-Warrior Level 4</p>
+</div>
+<p class="text-slate-500 dark:text-primary/60 text-base font-normal text-center mt-2">Equivalent to 5 trees planted this month</p>
+</div>
+</div>
+</div>
+<!-- Quick Stats Grid -->
+<div class="grid grid-cols-2 gap-4 px-4">
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-white dark:bg-card-dark border border-slate-200 dark:border-primary/5">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-primary/60 text-sm font-medium">EV Miles</p>
+<span class="material-symbols-outlined text-primary text-xl">bolt</span>
+</div>
+<p class="text-slate-900 dark:text-white text-2xl font-bold font-display">842</p>
+<p class="text-primary text-xs font-bold">+12% vs last month</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-white dark:bg-card-dark border border-slate-200 dark:border-primary/5">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-primary/60 text-sm font-medium">Pool Rides</p>
+<span class="material-symbols-outlined text-primary text-xl">groups</span>
+</div>
+<p class="text-slate-900 dark:text-white text-2xl font-bold font-display">24</p>
+<p class="text-primary text-xs font-bold">+5% vs last month</p>
+</div>
+</div>
+<!-- Badges Earned Section -->
+<div class="mt-8">
+<div class="flex items-center justify-between px-4 pb-3">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold font-display">Impact Badges</h2>
+<span class="text-primary text-sm font-bold">View all</span>
+</div>
+<div class="flex gap-4 overflow-x-auto px-4 no-scrollbar pb-2">
+<div class="flex flex-col items-center gap-2 min-w-[80px]">
+<div class="size-16 rounded-full bg-primary flex items-center justify-center neon-glow">
+<span class="material-symbols-outlined text-background-dark font-bold text-3xl">eco</span>
+</div>
+<span class="text-[10px] text-center font-bold uppercase tracking-tighter">Zero Emission</span>
+</div>
+<div class="flex flex-col items-center gap-2 min-w-[80px]">
+<div class="size-16 rounded-full bg-white/10 border border-primary/30 flex items-center justify-center opacity-80">
+<span class="material-symbols-outlined text-primary text-3xl">electric_car</span>
+</div>
+<span class="text-[10px] text-center font-bold uppercase tracking-tighter text-slate-500">Silent Rider</span>
+</div>
+<div class="flex flex-col items-center gap-2 min-w-[80px]">
+<div class="size-16 rounded-full bg-white/10 border border-primary/30 flex items-center justify-center opacity-80">
+<span class="material-symbols-outlined text-primary text-3xl">nature_people</span>
+</div>
+<span class="text-[10px] text-center font-bold uppercase tracking-tighter text-slate-500">Tree Planter</span>
+</div>
+<div class="flex flex-col items-center gap-2 min-w-[80px]">
+<div class="size-16 rounded-full bg-white/10 border border-primary/30 flex items-center justify-center opacity-80">
+<span class="material-symbols-outlined text-primary text-3xl">public</span>
+</div>
+<span class="text-[10px] text-center font-bold uppercase tracking-tighter text-slate-500">Global Citizen</span>
+</div>
+</div>
+</div>
+<!-- Impact Comparison Chart -->
+<div class="mt-8 px-4">
+<div class="bg-white dark:bg-card-dark rounded-xl p-6 border border-slate-200 dark:border-primary/10">
+<h2 class="text-slate-900 dark:text-white text-lg font-bold font-display mb-1">Footprint Comparison</h2>
+<p class="text-slate-500 dark:text-primary/60 text-xs mb-6">Carbon Emissions (kg) - 30 Day View</p>
+<div class="flex items-end justify-around h-48 gap-8 px-4">
+<div class="flex flex-col items-center flex-1 gap-4">
+<div class="w-full bg-primary/20 rounded-t-lg relative" style="height: 45%;">
+<div class="absolute inset-0 bg-primary/40 rounded-t-lg blur-sm"></div>
+<div class="absolute inset-0 bg-primary rounded-t-lg border-t-2 border-white/30"></div>
+<p class="absolute -top-8 left-1/2 -translate-x-1/2 text-primary font-bold">54kg</p>
+</div>
+<p class="text-[11px] font-bold text-slate-500 dark:text-primary/60 uppercase tracking-widest">Your Impact</p>
+</div>
+<div class="flex flex-col items-center flex-1 gap-4">
+<div class="w-full bg-slate-200 dark:bg-white/10 rounded-t-lg relative" style="height: 85%;">
+<div class="absolute inset-0 bg-slate-300 dark:bg-white/5 rounded-t-lg"></div>
+<p class="absolute -top-8 left-1/2 -translate-x-1/2 text-slate-400 font-bold">178kg</p>
+</div>
+<p class="text-[11px] font-bold text-slate-500 dark:text-primary/60 uppercase tracking-widest">Traditional</p>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-100 dark:border-white/5">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-slate-900 dark:text-white text-xl font-bold">-69.6% Reduction</p>
+<p class="text-slate-500 dark:text-primary/60 text-sm">You've saved more than most users</p>
+</div>
+<div class="size-12 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">trending_down</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Call to Action -->
+<div class="mt-10 px-4">
+<button class="w-full bg-primary text-background-dark font-bold py-4 rounded-full flex items-center justify-center gap-2 neon-glow hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined">share_windows</span>
+                Share Impact Journey
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Bar (iOS Style) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 px-6 pb-8 pt-3 flex justify-between items-center z-50">
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-medium">Rides</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined fill-[1]">monitoring</span>
+<span class="text-[10px] font-bold">Impact</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-[10px] font-medium">Wallet</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</div>
+</nav>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

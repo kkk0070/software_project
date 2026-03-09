@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sustainability Analytics | EcoRide Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .filled-icon { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen">
+<div class="flex flex-col lg:flex-row min-h-screen">
+<!-- Side Navigation -->
+<aside class="w-full lg:w-64 border-r border-slate-200 dark:border-white/10 flex flex-col bg-background-light dark:bg-background-dark">
+<div class="p-6 flex flex-col gap-8">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+<span class="material-symbols-outlined font-bold">eco</span>
+</div>
+<div>
+<h1 class="text-white text-base font-bold leading-none">EcoRide</h1>
+<p class="text-primary text-[10px] uppercase tracking-widest font-bold">Admin Console</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20" href="#">
+<span class="material-symbols-outlined filled-icon">energy_savings_leaf</span>
+<span class="text-sm font-bold">Sustainability</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">electric_car</span>
+<span class="text-sm font-medium">Fleet Management</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Users &amp; Drivers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-sm font-medium">Detailed Reports</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-6 border-t border-white/10">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-slate-800 border border-white/20" data-alt="Admin user profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBx7JoAYimoe6bpCwNyYM0YjZi_3t1xvlYSrwyhi4_IC5S-IeIbJ4KTdnAWiO41y1kjebvij6xLd-6cvvkVFg0dIyWIFdztVATq61RKKmSbLkHRixFTSmrvmXBso_DmAwuwaQkf8EkNQR-eotDcZmXV6w_WaOcSz4Tx12FWf0UKoDqOk8mC4ePEpGWD__BLNgU9YlnSX7FnwRmA7jR71RZfBg9DsJCVdDG5iQxZzhBL7eYtSEcXAAilznFBl9IvjY36oEsOXjZPuMZN"); background-size: cover;'></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-white leading-none">Marcus Thorne</p>
+<p class="text-xs text-slate-400 mt-1">Sustainability Lead</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-white/5 overflow-y-auto">
+<!-- Top Nav Bar -->
+<header class="flex items-center justify-between px-8 py-4 border-b border-white/10 bg-background-dark/50 backdrop-blur-md sticky top-0 z-10">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative max-w-md w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+<input class="w-full bg-white/5 border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-primary focus:border-primary text-white placeholder:text-slate-500 transition-all" placeholder="Search analytics or reports..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-lg bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full border-2 border-background-dark"></span>
+</button>
+<button class="flex items-center gap-2 bg-primary text-background-dark px-4 py-2 rounded-lg text-sm font-bold hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Export Report
+                    </button>
+</div>
+</header>
+<div class="p-8 space-y-8">
+<!-- Page Heading -->
+<div class="flex flex-wrap items-end justify-between gap-4">
+<div class="space-y-1">
+<h2 class="text-4xl font-black text-white tracking-tight">Sustainability Analytics</h2>
+<p class="text-slate-400 max-w-xl">Real-time overview of environmental impact, carbon emission reduction, and platform-wide green efficiency metrics.</p>
+</div>
+<div class="flex items-center bg-white/5 p-1 rounded-lg border border-white/10">
+<button class="px-4 py-1.5 rounded text-sm font-medium text-slate-400 hover:text-white">Daily</button>
+<button class="px-4 py-1.5 rounded text-sm font-medium text-slate-400 hover:text-white">Weekly</button>
+<button class="px-4 py-1.5 rounded text-sm font-medium bg-primary text-background-dark shadow-lg">Monthly</button>
+<button class="px-4 py-1.5 rounded text-sm font-medium text-slate-400 hover:text-white">Yearly</button>
+</div>
+</div>
+<!-- Stats Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-background-dark/40 border border-white/10 rounded-xl p-6 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-primary">co2</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">Total CO2 Offset</p>
+<div class="flex items-baseline gap-2 mt-2">
+<h3 class="text-3xl font-black text-white">1,240 <span class="text-sm font-normal text-slate-400">Tons</span></h3>
+<span class="text-primary text-sm font-bold flex items-center"><span class="material-symbols-outlined text-sm">arrow_upward</span>12%</span>
+</div>
+<div class="mt-4 w-full bg-white/5 h-1.5 rounded-full">
+<div class="bg-primary h-full rounded-full w-[74%]"></div>
+</div>
+</div>
+<div class="bg-background-dark/40 border border-white/10 rounded-xl p-6 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-primary">ev_station</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">Total EV Miles</p>
+<div class="flex items-baseline gap-2 mt-2">
+<h3 class="text-3xl font-black text-white">450,820 <span class="text-sm font-normal text-slate-400">mi</span></h3>
+<span class="text-primary text-sm font-bold flex items-center"><span class="material-symbols-outlined text-sm">arrow_upward</span>15%</span>
+</div>
+<div class="mt-4 w-full bg-white/5 h-1.5 rounded-full">
+<div class="bg-primary h-full rounded-full w-[82%]"></div>
+</div>
+</div>
+<div class="bg-background-dark/40 border border-white/10 rounded-xl p-6 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-primary">groups</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">Pooling Efficiency</p>
+<div class="flex items-baseline gap-2 mt-2">
+<h3 class="text-3xl font-black text-white">68%</h3>
+<span class="text-primary text-sm font-bold flex items-center"><span class="material-symbols-outlined text-sm">arrow_upward</span>5%</span>
+</div>
+<div class="mt-4 w-full bg-white/5 h-1.5 rounded-full">
+<div class="bg-primary h-full rounded-full w-[68%]"></div>
+</div>
+</div>
+<div class="bg-background-dark/40 border border-white/10 rounded-xl p-6 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-primary">forest</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">Tree Equivalent</p>
+<div class="flex items-baseline gap-2 mt-2">
+<h3 class="text-3xl font-black text-white">24,500 <span class="text-sm font-normal text-slate-400">trees</span></h3>
+<span class="text-primary text-sm font-bold flex items-center"><span class="material-symbols-outlined text-sm">arrow_upward</span>8%</span>
+</div>
+<div class="mt-4 w-full bg-white/5 h-1.5 rounded-full">
+<div class="bg-primary h-full rounded-full w-[45%]"></div>
+</div>
+</div>
+</div>
+<!-- Middle Section - Charts Placeholder -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 bg-background-dark/40 border border-white/10 rounded-xl p-6">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-lg font-bold text-white">CO2 Savings Trend</h3>
+<p class="text-sm text-slate-400">Monthly metric tons of carbon avoided</p>
+</div>
+<div class="flex items-center gap-4 text-xs">
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-primary"></span>
+<span class="text-slate-300">Actual Savings</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-white/20"></span>
+<span class="text-slate-400">Target</span>
+</div>
+</div>
+</div>
+<!-- Chart Visualization Placeholder -->
+<div class="relative h-64 w-full flex items-end gap-2 overflow-hidden px-4">
+<!-- Gradient background for the chart look -->
+<div class="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-primary/20 to-transparent rounded-t-xl opacity-30"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 transition-all rounded-t h-[40%] cursor-pointer group relative">
+<div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-background-dark text-[10px] font-bold px-2 py-1 rounded">120T</div>
+</div>
+<div class="flex-1 bg-primary/30 hover:bg-primary/50 transition-all rounded-t h-[55%] cursor-pointer group relative">
+<div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-background-dark text-[10px] font-bold px-2 py-1 rounded">145T</div>
+</div>
+<div class="flex-1 bg-primary/40 hover:bg-primary/60 transition-all rounded-t h-[50%] cursor-pointer group relative">
+<div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-background-dark text-[10px] font-bold px-2 py-1 rounded">130T</div>
+</div>
+<div class="flex-1 bg-primary/50 hover:bg-primary/70 transition-all rounded-t h-[70%] cursor-pointer group relative">
+<div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-background-dark text-[10px] font-bold px-2 py-1 rounded">185T</div>
+</div>
+<div class="flex-1 bg-primary/60 hover:bg-primary/80 transition-all rounded-t h-[85%] cursor-pointer group relative">
+<div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-background-dark text-[10px] font-bold px-2 py-1 rounded">210T</div>
+</div>
+<div class="flex-1 bg-primary hover:bg-primary/90 transition-all rounded-t h-[95%] cursor-pointer group relative border-t-2 border-white/50">
+<div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-background-dark text-[10px] font-bold px-2 py-1 rounded">240T</div>
+</div>
+</div>
+<div class="flex justify-between mt-4 px-4 text-[10px] uppercase font-bold tracking-widest text-slate-500">
+<span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+</div>
+</div>
+<div class="bg-background-dark/40 border border-white/10 rounded-xl p-6 flex flex-col">
+<h3 class="text-lg font-bold text-white mb-2">Fleet Composition</h3>
+<p class="text-sm text-slate-400 mb-6">Electric adoption progress</p>
+<div class="flex-1 flex flex-col items-center justify-center space-y-8">
+<!-- Circular Gauge Simulation -->
+<div class="relative size-40">
+<svg class="size-full" viewbox="0 0 36 36">
+<path class="stroke-current text-white/5" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="4"></path>
+<path class="stroke-current text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="72, 100" stroke-linecap="round" stroke-width="4"></path>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-black text-white leading-none">72%</span>
+<span class="text-[10px] font-bold text-primary uppercase mt-1">Green</span>
+</div>
+</div>
+<div class="w-full space-y-3">
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<span class="size-3 rounded-sm bg-primary"></span>
+<span class="text-slate-300">Fully Electric</span>
+</div>
+<span class="text-white font-bold">42%</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<span class="size-3 rounded-sm bg-primary/40"></span>
+<span class="text-slate-300">Hybrid Fleet</span>
+</div>
+<span class="text-white font-bold">30%</span>
+</div>
+<div class="flex items-center justify-between text-sm">
+<div class="flex items-center gap-2">
+<span class="size-3 rounded-sm bg-white/10"></span>
+<span class="text-slate-300">Standard</span>
+</div>
+<span class="text-white font-bold">28%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section - Leaderboard Table -->
+<div class="bg-background-dark/40 border border-white/10 rounded-xl overflow-hidden">
+<div class="p-6 border-b border-white/10 flex items-center justify-between">
+<div>
+<h3 class="text-xl font-bold text-white">Regional Sustainability Rankings</h3>
+<p class="text-sm text-slate-400">Cities ranked by their environmental impact and score</p>
+</div>
+<button class="text-primary text-sm font-bold hover:underline">View All Regions</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-white/5 text-slate-400 text-xs uppercase tracking-wider font-bold">
+<tr>
+<th class="px-6 py-4">City / Region</th>
+<th class="px-6 py-4">Sustainability Score</th>
+<th class="px-6 py-4">CO2 Saved (Month)</th>
+<th class="px-6 py-4">EV Fleet %</th>
+<th class="px-6 py-4">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/10 text-slate-200 text-sm">
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 font-bold text-white">San Francisco, CA</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="font-bold">98/100</span>
+<div class="flex-1 w-24 bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[98%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">245.8 Tons</td>
+<td class="px-6 py-4 font-medium">88%</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-primary/20 text-primary uppercase">Leader</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 font-bold text-white">Amsterdam, NL</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="font-bold">94/100</span>
+<div class="flex-1 w-24 bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[94%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">210.2 Tons</td>
+<td class="px-6 py-4 font-medium">92%</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-primary/20 text-primary uppercase">Leader</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 font-bold text-white">Berlin, DE</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="font-bold">82/100</span>
+<div class="flex-1 w-24 bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[82%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">158.4 Tons</td>
+<td class="px-6 py-4 font-medium">65%</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-white/10 text-slate-400 uppercase">Growth</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 font-bold text-white">Austin, TX</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="font-bold">76/100</span>
+<div class="flex-1 w-24 bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[76%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">124.9 Tons</td>
+<td class="px-6 py-4 font-medium">54%</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-white/10 text-slate-400 uppercase">Growth</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-white/5 flex justify-center">
+<nav class="flex items-center gap-1">
+<button class="size-8 flex items-center justify-center rounded border border-white/10 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded bg-primary text-background-dark font-bold text-xs">1</button>
+<button class="size-8 flex items-center justify-center rounded text-slate-400 hover:text-white font-bold text-xs">2</button>
+<button class="size-8 flex items-center justify-center rounded text-slate-400 hover:text-white font-bold text-xs">3</button>
+<button class="size-8 flex items-center justify-center rounded border border-white/10 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</nav>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="p-8 mt-auto border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-xs">
+<p>© 2024 EcoRide Platform Admin. All metrics verified by Global Carbon Standards.</p>
+<div class="flex items-center gap-6">
+<a class="hover:text-primary transition-colors" href="#">Data Privacy</a>
+<a class="hover:text-primary transition-colors" href="#">System Status</a>
+<a class="hover:text-primary transition-colors" href="#">API Documentation</a>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

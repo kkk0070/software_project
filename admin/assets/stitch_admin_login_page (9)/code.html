@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reports &amp; Export - EcoRide Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .active-nav { background-color: #28392e; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen">
+<div class="flex">
+<!-- Sidebar -->
+<aside class="w-64 fixed inset-y-0 bg-[#111813] border-r border-[#28392e] hidden md:flex flex-col">
+<div class="p-6 flex flex-col h-full">
+<div class="flex items-center gap-3 mb-10">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/30" data-alt="EcoRide corporate logo in green" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDhsorHidinH29lwICGDVVNrSC5wSQG7UBLRWXuWtBCdNIV-GhlJJDS1htzd9jtGczlILMd7V09Ht7GSUpPzyk9sgrWAxm6eyy4qUb9YaZLIDBnpSPhm5Z3G88O_xGiq-BEISJVgWUVme5mYd6BZQ98wbH7ECD8X49hTOvHtkG1jpo3KhR_vFi0dySvY1snvdgsSvKGoREpCuZW29892sJC9K0yTIZh4oYAWHGL6bJQsmvayI4dNP1gIKDmVvOc94lUPACbCko3tUon");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-bold leading-normal">EcoRide Admin</h1>
+<p class="text-primary text-xs font-medium uppercase tracking-wider">Operations</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">moped</span>
+<span class="text-sm font-medium">Fleet</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-sm font-medium">Drivers</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="text-sm font-medium">Rides</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 active-nav text-white rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-sm font-medium">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-[#28392e]">
+<button class="w-full bg-primary hover:bg-primary/90 text-[#111813] py-2.5 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">help</span>
+                        Help Center
+                    </button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 p-4 md:p-10">
+<div class="max-w-5xl mx-auto space-y-8">
+<!-- Page Heading -->
+<div class="flex flex-wrap items-end justify-between gap-4">
+<div class="space-y-1">
+<h1 class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">Reports &amp; Export</h1>
+<p class="text-slate-500 dark:text-[#9db9a6] text-lg">Generate and download operational and sustainability insights.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 border border-primary/20 px-4 py-2 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">eco</span>
+<div>
+<p class="text-[10px] uppercase font-bold text-primary tracking-widest">CO2 Offset Month</p>
+<p class="text-white font-bold">1,284 kg</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Config Section -->
+<div class="bg-white dark:bg-[#1c271f] rounded-xl border border-slate-200 dark:border-[#3b5443] overflow-hidden shadow-sm">
+<div class="p-6 border-b border-slate-200 dark:border-[#3b5443]">
+<h2 class="text-xl font-bold flex items-center gap-2">
+<span class="bg-primary text-[#111813] rounded-full size-6 flex items-center justify-center text-xs">1</span>
+                            Select Report Type
+                        </h2>
+</div>
+<div class="p-6">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<label class="relative flex flex-col gap-3 rounded-xl border-2 border-primary bg-primary/5 p-4 cursor-pointer group transition-all">
+<input checked="" class="absolute top-4 right-4 text-primary focus:ring-primary h-4 w-4" name="reportType" type="radio"/>
+<span class="material-symbols-outlined text-primary text-3xl">insights</span>
+<div class="space-y-1">
+<h3 class="font-bold text-slate-900 dark:text-white">Fleet Performance</h3>
+<p class="text-xs text-slate-500 dark:text-[#9db9a6]">Vehicle efficiency, mileage, and maintenance logs.</p>
+</div>
+</label>
+<label class="relative flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-[#3b5443] bg-white dark:bg-[#111813] p-4 cursor-pointer hover:border-primary/50 transition-all">
+<input class="absolute top-4 right-4 text-primary focus:ring-primary h-4 w-4" name="reportType" type="radio"/>
+<span class="material-symbols-outlined text-slate-400 text-3xl">forest</span>
+<div class="space-y-1">
+<h3 class="font-bold text-slate-900 dark:text-white">Sustainability</h3>
+<p class="text-xs text-slate-500 dark:text-[#9db9a6]">Carbon savings, CO2 offset, and green metrics.</p>
+</div>
+</label>
+<label class="relative flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-[#3b5443] bg-white dark:bg-[#111813] p-4 cursor-pointer hover:border-primary/50 transition-all">
+<input class="absolute top-4 right-4 text-primary focus:ring-primary h-4 w-4" name="reportType" type="radio"/>
+<span class="material-symbols-outlined text-slate-400 text-3xl">payments</span>
+<div class="space-y-1">
+<h3 class="font-bold text-slate-900 dark:text-white">Financials</h3>
+<p class="text-xs text-slate-500 dark:text-[#9db9a6]">Revenue, driver payouts, and tax compliance.</p>
+</div>
+</label>
+<label class="relative flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-[#3b5443] bg-white dark:bg-[#111813] p-4 cursor-pointer hover:border-primary/50 transition-all">
+<input class="absolute top-4 right-4 text-primary focus:ring-primary h-4 w-4" name="reportType" type="radio"/>
+<span class="material-symbols-outlined text-slate-400 text-3xl">trending_up</span>
+<div class="space-y-1">
+<h3 class="font-bold text-slate-900 dark:text-white">Growth</h3>
+<p class="text-xs text-slate-500 dark:text-[#9db9a6]">New signups, retention, and referral metrics.</p>
+</div>
+</label>
+</div>
+</div>
+<div class="p-6 bg-slate-50 dark:bg-[#16231a] border-t border-slate-200 dark:border-[#3b5443]">
+<h2 class="text-xl font-bold flex items-center gap-2 mb-6">
+<span class="bg-primary text-[#111813] rounded-full size-6 flex items-center justify-center text-xs">2</span>
+                            Parameters &amp; Format
+                        </h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="space-y-2">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300">Date Range</label>
+<div class="flex gap-2">
+<input class="w-full bg-white dark:bg-[#111813] border border-slate-200 dark:border-[#3b5443] rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary" type="date"/>
+<input class="w-full bg-white dark:bg-[#111813] border border-slate-200 dark:border-[#3b5443] rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary" type="date"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-slate-700 dark:text-slate-300">File Format</label>
+<div class="flex p-1 bg-white dark:bg-[#111813] border border-slate-200 dark:border-[#3b5443] rounded-lg">
+<button class="flex-1 py-1 px-3 text-xs font-bold rounded bg-primary text-[#111813]">CSV</button>
+<button class="flex-1 py-1 px-3 text-xs font-medium text-slate-500 dark:text-[#9db9a6] hover:text-white">PDF</button>
+<button class="flex-1 py-1 px-3 text-xs font-medium text-slate-500 dark:text-[#9db9a6] hover:text-white">XLSX</button>
+</div>
+</div>
+<div class="flex items-end">
+<button class="w-full bg-primary hover:bg-primary/90 text-[#111813] h-[42px] rounded-lg font-black transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">download_for_offline</span>
+                                    Generate Report
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent History -->
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<h2 class="text-[22px] font-bold tracking-tight">Recent Exports</h2>
+<button class="text-primary text-sm font-bold hover:underline">Clear History</button>
+</div>
+<div class="overflow-hidden rounded-xl border border-slate-200 dark:border-[#3b5443] bg-white dark:bg-[#111813]">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-[#1c271f] text-slate-500 dark:text-[#9db9a6] uppercase text-[10px] font-black tracking-widest border-b border-slate-200 dark:border-[#3b5443]">
+<th class="px-6 py-4">Report Name</th>
+<th class="px-6 py-4">Date Generated</th>
+<th class="px-6 py-4">Parameters</th>
+<th class="px-6 py-4">Size</th>
+<th class="px-6 py-4 text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-[#28392e]">
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="font-bold text-sm">fleet_performance_q3.csv</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-[#9db9a6]">Oct 24, 2023 14:30</td>
+<td class="px-6 py-4 text-xs font-medium uppercase tracking-tighter text-slate-400">Jul 01 - Sep 30</td>
+<td class="px-6 py-4 text-sm font-medium">2.4 MB</td>
+<td class="px-6 py-4 text-right">
+<button class="bg-primary/10 hover:bg-primary text-primary hover:text-[#111813] px-3 py-1 rounded text-xs font-bold transition-all">Download</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="font-bold text-sm">sustainability_impact_2023.pdf</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-[#9db9a6]">Oct 22, 2023 09:12</td>
+<td class="px-6 py-4 text-xs font-medium uppercase tracking-tighter text-slate-400">Jan 01 - Dec 31</td>
+<td class="px-6 py-4 text-sm font-medium">5.8 MB</td>
+<td class="px-6 py-4 text-right">
+<button class="bg-primary/10 hover:bg-primary text-primary hover:text-[#111813] px-3 py-1 rounded text-xs font-bold transition-all">Download</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">description</span>
+<span class="font-bold text-sm">revenue_summary_sept.xlsx</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-[#9db9a6]">Oct 20, 2023 18:45</td>
+<td class="px-6 py-4 text-xs font-medium uppercase tracking-tighter text-slate-400">Sep 01 - Sep 30</td>
+<td class="px-6 py-4 text-sm font-medium">--</td>
+<td class="px-6 py-4 text-right">
+<span class="text-slate-400 text-xs font-bold uppercase italic">Expired</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Generation Progress (Simulated UI State) -->
+<div class="bg-[#111813] border border-primary/30 rounded-xl p-4 flex items-center justify-between">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative size-10">
+<div class="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
+<div class="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-end mb-1">
+<p class="text-sm font-bold text-white">Generating: Fleet Performance Q4 Preview</p>
+<p class="text-xs font-bold text-primary">65%</p>
+</div>
+<div class="w-full bg-[#1c271f] rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full" style="width: 65%"></div>
+</div>
+</div>
+</div>
+<button class="ml-6 text-white/50 hover:text-white">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

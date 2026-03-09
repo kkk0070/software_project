@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Driver Earnings &amp; Impact</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen pb-24">
+<!-- Top Navigation Bar -->
+<div class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="flex items-center p-4 pb-2 justify-between">
+<div class="flex size-12 shrink-0 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/30" data-alt="Professional driver profile photo smiling" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDHA4s6pFGvcFLeH3qic2TUGN5Ju0GRjCnULcgzaSNqEBEKJcsPaokwJsShjFA4BKTxhGRyClsYV9FS7psOVlspQUHW2zkcTcTeXg6i2U0pqZvQytbY28Y8zdvJzkDSDoCX8-P1_GrlUtTuRMzPKwQQ3pxvGWpf2RSIbdOORMS89qtU_9tLjjbG9fhhf3RZOWvYMXj3Ytygcj5T0b7bV3VQOs4VIp3gWWS3XeeHn2eoNEwlKR1stA2Ql9e13bBLi3IeBIMhHt4HzfyG");'>
+</div>
+</div>
+<div class="flex-1 px-3">
+<h2 class="text-lg font-bold leading-tight tracking-tight">Impact Dashboard</h2>
+<div class="flex items-center gap-1">
+<span class="size-2 rounded-full bg-primary animate-pulse"></span>
+<p class="text-[10px] uppercase tracking-widest text-primary font-bold">Online • Eco-Elite</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex size-10 items-center justify-center rounded-full bg-white/5 text-white">
+<span class="material-symbols-outlined text-[24px]">notifications</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Main Earnings Section -->
+<div class="px-4 pt-6">
+<p class="text-slate-500 dark:text-primary/70 text-sm font-medium leading-normal mb-1">Total Weekly Earnings</p>
+<div class="flex items-end gap-3">
+<h1 class="text-[42px] font-bold leading-none tracking-tight">$1,284.50</h1>
+<span class="mb-1 text-primary bg-primary/10 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> +12%
+            </span>
+</div>
+</div>
+<!-- Stats Grid -->
+<div class="flex flex-wrap gap-3 p-4">
+<div class="flex min-w-[150px] flex-1 flex-col gap-2 rounded-xl p-5 bg-white dark:bg-[#1a2e21] border border-slate-100 dark:border-white/5">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Green Bonuses</p>
+<span class="material-symbols-outlined text-primary text-xl">eco</span>
+</div>
+<p class="tracking-tight text-2xl font-bold">+$142.20</p>
+<p class="text-primary text-xs font-bold bg-primary/10 w-fit px-2 py-0.5 rounded-full">Top 5% Driver</p>
+</div>
+<div class="flex min-w-[150px] flex-1 flex-col gap-2 rounded-xl p-5 bg-white dark:bg-[#1a2e21] border border-slate-100 dark:border-white/5">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">CO2 Saved</p>
+<span class="material-symbols-outlined text-primary text-xl">cloud_done</span>
+</div>
+<p class="tracking-tight text-2xl font-bold">45.8<span class="text-sm font-normal text-slate-400 ml-1">kg</span></p>
+<p class="text-primary text-xs font-bold bg-primary/10 w-fit px-2 py-0.5 rounded-full">3 Trees Planted</p>
+</div>
+</div>
+<!-- Vehicle Health Section -->
+<div class="px-4 mt-2">
+<div class="bg-white dark:bg-[#1a2e21] rounded-2xl p-5 border border-slate-100 dark:border-white/5">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-bold tracking-tight">Vehicle Health (EV)</h3>
+<span class="text-xs bg-slate-100 dark:bg-white/10 px-3 py-1 rounded-full text-slate-500 dark:text-slate-300">Model 3 Performance</span>
+</div>
+<!-- Battery Level Indicator -->
+<div class="flex items-center gap-4 mb-6">
+<div class="relative size-20 flex items-center justify-center">
+<svg class="size-full" viewbox="0 0 36 36">
+<path class="text-slate-200 dark:text-white/5" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="100, 100" stroke-width="3"></path>
+<path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="82, 100" stroke-linecap="round" stroke-width="3"></path>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-xl font-bold">82%</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between text-sm mb-1">
+<span class="text-slate-500 dark:text-slate-400">Range Est.</span>
+<span class="font-bold text-primary">284 miles</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-500 dark:text-slate-400">Battery Health</span>
+<span class="font-bold">Excellent</span>
+</div>
+</div>
+</div>
+<!-- Nearest Charger -->
+<div class="bg-background-light dark:bg-background-dark/50 rounded-xl p-3 flex items-center gap-4 border border-slate-100 dark:border-white/5">
+<div class="size-14 rounded-lg overflow-hidden relative">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Abstract map showing a blue pin for charging station" data-location="San Francisco" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC2NOxJB9mLQwf39iuYBA-nBjCeuNNLxcRrRb8q9oIAuyquQ-pFM9Qo6FrPnhuCK3xxX70dd4-KtJS9Z4K65Yan0eWzbEkQljg4Ng3JDHYrJk3qCyZwIb5_XhOMlOHsQV5MDlzifE5o2GIQoVC4XKpzFCycJg_2EvCCSwe_xz99DEQ6f8DN20Zlr9qqZlQPeZ-GlbU4gEWr0Eh7x5Suxdk_xWM4SMvAmZeRnY3iLqKQIMbATkQRgsZLcxsXAF65hILAHd7pVVGTR1tj');">
+</div>
+<div class="absolute inset-0 flex items-center justify-center bg-black/20">
+<span class="material-symbols-outlined text-white text-lg">bolt</span>
+</div>
+</div>
+<div class="flex-1">
+<p class="text-xs text-slate-400">Nearest Supercharger</p>
+<p class="text-sm font-bold">Market St. Hub (0.8 mi)</p>
+<p class="text-[10px] text-primary">6/8 Stalls Available</p>
+</div>
+<button class="bg-primary text-background-dark size-10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined font-bold">directions</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Recent Impact Trips -->
+<div class="px-4 mt-6">
+<div class="flex items-center justify-between mb-4 px-1">
+<h3 class="text-lg font-bold tracking-tight">Recent Eco-Trips</h3>
+<button class="text-primary text-sm font-bold">View All</button>
+</div>
+<div class="space-y-3">
+<!-- Trip Card 1 -->
+<div class="flex items-center justify-between p-4 bg-white dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+<div class="flex items-center gap-4">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">electric_car</span>
+</div>
+<div>
+<p class="font-bold text-sm">Financial District</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Yesterday, 4:20 PM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-sm">+$24.40</p>
+<p class="text-[10px] text-primary font-bold">+$3.20 Green Bonus</p>
+</div>
+</div>
+<!-- Trip Card 2 -->
+<div class="flex items-center justify-between p-4 bg-white dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+<div class="flex items-center gap-4">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">electric_car</span>
+</div>
+<div>
+<p class="font-bold text-sm">Mission Bay</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Yesterday, 2:15 PM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-sm">+$18.90</p>
+<p class="text-[10px] text-primary font-bold">+$2.10 Green Bonus</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<div class="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-2 bg-gradient-to-t from-background-light dark:from-background-dark via-background-light dark:via-background-dark to-transparent">
+<div class="bg-white/80 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-full h-16 flex items-center justify-around px-4 shadow-2xl">
+<button class="flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold mt-0.5">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px] font-bold mt-0.5">Trips</span>
+</button>
+<div class="-mt-12 bg-primary size-14 rounded-full flex items-center justify-center text-background-dark shadow-xl shadow-primary/30 border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined font-bold text-3xl">map</span>
+</div>
+<button class="flex flex-col items-center justify-center text-slate-400">
+<span class="material-symbols-outlined">ev_station</span>
+<span class="text-[10px] font-bold mt-0.5">Charging</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] font-bold mt-0.5">Profile</span>
+</button>
+</div>
+</div>
+</body></html>

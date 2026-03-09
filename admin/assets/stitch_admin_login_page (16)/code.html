@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoRide Admin - Vehicle Health Monitoring</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "alert-amber": "#ffbf00",
+                        "background-dark": "#0a0f0b",
+                        "card-bg": "#111812",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #1a2e1f; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #13ec5b; }
+        .car-glow {
+            filter: drop-shadow(0 0 20px rgba(19, 236, 91, 0.15));
+        }
+        .pulse-amber {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-white transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-white/10 bg-background-dark/80 backdrop-blur-md px-6 py-3 lg:px-10">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+<span class="material-symbols-outlined font-bold">eco</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">EcoRide Admin</h2>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<nav class="hidden lg:flex items-center gap-8">
+<a class="text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Drivers</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary py-1" href="#">Fleet Health</a>
+<a class="text-slate-400 hover:text-primary text-sm font-medium transition-colors" href="#">Analytics</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-white/5 text-white hover:bg-white/10">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<div class="size-10 rounded-full bg-slate-800 border border-white/10 overflow-hidden">
+<img alt="Admin" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyf6CAejRFCSI_HFs7rNMV_0KbXiE6_xKvsMY0MFP45tw0BxEz5DItepIKJXK6nhmFlYTi7-Wn3QsoVTH7yoWUdJB6n6XEaYXfAw5Yqr0VHQTgrkeMQ_OPa7mdLPRsYWSaRRXmARCiyUoj4vUdW5_EPVM7ah_eSNacueopBUCJjq9TnVc2jop5d2mI4x-wxKlxrco5rqWx51sZvvoFVVJkAUKq_7piN_8RMKeceJwYmozcrOkFRsu_7l2BsEHHlcEWl8Bh16QX9vkz"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex flex-1 flex-col lg:flex-row max-w-[1600px] mx-auto w-full">
+<div class="flex-1 p-6 lg:p-10 flex flex-col gap-8">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div>
+<div class="flex items-center gap-2 text-xs text-slate-500 uppercase font-bold tracking-widest mb-1">
+<a class="hover:text-primary" href="#">Fleet</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-slate-300">Vehicle Monitoring</span>
+</div>
+<div class="flex items-center gap-4">
+<h1 class="text-3xl font-black tracking-tight">Model 3 Performance</h1>
+<span class="px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase border border-primary/30 tracking-wider">Unit #4412</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm font-bold hover:bg-white/10 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">settings_remote</span> Remote Diag
+                    </button>
+<button class="px-4 py-2 rounded-lg bg-primary text-background-dark text-sm font-bold hover:brightness-110 transition-all">
+                        Schedule Service
+                    </button>
+</div>
+</div>
+<div class="relative bg-card-bg border border-white/10 rounded-3xl p-8 min-h-[400px] flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(19,236,91,0.05),transparent_70%)]"></div>
+<div class="relative z-10 w-full flex flex-col items-center">
+<div class="w-full max-w-2xl car-glow opacity-80">
+<img alt="Vehicle Perspective" class="w-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmFJ4aHFP_GUw-VD0b06eEEko7mbnMWc2n5VIUzMAW8li7sewMxMet_Ac7Jbfs1XdBATdmRPUSEoAbe37IqEt_p7MWGwV6cJwQRr2UWGyt1qNeIwVfd5mvAIHhSg2BfZS_TCwk3P6j0aK2lRdZCqc88RS5-rW3l3_wpkrt3FU9e7S8cLaX4M-zycH40LueVB9c-66A-Lr_hUewLzpaDtD-y1Tk_5tsXbxb6ZLtY-XswScLGFIjkxKfioUxELmQD7E7exKcOg6ETiiF"/>
+</div>
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute top-[10%] left-[10%] group pointer-events-auto">
+<div class="flex items-center gap-3 bg-black/60 backdrop-blur-md border border-primary/30 p-3 rounded-2xl">
+<span class="material-symbols-outlined text-primary">battery_charging_full</span>
+<div>
+<div class="text-[10px] uppercase font-bold text-slate-500">Battery Health</div>
+<div class="text-xl font-black">94.2%</div>
+</div>
+</div>
+</div>
+<div class="absolute bottom-[20%] left-[5%] group pointer-events-auto">
+<div class="flex items-center gap-3 bg-black/60 backdrop-blur-md border border-alert-amber/30 p-3 rounded-2xl">
+<span class="material-symbols-outlined text-alert-amber pulse-amber">tire_repair</span>
+<div>
+<div class="text-[10px] uppercase font-bold text-slate-500">Tire Pressure</div>
+<div class="text-xl font-black text-alert-amber">32 PSI</div>
+<div class="text-[9px] text-alert-amber/70">Rear Left Low</div>
+</div>
+</div>
+</div>
+<div class="absolute top-[25%] right-[10%] group pointer-events-auto">
+<div class="flex items-center gap-3 bg-black/60 backdrop-blur-md border border-white/10 p-3 rounded-2xl">
+<span class="material-symbols-outlined text-white/50">slow_motion_video</span>
+<div>
+<div class="text-[10px] uppercase font-bold text-slate-500">Brake Lining</div>
+<div class="text-xl font-black">82%</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+<div class="bg-card-bg border border-white/10 rounded-2xl p-6">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="font-bold text-lg">Energy Efficiency</h3>
+<p class="text-xs text-slate-500">Consumption trend (Wh/km)</p>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full">
+<span class="text-[10px] font-bold text-primary uppercase">Avg: 142 Wh/km</span>
+</div>
+</div>
+<div class="h-40 flex items-end gap-1.5">
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[65%] hover:bg-primary/40 transition-all cursor-help relative group">
+<div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-black text-[10px] px-2 py-1 rounded font-bold">138</div>
+</div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[72%] hover:bg-primary/40 transition-all cursor-help"></div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[60%] hover:bg-primary/40 transition-all cursor-help"></div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[85%] hover:bg-primary/40 transition-all cursor-help"></div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[40%] hover:bg-primary/40 transition-all cursor-help"></div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[55%] hover:bg-primary/40 transition-all cursor-help"></div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[68%] hover:bg-primary/40 transition-all cursor-help"></div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[90%] hover:bg-primary/40 transition-all cursor-help"></div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[75%] hover:bg-primary/40 transition-all cursor-help"></div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[62%] hover:bg-primary/40 transition-all cursor-help"></div>
+</div>
+<div class="mt-4 flex justify-between text-[10px] text-slate-500 font-bold uppercase">
+<span>08:00</span>
+<span>12:00</span>
+<span>16:00</span>
+<span>20:00</span>
+</div>
+</div>
+<div class="bg-card-bg border border-white/10 rounded-2xl p-6 flex flex-col gap-6">
+<div>
+<h3 class="font-bold text-lg mb-4">Battery Temp Trends</h3>
+<div class="relative h-24 flex items-center">
+<svg class="w-full h-full overflow-visible" viewBox="0 0 400 100">
+<path d="M0,80 Q50,40 100,60 T200,30 T300,70 T400,50" fill="none" stroke="#13ec5b" stroke-width="2"></path>
+<circle cx="200" cy="30" fill="#13ec5b" r="4"></circle>
+</svg>
+<div class="absolute top-0 right-0 text-right">
+<span class="text-2xl font-black">32°C</span>
+<p class="text-[10px] text-slate-500 uppercase font-bold">Optimal Range</p>
+</div>
+</div>
+</div>
+<div class="border-t border-white/5 pt-4">
+<h3 class="font-bold text-sm mb-3 uppercase tracking-wider text-slate-400">Predicted Maintenance</h3>
+<div class="relative pt-6 pb-2">
+<div class="absolute top-1/2 left-0 w-full h-0.5 bg-white/10 -translate-y-1/2"></div>
+<div class="flex justify-between relative">
+<div class="flex flex-col items-center gap-2">
+<div class="size-3 rounded-full bg-primary border-4 border-background-dark z-10"></div>
+<span class="text-[9px] font-bold text-slate-500">Tire Rotation</span>
+<span class="text-[10px] font-black">2.4k km</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="size-3 rounded-full bg-alert-amber border-4 border-background-dark z-10"></div>
+<span class="text-[9px] font-bold text-slate-500">Alignment</span>
+<span class="text-[10px] font-black text-alert-amber">Now</span>
+</div>
+<div class="flex flex-col items-center gap-2 opacity-50">
+<div class="size-3 rounded-full bg-white/20 border-4 border-background-dark z-10"></div>
+<span class="text-[9px] font-bold text-slate-500">HVAC Filter</span>
+<span class="text-[10px] font-black">15k km</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<aside class="w-full lg:w-96 border-l border-white/10 bg-background-dark/50 p-6 lg:p-8 shrink-0 flex flex-col gap-8">
+<section>
+<h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Quick Specs</h3>
+<div class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+<div class="flex items-center gap-4 mb-2 pb-4 border-b border-white/5">
+<div class="size-14 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 text-primary">
+<span class="material-symbols-outlined text-3xl">info</span>
+</div>
+<div>
+<h4 class="font-bold text-sm text-slate-400 uppercase tracking-tighter">Current Driver</h4>
+<p class="font-bold text-lg">Marcus Thompson</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-1">
+<span class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">VIN Number</span>
+<div class="flex justify-between items-center">
+<span class="font-mono text-sm font-bold">5YJ3E1EA5PF2XXXXX</span>
+<button class="material-symbols-outlined text-slate-500 text-sm hover:text-white">content_copy</button>
+</div>
+</div>
+<div class="flex justify-between items-center bg-white/5 p-3 rounded-xl">
+<div class="flex flex-col">
+<span class="text-slate-500 text-[10px] font-bold uppercase">Odometer</span>
+<span class="text-xl font-black tabular-nums tracking-tight">42,851 <span class="text-xs font-medium text-slate-400">km</span></span>
+</div>
+<span class="material-symbols-outlined text-primary/40">speed</span>
+</div>
+<div class="flex justify-between items-center bg-white/5 p-3 rounded-xl border-l-2 border-primary">
+<div class="flex flex-col">
+<span class="text-slate-500 text-[10px] font-bold uppercase">Last Service</span>
+<span class="text-sm font-bold">April 05, 2024</span>
+</div>
+<span class="text-[10px] text-primary font-bold">45 Days Ago</span>
+</div>
+</div>
+</div>
+</section>
+<section>
+<h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Sustainability Metrics</h3>
+<div class="grid grid-cols-2 gap-3">
+<div class="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-col">
+<span class="text-[10px] font-bold text-primary mb-1 uppercase">CO2 Avoided</span>
+<span class="text-lg font-black">1.2 Tons</span>
+</div>
+<div class="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-col">
+<span class="text-[10px] font-bold text-primary mb-1 uppercase">Efficiency Rank</span>
+<span class="text-lg font-black">Top 3%</span>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Active Alerts</h3>
+<span class="px-2 py-0.5 rounded bg-alert-amber/20 text-alert-amber text-[9px] font-bold uppercase">1 Action Required</span>
+</div>
+<div class="space-y-3">
+<div class="flex items-start gap-3 p-3 rounded-xl bg-alert-amber/10 border border-alert-amber/20">
+<span class="material-symbols-outlined text-alert-amber text-[20px] mt-0.5">warning</span>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-alert-amber">Low Tire Pressure</span>
+<span class="text-xs text-slate-300">Rear left tire is below recommended 34 PSI.</span>
+<span class="text-[10px] text-slate-500 mt-2 font-medium">Logged 14:20 PM Today</span>
+</div>
+</div>
+</div>
+</section>
+<div class="mt-auto pt-6 border-t border-white/10">
+<button class="w-full flex items-center justify-center gap-2 rounded-xl py-3 bg-primary/10 text-primary text-sm font-bold hover:bg-primary/20 transition-all border border-primary/20">
+<span class="material-symbols-outlined text-[18px]">file_download</span>
+                    Download Health Report
+                </button>
+</div>
+</aside>
+</main>
+</div>
+
+</body></html>

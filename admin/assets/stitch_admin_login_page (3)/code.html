@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Live Ride Monitoring | EcoRide Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "surface-dark": "#1c271f",
+                        "border-dark": "#28392e",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .map-gradient-overlay {
+            background: linear-gradient(180deg, rgba(16, 34, 22, 0.8) 0%, rgba(16, 34, 22, 0) 20%);
+        }
+        .pulse-red {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .7; transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-dark px-6 py-3 bg-background-light dark:bg-background-dark z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-primary">eco</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">EcoRide <span class="text-primary">Admin</span></h2>
+</div>
+<label class="flex flex-col min-w-64 !h-10">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#9db9a6] flex border-none bg-surface-dark items-center justify-center pl-4 rounded-l-lg">
+<span class="material-symbols-outlined text-sm">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-1 focus:ring-primary border-none bg-surface-dark placeholder:text-[#9db9a6] px-4 rounded-l-none pl-2 text-sm font-normal leading-normal" placeholder="Search vehicle ID or driver..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-white/60 hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-medium border-b-2 border-primary pb-1" href="#">Fleet Live</a>
+<a class="text-white/60 hover:text-primary text-sm font-medium transition-colors" href="#">Analytics</a>
+<a class="text-white/60 hover:text-primary text-sm font-medium transition-colors" href="#">Users</a>
+</nav>
+<div class="flex gap-3">
+<button class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-background-dark text-sm font-bold tracking-tight">
+<span class="truncate">Emergency View</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-surface-dark text-white hover:bg-border-dark transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-surface-dark text-white hover:bg-border-dark transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary" data-alt="Admin user profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBbvv62ddovg-CKLilOHehG8C4FbNDy0DeIU5Co_Uzh-Hp-ud8bQPwJLiAoGg46f_Vooet7jZmKuV71aNqELPvZkAKvbef34EbcA7HX_g4pU5ddsM-JQ5KbLEJCgfozxaUJ-CVPUziZSz4Qtx-U5higR6vVf7mqzNqZwly9XNohlyxhjaoF9jIm_T2W4_cYhSL6bdBktK2o6gVSdbHxdUnQh_Qv7dAgdUOaCvlAQLYBHb3KFm-587AEjgkkcbLcwoDXsKrsP2MjUVgB");'></div>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-border-dark bg-background-dark p-4 flex flex-col justify-between shrink-0">
+<div class="flex flex-col gap-6">
+<div class="flex flex-col">
+<h1 class="text-white text-base font-semibold">Fleet Monitor</h1>
+<div class="flex items-center gap-2 mt-1">
+<span class="size-2 bg-primary rounded-full animate-pulse"></span>
+<p class="text-[#9db9a6] text-xs font-normal">Active: 1,284 vehicles</p>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined fill-1">map</span>
+<p class="text-sm font-semibold">Live Map</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/70 hover:bg-surface-dark transition-colors cursor-pointer">
+<span class="material-symbols-outlined">warning</span>
+<p class="text-sm font-medium">Incidents</p>
+<span class="ml-auto bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">2</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/70 hover:bg-surface-dark transition-colors cursor-pointer">
+<span class="material-symbols-outlined">sos</span>
+<p class="text-sm font-medium">SOS Alerts</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/70 hover:bg-surface-dark transition-colors cursor-pointer">
+<span class="material-symbols-outlined">ev_station</span>
+<p class="text-sm font-medium">Charging Hubs</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/70 hover:bg-surface-dark transition-colors cursor-pointer">
+<span class="material-symbols-outlined">health_and_safety</span>
+<p class="text-sm font-medium">Fleet Health</p>
+</div>
+</div>
+<div class="pt-4 border-t border-border-dark">
+<p class="text-[#9db9a6] text-[10px] uppercase font-bold tracking-widest px-3 mb-2">Filters</p>
+<div class="space-y-1">
+<label class="flex items-center gap-3 px-3 py-2 hover:bg-surface-dark rounded-lg cursor-pointer">
+<input checked="" class="form-checkbox bg-transparent border-border-dark rounded text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-xs text-white/80">Active Rides</span>
+</label>
+<label class="flex items-center gap-3 px-3 py-2 hover:bg-surface-dark rounded-lg cursor-pointer">
+<input checked="" class="form-checkbox bg-transparent border-border-dark rounded text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-xs text-white/80">Available</span>
+</label>
+<label class="flex items-center gap-3 px-3 py-2 hover:bg-surface-dark rounded-lg cursor-pointer">
+<input class="form-checkbox bg-transparent border-border-dark rounded text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-xs text-white/80">Offline</span>
+</label>
+</div>
+</div>
+</div>
+<button class="flex w-full cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-surface-dark text-white text-sm font-bold border border-border-dark hover:bg-border-dark transition-colors">
+<span class="truncate">Export Logs</span>
+</button>
+</aside>
+<!-- Main Map Area -->
+<main class="flex-1 relative bg-[#0a0f0b]">
+<!-- Dark Map Placeholder -->
+<div class="absolute inset-0 bg-cover bg-center grayscale opacity-80 mix-blend-luminosity" data-alt="Dark stylized city map showing vehicle paths and grid" data-location="San Francisco City" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDKwNhYgnDHrfQ4oCXLjJzmn_lbikDWz1ZGsQWIj4IILdnmG7ZzgKZBp08Gi0EGvxiqd9w7d05yZZ1V4-8gS476pksCcUu7I57O_PcDXPsdt9mu4N-genxIjfGAUilEAd9zly8RqRjIoLVhgCthNLGQUOLXf_rKFeoUUTV292Z7MItRvqWXX1hfIcME_nvkRav-VlXZhslENs3exR0SEABDTh5mfLV4xSoZnUsMoKptiFOxn8DLiuCSrTBImuA7TpkDWPwwAWmGuQ0Z");'>
+</div>
+<!-- Map Overlays (Faux markers and paths) -->
+<div class="absolute inset-0 pointer-events-none">
+<!-- SVG Path for active route -->
+<svg class="w-full h-full opacity-40">
+<path class="drop-shadow-[0_0_8px_rgba(19,236,91,0.8)]" d="M400,300 Q450,450 600,400 T800,500" fill="transparent" stroke="#13ec5b" stroke-dasharray="10,5" stroke-width="3"></path>
+<path class="opacity-50" d="M100,600 Q250,550 300,400" fill="transparent" stroke="#13ec5b" stroke-width="2"></path>
+</svg>
+<!-- Custom Map Markers -->
+<div class="absolute top-[35%] left-[45%] pointer-events-auto cursor-pointer group">
+<div class="relative">
+<div class="bg-primary size-4 rounded-full border-2 border-background-dark shadow-[0_0_10px_rgba(19,236,91,0.8)]"></div>
+<!-- Tooltip on hover -->
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-surface-dark border border-border-dark rounded-lg p-3 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity">
+<div class="flex justify-between items-start mb-2">
+<p class="text-xs font-bold">VEH-8842</p>
+<span class="bg-primary/20 text-primary text-[10px] px-1.5 py-0.5 rounded">Active</span>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between text-[10px] text-white/60">
+<span>Battery</span>
+<span>84%</span>
+</div>
+<div class="w-full bg-background-dark h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[84%]"></div>
+</div>
+<p class="text-[10px] mt-1 text-white/80">Driver: Marcus T.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute top-[50%] left-[30%] pointer-events-auto cursor-pointer">
+<div class="bg-white size-3 rounded-full border border-background-dark shadow-lg"></div>
+</div>
+<div class="absolute top-[60%] left-[65%] pointer-events-auto cursor-pointer pulse-red">
+<div class="bg-red-500 size-4 rounded-full border-2 border-white shadow-[0_0_15px_rgba(239,68,68,0.8)]"></div>
+</div>
+</div>
+<!-- Floating Stats Cards -->
+<div class="absolute top-4 left-4 right-4 flex gap-4 z-10">
+<div class="flex-1 max-w-[200px] flex flex-col gap-1 rounded-xl p-4 bg-background-dark/80 backdrop-blur-md border border-border-dark shadow-2xl">
+<p class="text-white/60 text-xs font-medium uppercase tracking-wider">Active Rides</p>
+<div class="flex items-end gap-2">
+<p class="text-white text-2xl font-bold leading-none">842</p>
+<p class="text-primary text-xs font-bold">+12%</p>
+</div>
+</div>
+<div class="flex-1 max-w-[200px] flex flex-col gap-1 rounded-xl p-4 bg-background-dark/80 backdrop-blur-md border border-border-dark shadow-2xl">
+<p class="text-white/60 text-xs font-medium uppercase tracking-wider">Vehicles Online</p>
+<div class="flex items-end gap-2">
+<p class="text-white text-2xl font-bold leading-none">1,105</p>
+<p class="text-primary text-xs font-bold">+5%</p>
+</div>
+</div>
+<div class="flex-1 max-w-[200px] flex flex-col gap-1 rounded-xl p-4 bg-background-dark/80 backdrop-blur-md border border-border-dark shadow-2xl">
+<p class="text-white/60 text-xs font-medium uppercase tracking-wider">SOS Alerts</p>
+<div class="flex items-end gap-2">
+<p class="text-white text-2xl font-bold leading-none">2</p>
+<p class="text-red-400 text-xs font-bold">Critical</p>
+</div>
+</div>
+<div class="flex-1 max-w-[200px] flex flex-col gap-1 rounded-xl p-4 bg-background-dark/80 backdrop-blur-md border border-border-dark shadow-2xl">
+<p class="text-white/60 text-xs font-medium uppercase tracking-wider">CO2 Offset</p>
+<div class="flex items-end gap-2">
+<p class="text-white text-2xl font-bold leading-none">12.4t</p>
+<p class="text-primary text-xs font-bold">+15%</p>
+</div>
+</div>
+</div>
+<!-- Map Controls -->
+<div class="absolute bottom-6 right-6 flex flex-col gap-3 z-10">
+<div class="flex flex-col rounded-lg overflow-hidden border border-border-dark bg-surface-dark/90 backdrop-blur-sm shadow-xl">
+<button class="p-2 hover:bg-border-dark text-white border-b border-border-dark">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="p-2 hover:bg-border-dark text-white">
+<span class="material-symbols-outlined">remove</span>
+</button>
+</div>
+<button class="p-3 bg-primary text-background-dark rounded-lg shadow-xl hover:bg-primary/90 transition-transform active:scale-95">
+<span class="material-symbols-outlined">near_me</span>
+</button>
+</div>
+</main>
+<!-- Right Incident Sidebar -->
+<aside class="w-80 border-l border-border-dark bg-background-dark flex flex-col shrink-0">
+<div class="p-4 border-b border-border-dark bg-background-dark/50 backdrop-blur-sm">
+<h3 class="text-white text-sm font-bold flex items-center gap-2 uppercase tracking-widest">
+<span class="material-symbols-outlined text-red-500 fill-1 text-base">emergency</span>
+                    Critical Alerts
+                </h3>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<!-- SOS Alert Card -->
+<div class="p-4 rounded-xl bg-red-500/10 border border-red-500/30 relative overflow-hidden group hover:bg-red-500/20 transition-all cursor-pointer">
+<div class="flex items-start justify-between mb-3">
+<div class="flex flex-col">
+<span class="text-red-500 text-[10px] font-bold uppercase tracking-widest mb-1">SOS Triggered</span>
+<span class="text-white font-bold">VEH-0922</span>
+</div>
+<span class="text-white/40 text-[10px] font-medium">2m ago</span>
+</div>
+<div class="space-y-2 mb-4">
+<div class="flex items-center gap-2 text-xs text-white/80">
+<span class="material-symbols-outlined text-sm">location_on</span>
+                            8th &amp; Market St, SF
+                        </div>
+<div class="flex items-center gap-2 text-xs text-white/80">
+<span class="material-symbols-outlined text-sm">person</span>
+                            Sarah Jenkins
+                        </div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 bg-red-500 text-white text-xs font-bold rounded-lg hover:bg-red-600">Dispatch</button>
+<button class="p-2 bg-surface-dark text-white rounded-lg hover:bg-border-dark">
+<span class="material-symbols-outlined text-sm">call</span>
+</button>
+</div>
+</div>
+<!-- Incident Item 1 -->
+<div class="p-4 rounded-xl bg-surface-dark/50 border border-border-dark hover:border-primary/30 transition-all cursor-pointer">
+<div class="flex items-start justify-between mb-2">
+<span class="text-orange-400 text-[10px] font-bold uppercase tracking-widest">Low Battery</span>
+<span class="text-white/40 text-[10px] font-medium">12m ago</span>
+</div>
+<p class="text-sm font-semibold text-white mb-1">VEH-1142 <span class="text-white/50 text-xs font-normal">• 4% Remaining</span></p>
+<p class="text-xs text-white/60">Heading to Charging Hub B</p>
+</div>
+<!-- Incident Item 2 -->
+<div class="p-4 rounded-xl bg-surface-dark/50 border border-border-dark hover:border-primary/30 transition-all cursor-pointer">
+<div class="flex items-start justify-between mb-2">
+<span class="text-white/40 text-[10px] font-bold uppercase tracking-widest">Connection Lost</span>
+<span class="text-white/40 text-[10px] font-medium">24m ago</span>
+</div>
+<p class="text-sm font-semibold text-white mb-1">VEH-5590</p>
+<p class="text-xs text-white/60">Last seen near Golden Gate Park</p>
+</div>
+<!-- Incident Item 3 -->
+<div class="p-4 rounded-xl bg-surface-dark/50 border border-border-dark hover:border-primary/30 transition-all cursor-pointer">
+<div class="flex items-start justify-between mb-2">
+<span class="text-primary text-[10px] font-bold uppercase tracking-widest">Maintenance Required</span>
+<span class="text-white/40 text-[10px] font-medium">1h ago</span>
+</div>
+<p class="text-sm font-semibold text-white mb-1">VEH-2201</p>
+<p class="text-xs text-white/60">Brake sensor anomaly detected</p>
+</div>
+</div>
+<!-- Sidebar Bottom Info -->
+<div class="p-4 border-t border-border-dark bg-background-dark">
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center text-xs">
+<span class="text-white/60">Network Latency</span>
+<span class="text-primary font-bold">12ms</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-white/60">System Uptime</span>
+<span class="text-white font-bold">99.99%</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</body></html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoRide Admin - AI &amp; Optimization Control</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .chart-grid {
+            background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-solid border-slate-200 dark:border-white/10 bg-white dark:bg-background-dark px-6 py-3 lg:px-10">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+<span class="material-symbols-outlined font-bold">eco</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">EcoRide Admin</h2>
+</div>
+<label class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5">
+<div class="text-slate-500 dark:text-[#9db9a6] flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input w-full border-none bg-transparent focus:ring-0 placeholder:text-slate-500 dark:placeholder:text-[#9db9a6] px-4 text-sm" placeholder="Search models..."/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<nav class="hidden lg:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Fleets</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary py-1" href="#">AI Control</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Settings</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex flex-1 flex-col lg:flex-row max-w-[1440px] mx-auto w-full">
+<aside class="w-full lg:w-72 border-r border-slate-200 dark:border-white/10 bg-white/50 dark:bg-transparent p-6 shrink-0">
+<div class="flex flex-col gap-6">
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-normal uppercase tracking-wider text-xs opacity-60">AI Management</h1>
+<p class="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal">Optimization &amp; Logistics</p>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20" href="#">
+<span class="material-symbols-outlined text-[22px] fill-1">analytics</span>
+<span class="text-sm font-bold">Model Overview</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">hub</span>
+<span class="text-sm font-medium">Clustering Performance</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">tune</span>
+<span class="text-sm font-medium">Sensitivity Controls</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">history_edu</span>
+<span class="text-sm font-medium">Model History</span>
+</a>
+</div>
+</div>
+</aside>
+<div class="flex-1 overflow-y-auto bg-white/30 dark:bg-transparent pb-24">
+<div class="flex flex-wrap justify-between items-end gap-4 p-6 lg:p-10">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
+<span class="material-symbols-outlined text-xs">monitoring</span>
+                        System Performance
+                    </div>
+<p class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">AI &amp; Optimization Control</p>
+<p class="text-slate-500 dark:text-[#9db9a6] text-base font-normal leading-normal max-w-xl">Monitor real-time demand prediction accuracy, ride clustering efficiency, and fine-tune machine learning hyperparameters.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center rounded-lg h-10 px-4 bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white text-sm font-bold transition-all hover:opacity-80">
+<span class="material-symbols-outlined mr-2 text-sm">refresh</span>
+                        Re-train Model
+                    </button>
+<button class="flex items-center justify-center rounded-lg h-10 px-6 bg-primary text-background-dark text-sm font-black shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">
+                        Deploy Version 4.2
+                    </button>
+</div>
+</div>
+<div class="px-6 lg:px-10 space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-white dark:bg-white/5 p-6 rounded-xl border border-slate-200 dark:border-white/10">
+<p class="text-slate-500 dark:text-[#9db9a6] text-xs font-bold uppercase tracking-wider mb-2">Demand Accuracy</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">98.4%</h3>
+<span class="text-primary text-xs font-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-xs">arrow_upward</span> 1.2%
+                            </span>
+</div>
+</div>
+<div class="bg-white dark:bg-white/5 p-6 rounded-xl border border-slate-200 dark:border-white/10">
+<p class="text-slate-500 dark:text-[#9db9a6] text-xs font-bold uppercase tracking-wider mb-2">Clustering Gain</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">24.1%</h3>
+<span class="text-primary text-xs font-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-xs">arrow_upward</span> 0.5%
+                            </span>
+</div>
+</div>
+<div class="bg-white dark:bg-white/5 p-6 rounded-xl border border-slate-200 dark:border-white/10">
+<p class="text-slate-500 dark:text-[#9db9a6] text-xs font-bold uppercase tracking-wider mb-2">Latency (ms)</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">142ms</h3>
+<span class="text-amber-500 text-xs font-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-xs">warning</span> High
+                            </span>
+</div>
+</div>
+<div class="bg-white dark:bg-white/5 p-6 rounded-xl border border-slate-200 dark:border-white/10">
+<p class="text-slate-500 dark:text-[#9db9a6] text-xs font-bold uppercase tracking-wider mb-2">Eco-Efficiency</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">A+</h3>
+<span class="text-primary text-xs font-bold flex items-center mb-1">Optimal</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="lg:col-span-2 bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 flex flex-col">
+<div class="p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">bubble_chart</span>
+                                Predicted vs. Actual Clusters
+                            </h2>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-primary/40 border border-primary"></div>
+<span class="text-xs text-slate-400">Predicted</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-white/10 border border-white/40"></div>
+<span class="text-xs text-slate-400">Actual</span>
+</div>
+</div>
+</div>
+<div class="flex-1 p-6 relative min-h-[400px] chart-grid flex items-center justify-center overflow-hidden">
+<div class="relative w-full h-full max-w-[600px] max-h-[300px]">
+<div class="absolute top-[20%] left-[30%] size-24 rounded-full border-2 border-primary/30 bg-primary/5 flex items-center justify-center">
+<div class="size-16 rounded-full border border-white/20 bg-white/5"></div>
+</div>
+<div class="absolute bottom-[10%] left-[10%] size-32 rounded-full border-2 border-primary/30 bg-primary/5 flex items-center justify-center">
+<div class="size-28 rounded-full border border-white/20 bg-white/5"></div>
+</div>
+<div class="absolute top-[40%] right-[20%] size-20 rounded-full border-2 border-primary/30 bg-primary/5 flex items-center justify-center">
+<div class="size-14 rounded-full border border-white/20 bg-white/5"></div>
+</div>
+<div class="absolute top-1/4 left-1/2 size-1.5 bg-primary rounded-full"></div>
+<div class="absolute top-1/3 left-[45%] size-1.5 bg-white rounded-full opacity-50"></div>
+<div class="absolute bottom-1/4 right-[40%] size-1.5 bg-primary rounded-full"></div>
+<div class="absolute bottom-[22%] right-[42%] size-1.5 bg-white rounded-full opacity-50"></div>
+</div>
+</div>
+<div class="p-4 bg-slate-100 dark:bg-white/5 border-t border-slate-200 dark:border-white/10 flex justify-between items-center text-xs text-slate-500">
+<span>Last updated: 2 minutes ago</span>
+<span class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-primary"></span>
+                                Live Data Stream
+                            </span>
+</div>
+</div>
+<div class="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 flex flex-col">
+<div class="p-6 border-b border-slate-200 dark:border-white/10">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">AI Sensitivity</h2>
+<p class="text-xs text-slate-500 mt-1">Adjust optimization aggressive levels</p>
+</div>
+<div class="p-6 space-y-8">
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<p class="text-slate-900 dark:text-white text-sm font-bold">Clustering Tightness</p>
+<span class="text-primary font-black">High</span>
+</div>
+<input class="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="0" step="1" type="range" value="85"/>
+<p class="text-[10px] text-slate-400">Determines how close riders must be to trigger a shared ride cluster.</p>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<p class="text-slate-900 dark:text-white text-sm font-bold">Predictive Dispatch</p>
+<span class="text-primary font-black">Medium</span>
+</div>
+<input class="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="0" step="1" type="range" value="50"/>
+<p class="text-[10px] text-slate-400">Controls the lead time for pre-positioning drivers in high-demand zones.</p>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<p class="text-slate-900 dark:text-white text-sm font-bold">CO2 Priority</p>
+<span class="text-primary font-black">Max</span>
+</div>
+<input class="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="0" step="1" type="range" value="95"/>
+<p class="text-[10px] text-slate-400">Weight given to emission reduction vs. pickup speed.</p>
+</div>
+<button class="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold text-slate-300 transition-colors">
+                                Reset to Default Values
+                            </button>
+</div>
+</div>
+</div>
+<section class="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">Model Version Evaluation</h2>
+<div class="flex gap-2">
+<div class="flex items-center gap-1 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] text-primary font-bold">
+<span class="size-1.5 rounded-full bg-primary animate-pulse"></span>
+                                 ACTIVE: v4.1.2
+                             </div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest border-b border-slate-200 dark:border-white/10">
+<th class="px-6 py-4">Model Version</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4 text-right">MAE</th>
+<th class="px-6 py-4 text-right">RMSE</th>
+<th class="px-6 py-4 text-right">F1 Score</th>
+<th class="px-6 py-4">Last Evaluation</th>
+<th class="px-6 py-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-white/10 text-sm">
+<tr class="bg-white/50 dark:bg-transparent">
+<td class="px-6 py-4 font-bold text-slate-900 dark:text-white">v4.1.2 (Production)</td>
+<td class="px-6 py-4"><span class="px-2 py-1 bg-primary/20 text-primary rounded text-[10px] font-bold uppercase">Stable</span></td>
+<td class="px-6 py-4 text-right font-mono">0.042</td>
+<td class="px-6 py-4 text-right font-mono">0.058</td>
+<td class="px-6 py-4 text-right font-mono text-primary font-bold">0.962</td>
+<td class="px-6 py-4 text-slate-500">2023-11-24 09:12</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:underline font-bold">Details</button>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 font-bold text-slate-900 dark:text-white">v4.2.0-rc1</td>
+<td class="px-6 py-4"><span class="px-2 py-1 bg-amber-500/20 text-amber-500 rounded text-[10px] font-bold uppercase">Testing</span></td>
+<td class="px-6 py-4 text-right font-mono text-primary">0.038</td>
+<td class="px-6 py-4 text-right font-mono text-primary">0.045</td>
+<td class="px-6 py-4 text-right font-mono text-primary font-bold">0.981</td>
+<td class="px-6 py-4 text-slate-500">2023-11-25 14:05</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:underline font-bold">Promote</button>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 font-bold text-slate-900 dark:text-white">v4.0.8 (Legacy)</td>
+<td class="px-6 py-4"><span class="px-2 py-1 bg-slate-500/20 text-slate-500 rounded text-[10px] font-bold uppercase">Archived</span></td>
+<td class="px-6 py-4 text-right font-mono">0.081</td>
+<td class="px-6 py-4 text-right font-mono">0.092</td>
+<td class="px-6 py-4 text-right font-mono">0.914</td>
+<td class="px-6 py-4 text-slate-500">2023-10-12 11:30</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 hover:text-white">Restore</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10 px-6 py-4 flex items-center justify-between backdrop-blur-md bg-opacity-80">
+<div class="flex items-center gap-3">
+<div class="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse"></div>
+<p class="text-sm text-slate-600 dark:text-slate-400 font-medium">Pending sensitivity adjustments for Production Cluster</p>
+</div>
+<div class="flex gap-4">
+<button class="px-5 py-2 text-slate-600 dark:text-slate-400 text-sm font-bold hover:text-slate-900 dark:hover:text-white">Discard Changes</button>
+<button class="px-8 py-2 bg-primary text-background-dark rounded-lg text-sm font-black shadow-lg shadow-primary/20 hover:scale-[1.05] active:scale-95 transition-all">Apply Configuration</button>
+</div>
+</div>
+</div>
+
+</body></html>

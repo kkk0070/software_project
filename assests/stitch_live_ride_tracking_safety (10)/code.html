@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Driver Shift History</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white">
+<!-- Top Navigation Bar -->
+<nav class="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-white/10">
+<div class="flex items-center p-4 justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-white cursor-pointer">arrow_back_ios</span>
+<h2 class="text-white text-lg font-bold leading-tight tracking-tight">Shift History</h2>
+</div>
+<div class="flex gap-3">
+<button class="flex size-10 items-center justify-center rounded-full bg-white/5 text-white">
+<span class="material-symbols-outlined text-xl">calendar_today</span>
+</button>
+<button class="flex size-10 items-center justify-center rounded-full bg-white/5 text-white">
+<span class="material-symbols-outlined text-xl">insights</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="max-w-md mx-auto pb-24">
+<!-- Summary Stats Card Section -->
+<div class="p-4 grid grid-cols-2 gap-3">
+<div class="col-span-2 flex flex-col gap-2 rounded-xl p-6 bg-primary/10 border border-primary/20">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-primary/70 text-xs font-medium uppercase tracking-widest">Total Earnings</p>
+<p class="text-white tracking-tighter text-4xl font-bold leading-tight mt-1">$2,410.20</p>
+</div>
+<div class="bg-primary/20 p-2 rounded-full">
+<span class="material-symbols-outlined text-primary">payments</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-primary text-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> +12%
+                    </span>
+<span class="text-white/40 text-xs">vs last week</span>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-4 bg-white/5 border border-white/10">
+<p class="text-white/60 text-xs font-medium uppercase tracking-wider">Total Tips</p>
+<div class="flex items-end gap-1">
+<p class="text-white text-xl font-bold leading-tight">$342.00</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-4 bg-white/5 border border-white/10">
+<p class="text-white/60 text-xs font-medium uppercase tracking-wider">Avg Eco-Score</p>
+<div class="flex items-center gap-2">
+<p class="text-primary text-xl font-bold leading-tight">96%</p>
+<span class="material-symbols-outlined text-primary text-sm">eco</span>
+</div>
+</div>
+</div>
+<!-- Filter Chips Section -->
+<div class="flex gap-3 px-4 py-2 overflow-x-auto no-scrollbar">
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary px-5 text-black">
+<p class="text-sm font-bold">All Shifts</p>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white/5 border border-white/10 px-5 text-white">
+<p class="text-sm font-medium">High Earnings</p>
+<span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white/5 border border-white/10 px-5 text-white">
+<p class="text-sm font-medium">Eco-Certified</p>
+<span class="material-symbols-outlined text-sm">leaf_spark</span>
+</button>
+</div>
+<!-- Section Header -->
+<div class="px-4 pt-6 pb-2 flex justify-between items-center">
+<h3 class="text-white text-lg font-bold tracking-tight">Recent Activity</h3>
+<span class="text-primary text-sm font-medium">October 2023</span>
+</div>
+<!-- Shift Cards List -->
+<div class="flex flex-col gap-4 p-4">
+<!-- Shift Card 1: Expanded view of a shift -->
+<div class="flex flex-col gap-4 rounded-xl bg-white/[0.03] border border-white/10 p-4">
+<div class="flex items-start justify-between gap-4">
+<div class="flex flex-col gap-1">
+<p class="text-white/50 text-xs font-medium uppercase tracking-wider">Monday, Oct 23</p>
+<p class="text-white text-lg font-bold leading-tight">Morning Shift</p>
+<p class="text-white/60 text-sm font-normal leading-normal">06:00 AM - 02:00 PM • 8h 12m</p>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm font-bold">$245.50</span>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm">eco</span>
+<span class="text-xs font-bold">98% Score</span>
+</div>
+</div>
+</div>
+<hr class="border-white/5"/>
+<!-- Individual Trip Sub-list -->
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">near_me</span>
+</div>
+<div>
+<p class="text-sm font-bold">Downtown to Airport</p>
+<p class="text-xs text-white/40">14.2 km • 24 min</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold">$32.10</p>
+<p class="text-[10px] text-primary">+$5.00 Tip</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">near_me</span>
+</div>
+<div>
+<p class="text-sm font-bold">Westside Hub</p>
+<p class="text-xs text-white/40">5.4 km • 12 min</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold">$18.50</p>
+<p class="text-[10px] text-primary">Perfect Eco</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Shift Card 2 -->
+<div class="flex items-stretch justify-between gap-4 rounded-xl bg-white/[0.03] border border-white/10 p-4">
+<div class="flex flex-[2_2_0px] flex-col gap-4">
+<div class="flex flex-col gap-1">
+<p class="text-white/50 text-xs font-medium uppercase tracking-wider">Sunday, Oct 22</p>
+<p class="text-white text-lg font-bold leading-tight">Full Day Drive</p>
+<p class="text-white/60 text-sm font-normal leading-normal">10h 05m • 22 trips</p>
+</div>
+<div class="flex gap-2">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center rounded-full h-8 px-4 bg-primary text-black text-sm font-bold">
+                            $412.00
+                        </button>
+<div class="flex items-center gap-1 bg-white/10 px-3 rounded-full">
+<span class="material-symbols-outlined text-primary text-xs">eco</span>
+<span class="text-[10px] font-bold">92%</span>
+</div>
+</div>
+</div>
+<div class="w-32 bg-center bg-no-repeat bg-cover rounded-xl border border-white/10" data-alt="Stylized map showing trip route through city" data-location="Seattle" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBv3CUjQkcc2DxdrKos6EVTC1-9JxQCnOpPT3cUHrOe-onGYBc_vl3IJCVjAQ0DIDXmIFp8eWf1QXx1KKBadSYUAjrD2haWUEHEX5brn0FKln7UakYdnvwhycPjj4r-QrHDuUmL2PwDOa2SHb379vGQmMgJ57-TtAS12Xi6E3oFHFyyGIfCHhTU0w0JAAorAScqTCkn9gFRLn0A0TVYsSRo41Km1LrR8wY2ZsueSa4XAmQNfLSF7sAEd6j1Jn07LYVALI5LXWhJvstK");'></div>
+</div>
+<!-- Shift Card 3 -->
+<div class="flex items-stretch justify-between gap-4 rounded-xl bg-white/[0.03] border border-white/10 p-4">
+<div class="flex flex-[2_2_0px] flex-col gap-4">
+<div class="flex flex-col gap-1">
+<p class="text-white/50 text-xs font-medium uppercase tracking-wider">Saturday, Oct 21</p>
+<p class="text-white text-lg font-bold leading-tight">Night Shift</p>
+<p class="text-white/60 text-sm font-normal leading-normal">6h 30m • 9 trips</p>
+</div>
+<div class="flex gap-2">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center rounded-full h-8 px-4 bg-primary text-black text-sm font-bold">
+                            $198.25
+                        </button>
+<div class="flex items-center gap-1 bg-white/10 px-3 rounded-full">
+<span class="material-symbols-outlined text-primary text-xs">eco</span>
+<span class="text-[10px] font-bold">94%</span>
+</div>
+</div>
+</div>
+<div class="w-32 bg-center bg-no-repeat bg-cover rounded-xl border border-white/10" data-alt="Night city skyline with glowing lights" data-location="Los Angeles" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCX3Wm4dXLYswxXW8uB0Yg6folYkpgZ8Mk7-UwSuPWRvYSYM8_YDSrgacPS8zIWa3REvaYBNaB8YkwCmfXitvuK4zxa1NVUe-r8vj7HaTjGmOE3RvmYJNhWHZ3oT7nMHWm010ZGrigaKK687yNLSPAQlbKkHnGxKIApGi2Tpe9lGe8qtcAaYILJ7g8eOZXUDOVTICp1FXwUXMkVJk9jW22tqnDeX3n9dVStEeozYUg_nkMMlgfpYLbn0hRjKKSq4uSdAAv9EITgK2In");'></div>
+</div>
+</div>
+</main>
+<!-- Navigation Tab Bar (iOS Style) -->
+<div class="fixed bottom-0 left-0 right-0 bg-background-dark/95 backdrop-blur-xl border-t border-white/10 pb-6 pt-2">
+<div class="flex justify-around items-center px-4 max-w-md mx-auto">
+<div class="flex flex-col items-center gap-1 text-white/40">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Home</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">history</span>
+<span class="text-[10px] font-bold">History</span>
+</div>
+<div class="relative -top-4 flex flex-col items-center">
+<div class="size-14 rounded-full bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(19,236,91,0.4)]">
+<span class="material-symbols-outlined text-black text-3xl font-bold">add</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-1 text-white/40">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="text-[10px] font-medium">Scores</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-white/40">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</div>
+</div>
+</div>
+</body></html>

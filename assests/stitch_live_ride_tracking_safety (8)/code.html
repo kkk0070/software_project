@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Driver Professional Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#0a0f0b",
+                        "card-dark": "#16251b",
+                        "border-dark": "#243a2b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .filled-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen">
+<div class="max-w-[430px] mx-auto min-h-screen flex flex-col pb-10 border-x border-transparent dark:border-border-dark shadow-2xl">
+<!-- TopAppBar -->
+<div class="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pb-2 justify-between border-b border-gray-200 dark:border-border-dark">
+<div class="text-slate-900 dark:text-white flex size-10 shrink-0 items-center justify-center cursor-pointer" data-icon="ArrowBack">
+<span class="material-symbols-outlined">arrow_back_ios</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center">Professional Profile</h2>
+<div class="flex w-10 items-center justify-end">
+<button class="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-transparent text-slate-900 dark:text-white">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+<!-- ProfileHeader -->
+<div class="flex p-6 @container">
+<div class="flex w-full flex-col gap-5 items-center">
+<div class="flex gap-4 flex-col items-center relative">
+<div class="relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32 border-4 border-primary/20 shadow-xl" data-alt="Professional portrait of a male driver smiling" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDe4DDVejGFFDEfuEXx0QQc2JA1VXRd2OaJ8Y7wyQ5WpwqySXbQ464dJ3_jro2TGKc-Zo1Ok0f-4gf4eZznsUwA7WYk883C6em-qH4mI27_LxYDC6qnlqwTdt0JV9ZlZrh-5pGlorpy2wB8AlR7pv3HplVyGqe4NFEa5WGLwZ5nSJ6XfxtOLOkqBFgWAIGtb5Ud1Ex8MMrV3z9r4vnHa_oSY_GEG7lmF2a_vGE8W61UeGlEqINAO_tivIi8seaTDiGtGsSk3O4sKBDr");'>
+</div>
+<div class="absolute bottom-1 right-1 bg-primary text-black rounded-full p-1 border-2 border-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px] font-bold">verified</span>
+</div>
+</div>
+<div class="flex flex-col items-center justify-center">
+<p class="text-slate-900 dark:text-white text-2xl font-bold leading-tight tracking-tight text-center">Alex Thompson</p>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="material-symbols-outlined text-primary text-sm filled-icon">eco</span>
+<p class="text-primary text-sm font-semibold uppercase tracking-wider">Elite Eco-Certified</p>
+</div>
+<p class="text-slate-500 dark:text-[#9db9a6] text-sm font-medium mt-1">Platform Partner since July 2021</p>
+</div>
+</div>
+<div class="flex gap-3 w-full max-w-[320px]">
+<button class="flex-1 cursor-pointer items-center justify-center rounded-xl h-11 bg-primary text-black text-sm font-bold tracking-tight shadow-lg shadow-primary/10 transition-transform active:scale-95">
+<span class="truncate">Edit Profile</span>
+</button>
+<button class="flex items-center justify-center rounded-xl h-11 w-11 bg-slate-200 dark:bg-card-dark text-slate-900 dark:text-white border border-transparent dark:border-border-dark">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- ProfileStats -->
+<div class="px-4 py-2">
+<div class="grid grid-cols-3 gap-3">
+<div class="flex flex-col gap-1 rounded-2xl bg-white dark:bg-card-dark border border-gray-100 dark:border-border-dark p-4 items-center text-center shadow-sm">
+<div class="flex items-center gap-1 text-primary">
+<p class="text-slate-900 dark:text-white tracking-tight text-xl font-bold">4.98</p>
+<span class="material-symbols-outlined text-[16px] filled-icon">star</span>
+</div>
+<p class="text-slate-500 dark:text-[#9db9a6] text-xs font-medium uppercase tracking-tighter">Rating</p>
+</div>
+<div class="flex flex-col gap-1 rounded-2xl bg-white dark:bg-card-dark border border-gray-100 dark:border-border-dark p-4 items-center text-center shadow-sm">
+<p class="text-slate-900 dark:text-white tracking-tight text-xl font-bold">3.5</p>
+<p class="text-slate-500 dark:text-[#9db9a6] text-xs font-medium uppercase tracking-tighter">Years</p>
+</div>
+<div class="flex flex-col gap-1 rounded-2xl bg-white dark:bg-card-dark border border-gray-100 dark:border-border-dark p-4 items-center text-center shadow-sm">
+<p class="text-slate-900 dark:text-white tracking-tight text-xl font-bold">1,240</p>
+<p class="text-slate-500 dark:text-[#9db9a6] text-xs font-medium uppercase tracking-tighter">Green Trips</p>
+</div>
+</div>
+</div>
+<!-- Section: Professional Credentials -->
+<h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight px-5 pt-8 pb-3">Professional Credentials</h3>
+<!-- ListItem: Driver License -->
+<div class="flex items-center gap-4 bg-white dark:bg-card-dark mx-4 rounded-2xl px-4 min-h-[72px] py-3 justify-between border border-gray-100 dark:border-border-dark mb-3">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-primary/10 shrink-0 size-12">
+<span class="material-symbols-outlined">badge</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-white text-[15px] font-semibold leading-normal">Commercial Driver License</p>
+<p class="text-slate-500 dark:text-[#9db9a6] text-xs font-normal">Active • Expires Oct 2025</p>
+</div>
+</div>
+<div class="shrink-0">
+<div class="flex size-7 items-center justify-center">
+<div class="size-2.5 rounded-full bg-primary shadow-[0_0_8px_#13ec5b]"></div>
+</div>
+</div>
+</div>
+<!-- ListItem: Insurance -->
+<div class="flex items-center gap-4 bg-white dark:bg-card-dark mx-4 rounded-2xl px-4 min-h-[72px] py-3 justify-between border border-gray-100 dark:border-border-dark mb-3">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-primary/10 shrink-0 size-12">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-slate-900 dark:text-white text-[15px] font-semibold leading-normal">Premium Liability Insurance</p>
+<p class="text-slate-500 dark:text-[#9db9a6] text-xs font-normal">Active • $1M Coverage</p>
+</div>
+</div>
+<div class="shrink-0">
+<div class="flex size-7 items-center justify-center">
+<div class="size-2.5 rounded-full bg-primary shadow-[0_0_8px_#13ec5b]"></div>
+</div>
+</div>
+</div>
+<!-- Section: Vehicle Verification -->
+<h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight px-5 pt-6 pb-3">Vehicle Verification</h3>
+<div class="px-4">
+<div class="bg-white dark:bg-card-dark rounded-2xl border border-gray-100 dark:border-border-dark overflow-hidden">
+<div class="h-32 bg-cover bg-center" data-alt="Modern electric sedan vehicle" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD5F9Agdc_AW9ZFCLezwkLTFpbA11Dh08lBuVD5zyXDdA4TG88gi2IkklvM7rukJ-1wIilkeKvLPG0UJRSj2G4udbOpBsOznXBpAM7dag8zBXdORDis00uqrFVQ0j8CnUIgrF1ROWShbKJhpcKZueqF4_ffNzzMSXIAbLtlN0U8yaNBaf03tTUU8F5nbaQLpq1KLYqUb_u5yf6m7DjNzgO_uc5bZQs41bp9TwIisZeCBeJ5RPYKBflIOKdA1z91i6ZgNeMh5yDOgqgn');">
+<div class="w-full h-full bg-gradient-to-t from-background-dark/80 to-transparent flex items-end p-4">
+<span class="bg-primary text-black text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Verified EV</span>
+</div>
+</div>
+<div class="p-4 flex justify-between items-center">
+<div>
+<p class="text-slate-900 dark:text-white font-bold">Tesla Model 3 • 2023</p>
+<p class="text-slate-500 dark:text-[#9db9a6] text-xs">License Plate: <span class="font-mono text-slate-700 dark:text-slate-300">ECO-7742</span></p>
+</div>
+<div class="flex flex-col items-end">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm filled-icon">bolt</span>
+<span class="text-xs font-bold uppercase tracking-tight">Fully Electric</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Training & Certifications -->
+<h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight px-5 pt-8 pb-3">Training &amp; Certifications</h3>
+<div class="flex overflow-x-auto gap-3 px-4 no-scrollbar">
+<!-- Cert 1 -->
+<div class="flex flex-col min-w-[140px] p-4 bg-white dark:bg-card-dark border border-gray-100 dark:border-border-dark rounded-2xl items-center text-center gap-2">
+<div class="size-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center">
+<span class="material-symbols-outlined filled-icon">accessible</span>
+</div>
+<p class="text-slate-900 dark:text-white text-xs font-bold leading-tight">Accessibility Training</p>
+</div>
+<!-- Cert 2 -->
+<div class="flex flex-col min-w-[140px] p-4 bg-white dark:bg-card-dark border border-gray-100 dark:border-border-dark rounded-2xl items-center text-center gap-2">
+<div class="size-12 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center">
+<span class="material-symbols-outlined filled-icon">medical_services</span>
+</div>
+<p class="text-slate-900 dark:text-white text-xs font-bold leading-tight">First Aid Certified</p>
+</div>
+<!-- Cert 3 -->
+<div class="flex flex-col min-w-[140px] p-4 bg-white dark:bg-card-dark border border-gray-100 dark:border-border-dark rounded-2xl items-center text-center gap-2">
+<div class="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined filled-icon">shield_with_heart</span>
+</div>
+<p class="text-slate-900 dark:text-white text-xs font-bold leading-tight">Safety Excellence</p>
+</div>
+</div>
+<!-- Bottom Action -->
+<div class="mt-10 px-4">
+<button class="w-full bg-slate-200 dark:bg-border-dark hover:bg-slate-300 dark:hover:bg-border-dark/80 text-slate-900 dark:text-white py-4 rounded-2xl font-bold transition-colors">
+                View Performance Reports
+            </button>
+</div>
+</div>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

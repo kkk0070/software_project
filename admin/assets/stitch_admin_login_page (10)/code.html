@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoRide Admin - Settings &amp; Configuration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- TopNavBar Component -->
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-solid border-slate-200 dark:border-white/10 bg-white dark:bg-background-dark px-6 py-3 lg:px-10">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+<span class="material-symbols-outlined font-bold">eco</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">EcoRide Admin</h2>
+</div>
+<label class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5">
+<div class="text-slate-500 dark:text-[#9db9a6] flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input w-full border-none bg-transparent focus:ring-0 placeholder:text-slate-500 dark:placeholder:text-[#9db9a6] px-4 text-sm" placeholder="Search settings..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<nav class="hidden lg:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Fleets</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Riders</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary py-1" href="#">Settings</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex flex-1 flex-col lg:flex-row max-w-[1440px] mx-auto w-full">
+<!-- SideNavBar Component (Sub-navigation) -->
+<aside class="w-full lg:w-72 border-r border-slate-200 dark:border-white/10 bg-white/50 dark:bg-transparent p-6 shrink-0">
+<div class="flex flex-col gap-6">
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-normal uppercase tracking-wider text-xs opacity-60">Configuration</h1>
+<p class="text-slate-500 dark:text-[#9db9a6] text-sm font-normal leading-normal">System global variables</p>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">settings</span>
+<span class="text-sm font-medium">General</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20" href="#">
+<span class="material-symbols-outlined text-[22px] fill-1">payments</span>
+<span class="text-sm font-bold">Pricing Rules</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">science</span>
+<span class="text-sm font-medium">Beta Features</span>
+<span class="ml-auto px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-500 font-bold uppercase">3 New</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">language</span>
+<span class="text-sm font-medium">Localization</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">memory</span>
+<span class="text-sm font-medium">System Parameters</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]">accessibility</span>
+<span class="text-sm font-medium">Accessibility</span>
+</a>
+</div>
+<div class="pt-6 border-t border-slate-200 dark:border-white/10">
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-[22px]">history</span>
+<span class="text-sm font-medium">Recent Activity</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 overflow-y-auto bg-white/30 dark:bg-transparent pb-24">
+<!-- PageHeading Component -->
+<div class="flex flex-wrap justify-between items-end gap-4 p-6 lg:p-10">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest">
+<span class="material-symbols-outlined text-xs">arrow_back</span>
+                            Back to Settings
+                        </div>
+<p class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Pricing &amp; Rules</p>
+<p class="text-slate-500 dark:text-[#9db9a6] text-base font-normal leading-normal max-w-xl">Configure base fares, surge multipliers, and eco-discounts. Changes apply globally to all current fleets unless overridden.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center rounded-lg h-10 px-4 bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white text-sm font-bold transition-all hover:opacity-80">
+<span class="truncate">View Audit Logs</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 px-6 bg-primary text-background-dark text-sm font-black shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">
+<span class="truncate">Publish Changes</span>
+</button>
+</div>
+</div>
+<div class="px-6 lg:px-10 space-y-8">
+<!-- Section: Base Fare -->
+<section class="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-white/10">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">universal_currency_alt</span>
+                                Base Fare Configuration
+                            </h2>
+</div>
+<div class="p-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- TextField Components -->
+<label class="flex flex-col gap-2">
+<p class="text-slate-700 dark:text-white text-sm font-semibold">Standard Base Fare (USD)</p>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+<input class="form-input w-full rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 focus:border-primary focus:ring-1 focus:ring-primary h-12 pl-8 pr-4 text-slate-900 dark:text-white" value="5.00"/>
+</div>
+</label>
+<label class="flex flex-col gap-2">
+<p class="text-slate-700 dark:text-white text-sm font-semibold">Per Mile Rate</p>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+<input class="form-input w-full rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 focus:border-primary focus:ring-1 focus:ring-primary h-12 pl-8 pr-4 text-slate-900 dark:text-white" value="1.25"/>
+</div>
+</label>
+<label class="flex flex-col gap-2">
+<p class="text-slate-700 dark:text-white text-sm font-semibold">Minimum Trip Fare</p>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+<input class="form-input w-full rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 focus:border-primary focus:ring-1 focus:ring-primary h-12 pl-8 pr-4 text-slate-900 dark:text-white" value="8.00"/>
+</div>
+</label>
+</div>
+<div class="mt-8 p-4 rounded-lg bg-primary/5 border border-primary/20 flex gap-4 items-start">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="text-sm text-slate-600 dark:text-slate-300">
+<span class="font-bold text-slate-900 dark:text-white">Pro Tip:</span> 
+                                    These rates are used as the baseline. Specific vehicle types like "Eco-Premium" or "Electric SUV" can be adjusted in the Fleet Management settings.
+                                </p>
+</div>
+</div>
+</section>
+<!-- Section: Dynamic Pricing & Discounts -->
+<section class="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-white/10">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">bolt</span>
+                                Dynamic Pricing &amp; Eco-Incentives
+                            </h2>
+</div>
+<div class="divide-y divide-slate-200 dark:divide-white/10">
+<!-- Toggle Item 1 -->
+<div class="flex items-center justify-between p-6">
+<div class="flex flex-col gap-1 max-w-2xl">
+<p class="text-slate-900 dark:text-white text-base font-bold">Auto-Surge Multiplier</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Automatically apply surge pricing when demand exceeds driver supply by 150%.</p>
+</div>
+<div class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-primary">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</div>
+</div>
+<!-- Toggle Item 2 -->
+<div class="flex items-center justify-between p-6">
+<div class="flex flex-col gap-1 max-w-2xl">
+<div class="flex items-center gap-2">
+<p class="text-slate-900 dark:text-white text-base font-bold">EV-Only Discount</p>
+<span class="px-2 py-0.5 rounded-full text-[10px] bg-primary text-background-dark font-black uppercase">Active</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Apply a 10% discount to riders who select 100% electric vehicles to promote zero-emission travel.</p>
+</div>
+<div class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-primary">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</div>
+</div>
+<!-- Range Input Custom -->
+<div class="p-6">
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<p class="text-slate-900 dark:text-white text-base font-bold">Peak Hour Multiplier Cap</p>
+<span class="text-primary font-black text-xl">2.5x</span>
+</div>
+<input class="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary" max="5.0" min="1.0" step="0.1" type="range" value="2.5"/>
+<div class="flex justify-between text-xs text-slate-400 font-medium">
+<span>1.0x (No Surge)</span>
+<span>5.0x (Extreme)</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Beta Features -->
+<section class="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-500">science</span>
+                                Experimental &amp; Beta Features
+                            </h2>
+<button class="text-primary text-sm font-bold hover:underline">Manage Enrollments</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-slate-200 dark:bg-white/10">
+<div class="bg-white dark:bg-background-dark/50 p-6 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<p class="text-slate-900 dark:text-white font-bold">Autonomous Dispatching</p>
+<p class="text-xs text-slate-500">Uses AI to predict demand clusters 15m in advance.</p>
+</div>
+<div class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-300 dark:bg-white/20">
+<span class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white transition duration-200"></span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-background-dark/50 p-6 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<p class="text-slate-900 dark:text-white font-bold">Solar Station Integration</p>
+<p class="text-xs text-slate-500">Route drivers to partner solar charging hubs.</p>
+</div>
+<div class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white transition duration-200"></span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Sticky Save Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-[60] bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10 px-6 py-4 flex items-center justify-between backdrop-blur-md bg-opacity-80">
+<div class="flex items-center gap-3">
+<div class="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse"></div>
+<p class="text-sm text-slate-600 dark:text-slate-400 font-medium">You have 4 unsaved changes in Pricing Rules</p>
+</div>
+<div class="flex gap-4">
+<button class="px-5 py-2 text-slate-600 dark:text-slate-400 text-sm font-bold hover:text-slate-900 dark:hover:text-white">Discard All</button>
+<button class="px-8 py-2 bg-primary text-background-dark rounded-lg text-sm font-black shadow-lg shadow-primary/20 hover:scale-[1.05] active:scale-95 transition-all">Save Changes</button>
+</div>
+</div>
+</div>
+</body></html>

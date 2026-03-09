@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Route &amp; Performance Analytics | EcoRide Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chart-gradient-primary {
+            background: linear-gradient(180deg, rgba(19, 236, 91, 0.2) 0%, rgba(19, 236, 91, 0) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased font-display">
+<div class="flex h-screen overflow-hidden">
+<!-- Side Navigation -->
+<aside class="w-64 flex flex-col border-r border-slate-200 dark:border-white/10 bg-white dark:bg-background-dark/50 shrink-0">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary size-8 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-background-dark font-bold">eco</span>
+</div>
+<div>
+<h1 class="text-sm font-bold tracking-tight">EcoRide Admin</h1>
+<p class="text-[10px] text-slate-500 dark:text-primary uppercase tracking-widest font-bold leading-none mt-1">Fleet Management</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1 mt-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">electric_moped</span>
+<span class="text-sm font-medium">Fleet Overview</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+<span class="text-sm font-medium">Route Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="text-sm font-medium">Driver Performance</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-500 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">map</span>
+<span class="text-sm font-medium">Real-time Map</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-white/10">
+<button class="w-full flex items-center justify-center gap-2 bg-primary text-background-dark py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                    Export Report
+                </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-10 flex items-center justify-between px-8 py-4 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-white/10">
+<div class="flex items-center gap-4">
+<h2 class="text-xl font-bold tracking-tight">Route &amp; Performance Analytics</h2>
+<div class="flex items-center gap-1.5 px-2 py-1 rounded bg-primary/10 border border-primary/20">
+<span class="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-[10px] font-bold text-primary uppercase">System Health: Optimal</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-white/5 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary w-64" placeholder="Search routes or IDs..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-cover bg-center ring-2 ring-primary/20 ring-offset-2 ring-offset-background-dark" data-alt="Avatar of the fleet manager admin" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAv1JxSAigs7tybai0pBGrIfc8PRB1u5z2sKrVpYfq40zlsgVtnsnCjD78sK8XHLjPwhbLUaRRubdWknBc0FvghDmy-BOicDmTlvRu0Y3Ykx0AhsgJwRtgh41AmkzoHrln-fY8sg7K1HyQemS_yzFnhrXNBiFWvP_WZzGtyHFy4ad5cZmL77Lox9wMIHK3NtprfkjobY9igqObMgFHAKZAtZ7o0ilRuhMi4-Toml-qQjHmqVp8Y2717DX4AtxwuW7KyntwjPllw6PvS')"></div>
+</div>
+</div>
+</header>
+<div class="p-8 space-y-8 max-w-7xl mx-auto">
+<!-- Filters Section -->
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-medium">
+                            All Regions <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/20 border border-primary/40 text-primary text-sm font-medium">
+                            Electric Only <span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm font-medium">
+                            Hybrid <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+<div class="flex items-center gap-3 text-sm font-medium text-slate-500">
+<span class="material-symbols-outlined text-primary text-[20px]">calendar_today</span>
+<span>Oct 1 - Oct 30, 2023</span>
+</div>
+</div>
+<!-- KPI Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="p-6 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-sm font-medium text-slate-500">Avg. Route Efficiency</p>
+<span class="text-primary material-symbols-outlined">speed</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">94.2%</h3>
+<span class="text-xs font-bold text-primary">+2.4%</span>
+</div>
+<div class="mt-4 h-1 w-full bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[94.2%]"></div>
+</div>
+</div>
+<div class="p-6 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-sm font-medium text-slate-500">Total Distance</p>
+<span class="text-slate-400 material-symbols-outlined">route</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">12,450 km</h3>
+<span class="text-xs font-bold text-red-500">-1.2%</span>
+</div>
+<div class="mt-4 flex gap-1 items-end h-8">
+<div class="flex-1 bg-slate-200 dark:bg-white/10 h-[60%] rounded-t-sm"></div>
+<div class="flex-1 bg-slate-200 dark:bg-white/10 h-[40%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/40 h-[80%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-[100%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/60 h-[70%] rounded-t-sm"></div>
+</div>
+</div>
+<div class="p-6 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-sm font-medium text-slate-500">Fuel Saved</p>
+<span class="text-primary material-symbols-outlined">local_gas_station</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">840 Gal</h3>
+<span class="text-xs font-bold text-primary">+5.7%</span>
+</div>
+<p class="mt-4 text-[11px] text-slate-400 uppercase font-bold tracking-tight">Equiv. to 12.4 Tons CO2</p>
+</div>
+<div class="p-6 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<p class="text-sm font-medium text-slate-500">Accuracy Rate</p>
+<span class="text-slate-400 material-symbols-outlined">target</span>
+</div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-3xl font-bold">91.5%</h3>
+<span class="text-xs font-bold text-primary">+0.8%</span>
+</div>
+<div class="mt-4 h-1 w-full bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-blue-500 w-[91.5%]"></div>
+</div>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Predicted vs Actual Line Chart -->
+<div class="lg:col-span-2 p-8 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 flex flex-col">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h4 class="text-lg font-bold">Travel Time Comparison</h4>
+<p class="text-xs text-slate-400">Predicted vs. Actual travel duration (minutes)</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary/40"></span>
+<span class="text-xs font-medium text-slate-400">Predicted</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-xs font-medium text-slate-400">Actual</span>
+</div>
+</div>
+</div>
+<div class="relative h-64 w-full flex items-end justify-between px-2 gap-4 border-b border-slate-200 dark:border-white/10">
+<!-- SVG Path Representation of Chart Lines -->
+<div class="absolute inset-x-0 bottom-0 h-full w-full pointer-events-none opacity-20">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M0 80 Q 25 20, 50 60 T 100 30" fill="none" stroke="#13ec5b" stroke-width="4"></path>
+<path d="M0 90 Q 25 30, 50 70 T 100 40" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"></path>
+</svg>
+</div>
+<!-- X Axis Labels -->
+<span class="text-[10px] text-slate-400">Mon</span>
+<span class="text-[10px] text-slate-400">Tue</span>
+<span class="text-[10px] text-slate-400">Wed</span>
+<span class="text-[10px] text-slate-400">Thu</span>
+<span class="text-[10px] text-slate-400">Fri</span>
+<span class="text-[10px] text-slate-400">Sat</span>
+<span class="text-[10px] text-slate-400">Sun</span>
+</div>
+</div>
+<!-- CO2 Impact Widget -->
+<div class="p-8 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 flex flex-col justify-center items-center text-center">
+<h4 class="text-lg font-bold mb-2">Sustainability Impact</h4>
+<p class="text-xs text-slate-400 mb-8">Greenhouse gases prevented this month</p>
+<div class="relative flex items-center justify-center mb-8">
+<svg class="w-48 h-48 -rotate-90">
+<circle class="text-slate-100 dark:text-white/5" cx="96" cy="96" fill="none" r="88" stroke="currentColor" stroke-width="8"></circle>
+<circle cx="96" cy="96" fill="none" r="88" stroke="#13ec5b" stroke-dasharray="552" stroke-dashoffset="138" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-4xl font-black text-primary">75%</span>
+<span class="text-[10px] uppercase font-bold text-slate-400">Target Achieved</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 w-full">
+<div class="p-3 rounded-lg bg-primary/10 border border-primary/20">
+<p class="text-[10px] text-slate-400 uppercase font-bold mb-1">CO2 Saved</p>
+<p class="text-lg font-bold">12.4t</p>
+</div>
+<div class="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+<p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Trees Planted</p>
+<p class="text-lg font-bold">342</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Detailed Performance Table -->
+<div class="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
+<h4 class="text-lg font-bold">Fleet Efficiency Leaderboard</h4>
+<button class="text-xs font-bold text-primary uppercase flex items-center gap-1">
+                            View All Assets <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<table class="w-full text-left">
+<thead class="bg-slate-50 dark:bg-white/5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+<tr>
+<th class="px-6 py-4">Vehicle ID</th>
+<th class="px-6 py-4">Driver</th>
+<th class="px-6 py-4">Efficiency</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Avg. Time Delta</th>
+<th class="px-6 py-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-white/10">
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium">EV-9021-A</td>
+<td class="px-6 py-4 flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-white/10 bg-cover bg-center" data-alt="Driver headshot" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDRaVsjKFvhieMbAW_1adaFDJmlJbFNC2Su3ztPMntj3YQMxiWrTDlVmzzqC0aqxHFLnPI9epve1g1jkgvIvEDz3XKutYvMETzhguPcIV3CBE98mOJgzpa05Z8x3_CwYmJe758GZeRpK_7zyx4e-MAWT079IvoI9viF9VpGQ_zzMq-fegZCg79aCzqjYXzukmvTdCvH1AOcimPFojzlQD3Kw_mmn_QauxrQVp2iMuDB7Q6mU9svLXXCw2DRW40HkWrJCtn5_lxH6znW')"></div>
+<span class="text-sm">Marcus Chen</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[98%]"></div>
+</div>
+<span class="text-xs font-bold">98%</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/20 text-primary border border-primary/30 uppercase">Active</span>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-primary">-1.4m</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">more_horiz</span></button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium">EV-4412-F</td>
+<td class="px-6 py-4 flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-white/10 bg-cover bg-center" data-alt="Driver headshot" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuByPi-N30m_HBVEUXjM_13RMmpyPBwHGWjA617w1zK7QfTL5LYNhWnfXHKAS2-Y9ewL5-qDh22qxmsbijumwNo0NmZKbUKeuZc3t3pF3_KmESisu1O4VJwFDiCIArnO1g_PBEpajvCFg-3Q3SSfY2OtP6Yi3GCyJZ1upOtqdz3gtmq2hzpmMEhqYdT9Z_OhXtc1BgG2uMYZ1fcEM-RdA22axMVmqwScC4LlDcliY3R0YbP23bMsguxm9TrRr8bueWOwAsV_0neV5UUk')"></div>
+<span class="text-sm">Sarah Jenkins</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[94%]"></div>
+</div>
+<span class="text-xs font-bold">94%</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/20 text-primary border border-primary/30 uppercase">Active</span>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-primary">-0.8m</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">more_horiz</span></button>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium">HY-1102-B</td>
+<td class="px-6 py-4 flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-white/10 bg-cover bg-center" data-alt="Driver headshot" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBjif06V-zus5ugLvGVWlp8Eu7p5Dio1l4HKXQ6DgwH5O-ieB4mVwKMnmSO8xGIbAiZ0U8ISwkhy6TkrWqm48nHveCdVainjGNNDWuexpwjZ45AMn05dIxj4QivrLWH1v76xz7S4IfI4rlLzg4N8Tv0gtYuQBMm4yI6kYeLiBGkIiaVZ4kjsGvVqRkeWI8UVfxSk4cLeSGvOWe318d4NEzgr1TuZM0QyQ5oLpUd7qN389uQ2gbXTfYVRQq3Q6oTKzmg0Hryk_WcRtJQ')"></div>
+<span class="text-sm">Robert Pike</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 h-1.5 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-orange-500 w-[78%]"></div>
+</div>
+<span class="text-xs font-bold text-orange-500">78%</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-white/10 text-slate-400 border border-slate-200 dark:border-white/10 uppercase">Charging</span>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-red-400">+2.5m</td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">more_horiz</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Footer Summary -->
+<footer class="flex items-center justify-between text-[11px] text-slate-500 font-medium pb-8 border-t border-slate-200 dark:border-white/10 pt-4">
+<p>© 2023 EcoRide Platform. Data refreshed 2 minutes ago.</p>
+<div class="flex gap-4">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Analytics Guide</a>
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</footer>
+</div>
+</main>
+</div>
+</body></html>
