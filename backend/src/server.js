@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
+import bcrypt from 'bcrypt';
+
 import userRoutes from './routes/driver/userRoutes.js';
 import rideRoutes from './routes/rider/rideRoutes.js';
 import emergencyRoutes from './routes/shared/emergencyRoutes.js';
@@ -25,9 +27,81 @@ const runMigrations = async () => {
   const client = await pool.connect();
 
   try {
-    console.log('[INFO] Running automatic database migrations...');
+    // Users table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        phone VARCHAR(50),
+        location VARCHAR(255),
+        profile_photo TEXT,
+        role VARCHAR(50) DEFAULT 'Rider' CHECK (role IN ('Rider', 'Driver', 'Admin')),
+        status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'Suspended', 'Pending')),
+        verified BOOLEAN DEFAULT false,
+        profile_setup_complete BOOLEAN DEFAULT false,
+        rating DECIMAL(3,2) DEFAULT 0.0,
+        total_rides INTEGER DEFAULT 0,
+        two_factor_enabled BOOLEAN DEFAULT false,
+        two_factor_secret VARCHAR(255),
+        joined_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] Users table ready');
 
-    // Create encryption_keys table if it doesn't exist
+    // Drivers table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS drivers (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        vehicle_type VARCHAR(50) CHECK (vehicle_type IN ('Electric Vehicle', 'Hybrid', 'Gas')),
+        vehicle_model VARCHAR(255),
+        license_plate VARCHAR(50),
+        license_number VARCHAR(100),
+        vehicle_year INTEGER,
+        available BOOLEAN DEFAULT true,
+        earnings DECIMAL(10,2) DEFAULT 0.00,
+        verification_status VARCHAR(50) DEFAULT 'Pending' CHECK (verification_status IN ('Pending', 'Verified', 'Rejected')),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id)
+      );
+    `);
+    console.log('[SUCCESS] Drivers table ready');
+
+    // Rides table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS rides (
+        id SERIAL PRIMARY KEY,
+        rider_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        driver_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        pickup_location VARCHAR(255) NOT NULL,
+        dropoff_location VARCHAR(255) NOT NULL,
+        ride_type VARCHAR(50) DEFAULT 'Solo',
+        status VARCHAR(50) DEFAULT 'Pending',
+        fare DECIMAL(10,2),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] Rides table ready');
+
+    // Seed admin if not exists
+    const adminCheck = await client.query(`SELECT id FROM users WHERE email = 'admin@ecoride.com'`);
+    if (adminCheck.rows.length === 0) {
+      const adminPasswordHash = await bcrypt.hash('admin123', 10);
+      await client.query(`
+        INSERT INTO users (name, email, password, role, status, verified, location)
+        VALUES ('Admin User', 'admin@ecoride.com', $1, 'Admin', 'Active', true, 'Headquarters')
+      `, [adminPasswordHash]);
+      console.log('[SUCCESS] Admin user seeded: admin@ecoride.com / admin123');
+    }
+
+    // Existing migrations for encryption and chat...
+    // Encryption keys table
     await client.query(`
       CREATE TABLE IF NOT EXISTS encryption_keys (
         id SERIAL PRIMARY KEY,
