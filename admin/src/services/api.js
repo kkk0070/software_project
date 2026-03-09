@@ -3,14 +3,36 @@
  * This file provides methods to interact with the backend API
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+let BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+// Render fix: If the URL is just a hostname (like "ecoride-backend-xxxx"),
+// convert it to a full public HTTPS URL.
+if (BASE_URL && !BASE_URL.startsWith('http')) {
+  if (!BASE_URL.includes('.')) {
+    BASE_URL = `https://${BASE_URL}.onrender.com`;
+  } else {
+    // If it has dots but no protocol, assume https
+    BASE_URL = `https://${BASE_URL}`;
+  }
+}
+
+const API_BASE_URL = BASE_URL;
 console.log('[EcoRide] API_BASE_URL:', API_BASE_URL);
 
 /**
  * Helper function to handle API responses
  */
 const handleResponse = async (response) => {
-  const data = await response.json();
+  // Check if content type is JSON
+  const contentType = response.headers.get("content-type");
+  let data;
+
+  if (contentType && contentType.includes("application/json")) {
+    data = await response.json();
+  } else {
+    const text = await response.text();
+    data = { message: text || 'API request failed' };
+  }
 
   if (!response.ok) {
     throw new Error(data.message || 'API request failed');
