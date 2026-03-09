@@ -37,7 +37,7 @@ services:
         fromService:
           type: web
           name: ecoride-backend
-          property: host
+          property: url
 
   # Flutter Web App
   - type: web
@@ -50,4 +50,4 @@ services:
         fromService:
           type: web
           name: ecoride-backend
-          property: host
+          property: url
