@@ -1,10 +1,10 @@
-services:
-  # PostgreSQL Database
-  - type: db
-    name: ecoride-db
-    plan: free
+databases:
+  - name: ecoride-db
     databaseName: ecoride_db
     user: postgres
+    plan: free
+
+services:
 
   # Express Backend
   - type: web
