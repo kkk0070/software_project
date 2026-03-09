@@ -50,6 +50,21 @@ class ApiConfig {
   static String get ridesUrl => '$baseUrl$ridesEndpoint';
   static String get emergencyUrl => '$baseUrl$emergencyEndpoint';
   
+  // ML Service (OSMx + ML Models)
+  static String get mlBaseUrl {
+    if (kIsWeb) return 'http://localhost:8080';
+    try {
+      if (Platform.isAndroid) return 'http://10.12.151.38:8080';
+    } catch (_) {}
+    return 'http://localhost:8080';
+  }
+
+  static String get mlRouteUrl => '$mlBaseUrl/route';
+  static String get mlFareUrl => '$mlBaseUrl/fare';
+  static String get mlEmissionUrl => '$mlBaseUrl/emission';
+  static String get mlAutocompleteUrl => '$mlBaseUrl/autocomplete';
+  static String get mlGeocodeUrl => '$mlBaseUrl/geocode';
+  
   // Timeout durations
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);

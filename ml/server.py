@@ -55,6 +55,7 @@ from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
 from shortest_path import find_all_routes
 from emission_model import predict_emission, estimate_aqi, VEHICLE_TYPES
+from fare_model import predict_fare, WEATHER_CONDITIONS, TRAFFIC_LEVELS, TIME_OF_DAY
 
 
 app = Flask(__name__)
@@ -260,6 +261,47 @@ def air_quality():
     except Exception as exc:
         traceback.print_exc()
         return _err(f"AQI calculation error: {exc}", 500)
+
+
+# ---------------------------------------------------------------------------
+# /fare — ML-based fare prediction
+# ---------------------------------------------------------------------------
+
+@app.route("/fare")
+def fare():
+    """
+    Calculate estimated fare using the ML fare model.
+
+    Required params: distance_km, weather, traffic, time, co2_kg
+    """
+    distance_km = _float("distance_km")
+    weather     = request.args.get("weather", "Clear").strip()
+    traffic     = request.args.get("traffic", "Low").strip()
+    time        = request.args.get("time", "Off-Peak").strip()
+    co2_kg      = _float("co2_kg") or 0.0
+    vehicle_type = request.args.get("vehicle_type", "car_petrol").strip()
+
+    if distance_km is None:
+        return _err("Required param: distance_km")
+
+    try:
+        result = predict_fare(distance_km, weather, traffic, time, co2_kg, vehicle_type)
+        result["inputs"] = {
+            "distance_km": distance_km,
+            "weather": weather,
+            "traffic": traffic,
+            "time": time,
+            "co2_kg": co2_kg
+        }
+        result["supported_options"] = {
+            "weather": WEATHER_CONDITIONS,
+            "traffic": TRAFFIC_LEVELS,
+            "time": TIME_OF_DAY
+        }
+        return jsonify(result)
+    except Exception as exc:
+        traceback.print_exc()
+        return _err(f"Fare calculation error: {exc}", 500)
 
 
 # ---------------------------------------------------------------------------
