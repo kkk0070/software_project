@@ -201,30 +201,23 @@ const corsOptions = {
       'http://localhost:3000',
       'http://localhost:5000',
       'http://localhost:5001',
-      /^http:\/\/localhost:[3-9]\d{3}$/,  // localhost ports 3000-9999
-      /^http:\/\/127\.0\.0\.1:[3-9]\d{3}$/,  // 127.0.0.1 ports 3000-9999
-      /\.onrender\.com$/,  // Any Render subdomain
+      /^http:\/\/localhost:[3-9]\d{3}$/,
+      /^http:\/\/127\.0\.0\.1:[3-9]\d{3}$/,
+      /\.onrender\.com$/,
     ];
 
     // Check if origin is allowed
     const isAllowed = allowedOrigins.some(pattern => {
-      if (typeof pattern === 'string') {
-        return origin === pattern;
-      } else if (pattern instanceof RegExp) {
-        return pattern.test(origin);
-      }
+      if (typeof pattern === 'string') return origin === pattern;
+      if (pattern instanceof RegExp) return pattern.test(origin);
       return false;
     });
 
-    // Allow if origin is in whitelist OR if in development mode with explicit flag
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    if (isAllowed) {
-      callback(null, true);
-    } else if (isDevelopment) {
-      // Log warning when allowing origin in development mode
-      console.warn(`[WARNING]  CORS: Allowing origin ${origin} in development mode`);
+    if (isAllowed || process.env.NODE_ENV === 'development') {
+      if (!isAllowed) console.warn(`[CORS] Allowing origin ${origin} in development mode`);
       callback(null, true);
     } else {
+      console.error(`[CORS ERROR] Origin blocked: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
