@@ -441,12 +441,26 @@ app.get('/api/health', async (req, res) => {
   try {
     // Test database connection
     await pool.query('SELECT 1');
+
+    // Check for core tables
+    const tables = ['users', 'drivers', 'rides', 'emergency_incidents', 'settings'];
+    const tableStatus = {};
+
+    for (const table of tables) {
+      try {
+        const countRes = await pool.query(`SELECT COUNT(*) FROM ${table}`);
+        tableStatus[table] = { exists: true, rows: parseInt(countRes.rows[0].count) };
+      } catch (e) {
+        tableStatus[table] = { exists: false, error: e.message };
+      }
+    }
+
     res.json({
       success: true,
       message: 'Backend is healthy and connected to database',
       timestamp: new Date().toISOString(),
-      env: process.env.NODE_ENV,
-      db_status: 'Connected'
+      db_status: 'Connected',
+      tables: tableStatus
     });
   } catch (error) {
     console.error('[DATABASE ERROR] Health check failed:', error);
@@ -454,7 +468,6 @@ app.get('/api/health', async (req, res) => {
       success: false,
       message: 'Backend is running but database is not connected',
       error: error.message,
-      timestamp: new Date().toISOString(),
       db_status: 'Disconnected'
     });
   }
