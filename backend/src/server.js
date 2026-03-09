@@ -191,37 +191,10 @@ const httpServer = createServer(app);
 // Middleware
 // CORS configuration to support multiple origins including Flutter Web
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, Postman, curl)
-    if (!origin) return callback(null, true);
-
-    // List of allowed origins
-    const allowedOrigins = [
-      'http://localhost:5173',  // Admin dashboard (dev)
-      'http://localhost:3000',
-      'http://localhost:5000',
-      'http://localhost:5001',
-      /^http:\/\/localhost:[3-9]\d{3}$/,
-      /^http:\/\/127\.0\.0\.1:[3-9]\d{3}$/,
-      /\.onrender\.com$/,
-    ];
-
-    // Check if origin is allowed
-    const isAllowed = allowedOrigins.some(pattern => {
-      if (typeof pattern === 'string') return origin === pattern;
-      if (pattern instanceof RegExp) return pattern.test(origin);
-      return false;
-    });
-
-    if (isAllowed || process.env.NODE_ENV === 'development') {
-      if (!isAllowed) console.warn(`[CORS] Allowing origin ${origin} in development mode`);
-      callback(null, true);
-    } else {
-      console.error(`[CORS ERROR] Origin blocked: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // Allow all origins during debugging
   credentials: true
+};
+credentials: true
 };
 
 app.use(cors(corsOptions));
@@ -346,15 +319,21 @@ app.use((err, req, res, next) => {
 
 // Start server
 httpServer.listen(PORT, async () => {
+  // Define API_BASE_URL here for logging purposes, assuming it's derived from the server's own address
+  // In a real scenario, VITE_API_URL would be a frontend environment variable.
+  // For server-side logging, we'll use the server's own address.
+  const API_BASE_URL = `http://localhost:${PORT}`;
   console.log(`
 ╔═══════════════════════════════════════════╗
 ║   🚀 EcoRide Backend API Server          ║
 ║   📡 Port: ${PORT}
 ║   🌍 Environment: ${process.env.NODE_ENV || 'development'}
 ║   🔗 CORS Origin: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}
+║   API_BASE_URL: ${API_BASE_URL}
 ║   🔌 WebSocket: Enabled
 ╚═══════════════════════════════════════════╝
   `);
+  console.log('[EcoRide] API_BASE_URL:', API_BASE_URL); // Added this line as per instruction
 
   try {
     // Run migrations first

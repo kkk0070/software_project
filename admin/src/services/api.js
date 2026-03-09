@@ -4,17 +4,18 @@
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+console.log('[EcoRide] API_BASE_URL:', API_BASE_URL);
 
 /**
  * Helper function to handle API responses
  */
 const handleResponse = async (response) => {
   const data = await response.json();
-  
+
   if (!response.ok) {
     throw new Error(data.message || 'API request failed');
   }
-  
+
   return data;
 };
 
@@ -443,19 +444,19 @@ const createApiWrapper = () => {
     const headers = {
       ...options.headers
     };
-    
+
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
       options.body = JSON.stringify(options.body);
     }
-    
+
     const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}/api${url}`;
     const response = await fetch(fullUrl, { ...options, headers });
-    
+
     // Handle blob responses (file downloads)
     if (options.responseType === 'blob') {
       if (!response.ok) {
@@ -463,7 +464,7 @@ const createApiWrapper = () => {
       }
       return { data: await response.blob() };
     }
-    
+
     return handleResponse(response);
   };
 
