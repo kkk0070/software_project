@@ -45,22 +45,31 @@ const runMigrations = async () => {
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
-        phone VARCHAR(50),
-        location VARCHAR(255),
-        profile_photo TEXT,
-        role VARCHAR(50) DEFAULT 'Rider' CHECK (role IN ('Rider', 'Driver', 'Admin')),
-        status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'Suspended', 'Pending')),
-        verified BOOLEAN DEFAULT false,
-        profile_setup_complete BOOLEAN DEFAULT false,
-        rating DECIMAL(3,2) DEFAULT 0.0,
-        total_rides INTEGER DEFAULT 0,
-        two_factor_enabled BOOLEAN DEFAULT false,
-        two_factor_secret VARCHAR(255),
-        joined_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        role VARCHAR(50) DEFAULT 'Rider'
       );
     `);
+
+    // Add missing columns to users
+    const userColumns = await client.query(`SELECT column_name FROM information_schema.columns WHERE table_name = 'users'`);
+    const existingUserCols = userColumns.rows.map(r => r.column_name);
+    const missingUserCols = {
+      'phone': 'VARCHAR(50)',
+      'location': 'VARCHAR(255)',
+      'profile_photo': 'TEXT',
+      'status': "VARCHAR(50) DEFAULT 'Active'",
+      'verified': 'BOOLEAN DEFAULT false',
+      'profile_setup_complete': 'BOOLEAN DEFAULT false',
+      'rating': 'DECIMAL(3,2) DEFAULT 0.0',
+      'total_rides': 'INTEGER DEFAULT 0',
+      'two_factor_enabled': 'BOOLEAN DEFAULT false',
+      'two_factor_secret': 'VARCHAR(255)',
+      'joined_date': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+      'created_at': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+      'updated_at': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+    };
+    for (const [col, type] of Object.entries(missingUserCols)) {
+      if (!existingUserCols.includes(col)) await client.query(`ALTER TABLE users ADD COLUMN ${col} ${type}`);
+    }
     console.log('[SUCCESS] Users table ready');
 
     // Drivers table
@@ -68,22 +77,31 @@ const runMigrations = async () => {
       CREATE TABLE IF NOT EXISTS drivers (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-        vehicle_type VARCHAR(50) CHECK (vehicle_type IN ('Electric Vehicle', 'Hybrid', 'Gas')),
-        vehicle_model VARCHAR(255),
-        license_plate VARCHAR(50),
-        license_number VARCHAR(100),
-        vehicle_year INTEGER,
-        available BOOLEAN DEFAULT true,
-        earnings DECIMAL(10,2) DEFAULT 0.00,
-        verification_status VARCHAR(50) DEFAULT 'Pending' CHECK (verification_status IN ('Pending', 'Verified', 'Rejected')),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id)
       );
     `);
+
+    // Add missing columns to drivers
+    const driverColumns = await client.query(`SELECT column_name FROM information_schema.columns WHERE table_name = 'drivers'`);
+    const existingDriverCols = driverColumns.rows.map(r => r.column_name);
+    const missingDriverCols = {
+      'vehicle_type': 'VARCHAR(50)',
+      'vehicle_model': 'VARCHAR(255)',
+      'license_plate': 'VARCHAR(50)',
+      'license_number': 'VARCHAR(100)',
+      'vehicle_year': 'INTEGER',
+      'available': 'BOOLEAN DEFAULT true',
+      'earnings': 'DECIMAL(10,2) DEFAULT 0.00',
+      'verification_status': "VARCHAR(50) DEFAULT 'Pending'",
+      'created_at': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+      'updated_at': 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+    };
+    for (const [col, type] of Object.entries(missingDriverCols)) {
+      if (!existingDriverCols.includes(col)) await client.query(`ALTER TABLE drivers ADD COLUMN ${col} ${type}`);
+    }
     console.log('[SUCCESS] Drivers table ready');
 
-    // Rides table
+    // Rides table (Main)
     await client.query(`
       CREATE TABLE IF NOT EXISTS rides (
         id SERIAL PRIMARY KEY,
@@ -91,25 +109,41 @@ const runMigrations = async () => {
         driver_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
         pickup_location VARCHAR(255) NOT NULL,
         dropoff_location VARCHAR(255) NOT NULL,
-        pickup_lat DECIMAL(10, 8),
-        pickup_lng DECIMAL(11, 8),
-        dropoff_lat DECIMAL(10, 8),
-        dropoff_lng DECIMAL(11, 8),
         ride_type VARCHAR(50) DEFAULT 'Solo' CHECK (ride_type IN ('Solo', 'Pool', 'EV')),
         status VARCHAR(50) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Active', 'Completed', 'Cancelled')),
         fare DECIMAL(10,2),
-        distance DECIMAL(10,2),
-        duration INTEGER,
-        carbon_saved DECIMAL(10,3),
-        rating DECIMAL(3,2),
-        scheduled_time TIMESTAMP,
-        started_at TIMESTAMP,
-        completed_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
     console.log('[SUCCESS] Rides table ready');
+
+    // Add missing columns to rides if it existed before
+    const rideColumns = await client.query(`
+      SELECT column_name FROM information_schema.columns WHERE table_name = 'rides'
+    `);
+    const existingRideCols = rideColumns.rows.map(r => r.column_name);
+
+    const missingCols = {
+      'pickup_lat': 'DECIMAL(10, 8)',
+      'pickup_lng': 'DECIMAL(11, 8)',
+      'dropoff_lat': 'DECIMAL(10, 8)',
+      'dropoff_lng': 'DECIMAL(11, 8)',
+      'distance': 'DECIMAL(10, 2)',
+      'duration': 'INTEGER',
+      'carbon_saved': 'DECIMAL(10, 3)',
+      'rating': 'DECIMAL(3, 2)',
+      'scheduled_time': 'TIMESTAMP',
+      'started_at': 'TIMESTAMP',
+      'completed_at': 'TIMESTAMP'
+    };
+
+    for (const [col, type] of Object.entries(missingCols)) {
+      if (!existingRideCols.includes(col)) {
+        await client.query(`ALTER TABLE rides ADD COLUMN ${col} ${type}`);
+        console.log(`[SUCCESS] Added missing column ${col} to rides table`);
+      }
+    }
 
     // Emergency incidents table
     await client.query(`
