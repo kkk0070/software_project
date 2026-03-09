@@ -12,15 +12,8 @@ ARG BACKEND_URL
 RUN flutter pub get
 RUN flutter build web --release --dart-define=BACKEND_URL=$BACKEND_URL
 
-# Copy project files
-WORKDIR /app
-COPY . .
 
-# Build for web
-ARG BACKEND_URL
-RUN flutter pub get
-RUN flutter build web --release --dart-define=BACKEND_URL=$BACKEND_URL
-
+# Stage 2: Serve with Nginx
 # Stage 2: Serve with Nginx
 FROM nginx:alpine
 COPY --from=build /app/build/web /usr/share/nginx/html
