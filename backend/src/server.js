@@ -80,14 +80,84 @@ const runMigrations = async () => {
         driver_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
         pickup_location VARCHAR(255) NOT NULL,
         dropoff_location VARCHAR(255) NOT NULL,
-        ride_type VARCHAR(50) DEFAULT 'Solo',
-        status VARCHAR(50) DEFAULT 'Pending',
+        pickup_lat DECIMAL(10, 8),
+        pickup_lng DECIMAL(11, 8),
+        dropoff_lat DECIMAL(10, 8),
+        dropoff_lng DECIMAL(11, 8),
+        ride_type VARCHAR(50) DEFAULT 'Solo' CHECK (ride_type IN ('Solo', 'Pool', 'EV')),
+        status VARCHAR(50) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Active', 'Completed', 'Cancelled')),
         fare DECIMAL(10,2),
+        distance DECIMAL(10,2),
+        duration INTEGER,
+        carbon_saved DECIMAL(10,3),
+        rating DECIMAL(3,2),
+        scheduled_time TIMESTAMP,
+        started_at TIMESTAMP,
+        completed_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
     console.log('[SUCCESS] Rides table ready');
+
+    // Emergency incidents table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS emergency_incidents (
+        id SERIAL PRIMARY KEY,
+        ride_id INTEGER REFERENCES rides(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        incident_type VARCHAR(100) NOT NULL,
+        description TEXT,
+        location VARCHAR(255),
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        status VARCHAR(50) DEFAULT 'Open' CHECK (status IN ('Open', 'In Progress', 'Resolved')),
+        priority VARCHAR(50) DEFAULT 'Medium' CHECK (priority IN ('Low', 'Medium', 'High', 'Critical')),
+        resolved_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] Emergency incidents table ready');
+
+    // Carbon savings table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS carbon_savings (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        ride_id INTEGER REFERENCES rides(id) ON DELETE CASCADE,
+        co2_saved DECIMAL(10,3),
+        trees_equivalent DECIMAL(10,2),
+        recorded_date DATE DEFAULT CURRENT_DATE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] Carbon savings table ready');
+
+    // System logs table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS system_logs (
+        id SERIAL PRIMARY KEY,
+        log_type VARCHAR(50) NOT NULL CHECK (log_type IN ('Error', 'Warning', 'Info', 'Security')),
+        message TEXT NOT NULL,
+        details JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] System logs table ready');
+
+    // Settings table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS settings (
+        id SERIAL PRIMARY KEY,
+        key VARCHAR(100) UNIQUE NOT NULL,
+        value TEXT NOT NULL,
+        category VARCHAR(50),
+        description TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] Settings table ready');
 
     // Seed admin if not exists
     const adminCheck = await client.query(`SELECT id FROM users WHERE email = 'admin@ecoride.com'`);
