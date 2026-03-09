@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { API_BASE_URL } from '../services/api';
 
 const AuthContext = createContext();
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Removed local API_BASE_URL to use the one from api.js
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -42,7 +43,16 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      // Check if content type is JSON
+      const contentType = response.headers.get("content-type");
+      let data;
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        data = { message: text || 'API request failed' };
+      }
 
       if (response.ok && data.success) {
         const userData = data.data.user;
@@ -58,16 +68,16 @@ export const AuthProvider = ({ children }) => {
 
         return { success: true };
       } else {
-        return { 
-          success: false, 
-          message: data.message || 'Invalid credentials' 
+        return {
+          success: false,
+          message: data.message || 'Invalid credentials'
         };
       }
     } catch (error) {
       console.error('Login error:', error);
-      return { 
-        success: false, 
-        message: 'Network error. Please check if the server is running.' 
+      return {
+        success: false,
+        message: 'Network error. Please check if the server is running.'
       };
     }
   };
@@ -76,7 +86,7 @@ export const AuthProvider = ({ children }) => {
     // Clear localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    
+
     // Clear state
     setUser(null);
     setIsAuthenticated(false);

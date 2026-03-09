@@ -16,7 +16,7 @@ if (BASE_URL && !BASE_URL.startsWith('http')) {
   }
 }
 
-const API_BASE_URL = BASE_URL;
+export const API_BASE_URL = BASE_URL;
 console.log('[EcoRide] API_BASE_URL:', API_BASE_URL);
 
 /**
