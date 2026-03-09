@@ -47,6 +47,7 @@ class AuthService {
   static Future<Map<String, dynamic>> login({
     required String email,
     required String password,
+    bool reactivate = false,
   }) async {
     try {
       // Send POST request to login endpoint with credentials
@@ -56,6 +57,7 @@ class AuthService {
         body: jsonEncode({
           'email': email,
           'password': password,
+          if (reactivate) 'reactivate': true,
         }),
       ).timeout(ApiConfig.connectionTimeout); // Add timeout to prevent hanging
 
@@ -98,8 +100,15 @@ class AuthService {
         // Return success with user data
         return {
           'success': true,
-          'message': data['message'] ?? 'Login successful',
+          'message': data['message'] ?? 'Logged in successfully',
           'user': user,
+        };
+      } else if (response.statusCode == 403 && data['isDeactivated'] == true) {
+        // Return deactivation status to trigger UI prompt
+        return {
+          'success': false,
+          'isDeactivated': true,
+          'message': data['message'] ?? 'This account is deactivated. Would you like to reactivate it?',
         };
       } else {
         // Login failed - return error message from server

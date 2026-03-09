@@ -3,14 +3,14 @@ import 'package:animate_do/animate_do.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/user_service.dart';
-import '../../../services/storage_service.dart';
-import '../../../services/ride_service.dart';
 import '../driver/driver_profile_detail_screen.dart';
 import '../shared/location_picker_screen.dart';
 import '../shared/payment_screen.dart';
 import '../shared/user_profile_screen.dart';
 import '../../../services/ml_service.dart';
+import '../../../services/storage_service.dart';
 import 'dart:async';
+import 'dart:math' as math;
 
 /// Rider Booking Screen
 /// Features:
@@ -46,12 +46,6 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
   int _riderCount = 1;
   double _calculatedDistanceKm = 0.0;
   double _tripDurationMin = 0.0;
-  List<Map<String, dynamic>> _activeRides = [];
-
-  // ML Conditions
-  String _selectedWeather = 'Clear';
-  String _selectedTraffic = 'Low';
-  String _selectedTime = 'Off-Peak';
   double _predictedFare = 0.0;
   Map<String, dynamic>? _fareBreakdown;
   bool _calculatingFare = false;
@@ -72,30 +66,9 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
   void initState() {
     super.initState();
     _loadAvailableDrivers();
-    _loadActiveRides();
   }
 
-  Future<void> _loadActiveRides() async {
-    try {
-      final riderId = await StorageService.getUserId();
-      if (riderId == null) return;
-      
-      final result = await RideService.getRides(
-        riderId: riderId.toString(),
-        status: 'Active',
-      );
-      
-      if (result['success'] == true && result['data'] != null) {
-        if (mounted) {
-          setState(() {
-            _activeRides = List<Map<String, dynamic>>.from(result['data']);
-          });
-        }
-      }
-    } catch (e) {
-      // Silently fail
-    }
-  }
+
 
   @override
   void dispose() {
@@ -217,9 +190,9 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
 
     final result = await MLService.predictFare(
       distanceKm: dist,
-      weather: _selectedWeather,
-      traffic: _selectedTraffic,
-      time: _selectedTime,
+      weather: 'Clear',
+      traffic: 'Low',
+      time: 'Off-Peak',
       co2Kg: co2,
       vehicleType: vehicleType,
     ).timeout(const Duration(seconds: 10), onTimeout: () => {'estimated_fare': 0.0, 'success': false});
@@ -383,10 +356,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
     return defaultValue;
   }
 
-  // Calculate pricing breakdown
-    if (value is String) return double.tryParse(value) ?? defaultValue;
-    return defaultValue;
-  }
+
 
   double _haversineDistance(double lat1, double lon1, double lat2, double lon2) {
     const r = 6371.0; // km
@@ -493,10 +463,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (_activeRides.isNotEmpty) ...[
-                _buildActiveRidesSection(isDark),
-                const SizedBox(height: 24),
-              ],
+              
               
               // Location Input Section
               FadeInDown(
@@ -600,15 +567,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
                 ),
               ),
               
-              const SizedBox(height: 24),
-
-              // Conditions Selection Section
-              FadeInUp(
-                delay: const Duration(milliseconds: 50),
-                child: _buildConditionsSection(),
-              ),
               
-              const SizedBox(height: 24),
               
               // Ride Type Selection Section
               FadeInUp(
@@ -778,113 +737,7 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
     );
   }
 
-  Widget _buildConditionsSection() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.cardDark : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-           Text(
-            'Current Conditions',
-            style: TextStyle(
-              color: isDark ? Colors.white : AppTheme.textDark,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildConditionDropdown(
-                  label: 'Weather',
-                  value: _selectedWeather,
-                  items: ['Clear', 'Rainy', 'Snowy', 'Stormy'],
-                  icon: FontAwesomeIcons.cloudSun,
-                  onChanged: (v) {
-                    setState(() => _selectedWeather = v!);
-                    _calculateMLFare();
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildConditionDropdown(
-                  label: 'Traffic',
-                  value: _selectedTraffic,
-                  items: ['Low', 'Medium', 'High'],
-                  icon: FontAwesomeIcons.trafficLight,
-                  onChanged: (v) {
-                    setState(() => _selectedTraffic = v!);
-                    _calculateMLFare();
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildConditionDropdown(
-                  label: 'Time',
-                  value: _selectedTime,
-                  items: ['Off-Peak', 'Peak', 'Night'],
-                  icon: FontAwesomeIcons.clock,
-                  onChanged: (v) {
-                    setState(() => _selectedTime = v!);
-                    _calculateMLFare();
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildConditionDropdown({
-    required String label,
-    required String value,
-    required List<String> items,
-    required IconData icon,
-    required ValueChanged<String?> onChanged,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(color: Colors.grey[500], fontSize: 10)),
-        const SizedBox(height: 4),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          decoration: BoxDecoration(
-            color: isDark ? AppTheme.backgroundDark : Colors.grey[100],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: value,
-              isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down, size: 16, color: AppTheme.primaryGreen),
-              style: TextStyle(color: isDark ? Colors.white : AppTheme.textDark, fontSize: 12),
-              items: items.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: onChanged,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildLocationInput({
     required TextEditingController controller,
@@ -1105,43 +958,6 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
                   style: TextStyle(
                     color: isDark ? Colors.white : AppTheme.textDark,
                     fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ],
-          const SizedBox(height: 8),
-          if (_fareBreakdown != null) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Weather/Traffic Surge',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                ),
-                Text(
-                  'x${_fareBreakdown!['surge_multiplier']}',
-                  style: TextStyle(
-                    color: AppTheme.warningOrange,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'CO2 Impact',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                ),
-                Text(
-                  '${_fareBreakdown!['factors']['co2_impact']}',
-                  style: TextStyle(
-                    color: AppTheme.primaryGreen,
-                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1567,148 +1383,4 @@ class _RiderBookingScreenState extends State<RiderBookingScreen> {
     );
   }
 
-  Widget _buildActiveRidesSection(bool isDark) {
-    return FadeInDown(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(FontAwesomeIcons.carOn, color: AppTheme.primaryGreen, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Active Rides',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : AppTheme.textDark,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ..._activeRides.map((ride) => _buildActiveRideCard(ride, isDark)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActiveRideCard(Map<String, dynamic> ride, bool isDark) {
-    final driverName = ride['driver_name'] ?? 'Driver';
-    final vehicleModel = ride['vehicle_model'] ?? 'Standard Car';
-    final licensePlate = ride['license_plate'] ?? '';
-    final pickup = ride['pickup_location'] ?? 'Unknown pickup';
-    final dropoff = ride['dropoff_location'] ?? 'Unknown drop-off';
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryGreen.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.3)),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primaryGreen.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(FontAwesomeIcons.carSide, color: AppTheme.primaryGreen, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      driverName,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : AppTheme.textDark,
-                      ),
-                    ),
-                    Text(
-                      '$vehicleModel${licensePlate.isNotEmpty ? ' • $licensePlate' : ''}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark ? Colors.grey[400] : Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'On the way',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(FontAwesomeIcons.locationDot, color: AppTheme.primaryGreen, size: 14),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  pickup,
-                  style: TextStyle(
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontSize: 13,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(FontAwesomeIcons.flagCheckered, color: AppTheme.accentBlue, size: 14),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  dropoff,
-                  style: TextStyle(
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontSize: 13,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }

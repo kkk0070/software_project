@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../providers/theme_provider.dart';
+import '../providers/active_ride_provider.dart';
 import '../services/auth_service.dart';
+import 'rideshare/shared/landing_screen.dart';
 
 class DeactivateAccountScreen extends StatefulWidget {
   const DeactivateAccountScreen({super.key});
@@ -31,8 +33,16 @@ class _DeactivateAccountScreenState extends State<DeactivateAccountScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Account deactivated successfully')),
       );
-      // Auth service automatically calls logout(), redirect to login
-      Navigator.of(context).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
+      // Clear active ride state if any
+      if (context.mounted) {
+        Provider.of<ActiveRideProvider>(context, listen: false).clearRide();
+      }
+      
+      // Auth service automatically calls logout(), redirect to landing
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const LandingScreen()),
+        (Route<dynamic> route) => false,
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['message'] ?? 'Failed to deactivate account')),
