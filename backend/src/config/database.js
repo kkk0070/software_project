@@ -12,7 +12,10 @@ const knex = knexLib(knexConfig);
 
 // Keep legacy pool for backwards compatibility (migrations and other scripts)
 const poolConfig = process.env.DATABASE_URL
-  ? { connectionString: process.env.DATABASE_URL }
+  ? {
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  }
   : {
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
