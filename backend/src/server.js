@@ -197,9 +197,13 @@ const corsOptions = {
 
     // List of allowed origins
     const allowedOrigins = [
-      'http://localhost:5173',  // Admin dashboard
-      /^http:\/\/localhost:[3-9]\d{3}$/,  // localhost ports 3000-9999 (common dev ports)
+      'http://localhost:5173',  // Admin dashboard (dev)
+      'http://localhost:3000',
+      'http://localhost:5000',
+      'http://localhost:5001',
+      /^http:\/\/localhost:[3-9]\d{3}$/,  // localhost ports 3000-9999
       /^http:\/\/127\.0\.0\.1:[3-9]\d{3}$/,  // 127.0.0.1 ports 3000-9999
+      /\.onrender\.com$/,  // Any Render subdomain
     ];
 
     // Check if origin is allowed
