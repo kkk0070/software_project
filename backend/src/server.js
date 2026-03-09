@@ -24,7 +24,18 @@ dotenv.config();
 
 // Auto-run migrations on startup
 const runMigrations = async () => {
-  const client = await pool.connect();
+  console.log('[INFO] Starting database initialization check...');
+  console.log('  DATABASE_URL present:', !!process.env.DATABASE_URL);
+
+  let client;
+  try {
+    client = await pool.connect();
+    console.log('[SUCCESS] Pool connected to PostgreSQL for migrations');
+  } catch (error) {
+    console.error('[ERROR] DATABASE CONNECTION FAILED:', error.message);
+    console.error('  If on Render, ensure SSL is enabled or check DATABASE_URL.');
+    return; // Stop migrations but letting server start so we can see health check
+  }
 
   try {
     // Users table
@@ -424,6 +435,30 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/chat', chatRoutes);
+
+// Health check endpoint with DB test
+app.get('/api/health', async (req, res) => {
+  try {
+    // Test database connection
+    await pool.query('SELECT 1');
+    res.json({
+      success: true,
+      message: 'Backend is healthy and connected to database',
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV,
+      db_status: 'Connected'
+    });
+  } catch (error) {
+    console.error('[DATABASE ERROR] Health check failed:', error);
+    res.status(503).json({
+      success: false,
+      message: 'Backend is running but database is not connected',
+      error: error.message,
+      timestamp: new Date().toISOString(),
+      db_status: 'Disconnected'
+    });
+  }
+});
 
 // Root endpoint
 app.get('/', (req, res) => {
