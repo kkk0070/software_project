@@ -1,0 +1,60 @@
+services:
+  # PostgreSQL Database
+  - type: db
+    name: ecoride-db
+    plan: free
+    databaseName: ecoride_db
+    user: postgres
+
+  # Express Backend
+  - type: web
+    name: ecoride-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ecoride-db
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000
+
+  # Admin Dashboard (Vite Static Site)
+  - type: static
+    name: ecoride-admin
+    plan: free
+    rootDir: admin
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: ecoride-backend
+          property: host
+
+  # Flutter Web App
+  - type: web
+    name: ecoride-app
+    env: docker
+    plan: free
+    dockerfilePath: Dockerfile.web
+    buildArgs:
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: ecoride-backend
+          property: host
+    envVars:
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: ecoride-backend
+          property: host

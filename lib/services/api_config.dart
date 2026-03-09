@@ -12,6 +12,12 @@ class ApiConfig {
   //
   // Make sure the backend server is running before using the app!
   static String get baseUrl {
+    // Check for a dart-define first (useful for production)
+    const backendUrlFromEnv = String.fromEnvironment('BACKEND_URL');
+    if (backendUrlFromEnv.isNotEmpty) {
+      return backendUrlFromEnv;
+    }
+
     if (kIsWeb) {
       // Flutter Web - use localhost
       return 'http://localhost:5000';
