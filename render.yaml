@@ -47,12 +47,6 @@ services:
     env: docker
     plan: free
     dockerfilePath: Dockerfile.web
-    buildArgs:
-      - key: BACKEND_URL
-        fromService:
-          type: web
-          name: ecoride-backend
-          property: host
     envVars:
       - key: BACKEND_URL
         fromService:
