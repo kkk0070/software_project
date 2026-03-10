@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 
 const createTables = async () => {
   const client = await pool.connect();
-  
+
   try {
     console.log('[INFO] Creating database tables...');
 
@@ -18,7 +18,7 @@ const createTables = async () => {
         location VARCHAR(255),
         profile_photo TEXT,
         role VARCHAR(50) DEFAULT 'Rider' CHECK (role IN ('Rider', 'Driver', 'Admin')),
-        status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'Suspended', 'Pending')),
+        status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'Suspended', 'Pending', 'Deactivated')),
         verified BOOLEAN DEFAULT false,
         profile_setup_complete BOOLEAN DEFAULT false,
         rating DECIMAL(3,2) DEFAULT 0.0,
@@ -33,12 +33,18 @@ const createTables = async () => {
     `);
     console.log('[SUCCESS] Users table created');
 
-    // Make sure deactivated_at exists if the table was previously created
+    // Ensure deactivated_at exists and the status constraint includes 'Deactivated'
     await client.query(`
       ALTER TABLE users
       ADD COLUMN IF NOT EXISTS deactivated_at TIMESTAMP;
+      
+      -- Update status constraint if it exists
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS users_status_check;
+      ALTER TABLE users 
+        ADD CONSTRAINT users_status_check 
+        CHECK (status IN ('Active', 'Suspended', 'Pending', 'Deactivated'));
     `);
-    console.log('[SUCCESS] Users table missing columns ensured');
+    console.log('[SUCCESS] Users table missing columns and status constraint ensured');
 
     // Drivers table (additional driver-specific info)
     await client.query(`
@@ -268,20 +274,20 @@ const createTables = async () => {
 
 const seedInitialData = async () => {
   const client = await pool.connect();
-  
+
   try {
     console.log('🌱 Seeding initial data...');
 
     // Check if admin user already exists
     const adminCheck = await client.query(`SELECT id FROM users WHERE email = 'admin@ecoride.com'`);
-    
+
     if (adminCheck.rows.length === 0) {
       console.log('[ENCRYPTING] Creating default login credentials...\n');
-      
+
       // Generate password hashes
       const adminPasswordHash = await bcrypt.hash('admin123', 10);
       const defaultPasswordHash = await bcrypt.hash('password123', 10);
-      
+
       // Insert admin user (password: admin123)
       await client.query(`
         INSERT INTO users (name, email, password, role, status, verified, location)
@@ -335,7 +341,7 @@ const seedInitialData = async () => {
       console.log('[SUCCESS] Driver details added');
 
       // Initialize default wallets for these sample users
-      const allSampleUsers = [...riderUsers.rows, ...drivers, adminCheck.rows.length === 0 ? {id: 1} : null].filter(Boolean); // Very rough, admin user is likely 1
+      const allSampleUsers = [...riderUsers.rows, ...drivers, adminCheck.rows.length === 0 ? { id: 1 } : null].filter(Boolean); // Very rough, admin user is likely 1
       for (const user of allSampleUsers) {
         await client.query(`
           INSERT INTO wallets (user_id, balance) VALUES ($1, 100.00) ON CONFLICT DO NOTHING
@@ -356,7 +362,7 @@ const seedInitialData = async () => {
         ON CONFLICT (key) DO NOTHING
       `);
       console.log('[SUCCESS] Default settings created');
-      
+
       // Display login credentials summary
       console.log('\n' + '='.repeat(60));
       console.log('[INFO] DEFAULT LOGIN CREDENTIALS');
@@ -381,6 +387,8 @@ const seedInitialData = async () => {
   }
 };
 
+export { createTables, seedInitialData };
+
 const initDatabase = async () => {
   try {
     await createTables();
@@ -392,4 +400,8 @@ const initDatabase = async () => {
   }
 };
 
-initDatabase();
+// Only run directly if this is the entry point
+const isMain = process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'));
+if (isMain) {
+  initDatabase();
+}

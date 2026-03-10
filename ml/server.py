@@ -59,7 +59,12 @@ from fare_model import predict_fare, WEATHER_CONDITIONS, TRAFFIC_LEVELS, TIME_OF
 
 
 app = Flask(__name__)
-CORS(app)  # Allow all origins – required for Flutter Web on localhost
+CORS(app, origins=[
+    "http://localhost:*",
+    "https://*.vercel.app",
+    "https://frontend-kkk0070s-projects.vercel.app",
+    "https://web-axdhnv022-kkk0070s-projects.vercel.app",
+])
 
 _geocoder = Nominatim(user_agent="sepro-route-server/1.0", timeout=10)
 
@@ -81,6 +86,12 @@ def _float(name: str):
 
 def _err(msg: str, code: int = 400):
     return jsonify({"error": msg}), code
+
+
+@app.route("/health")
+def health():
+    """Health check endpoint for monitoring (Render, UptimeRobot, etc.)."""
+    return jsonify({"status": "ok", "service": "EcoRide ML Server"});
 
 
 # ---------------------------------------------------------------------------

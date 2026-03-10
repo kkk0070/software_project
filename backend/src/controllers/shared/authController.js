@@ -27,9 +27,15 @@ const __dirname = dirname(__filename);
 
 // Create directory for storing profile photos if it doesn't exist
 const uploadsDir = path.join(__dirname, '../../uploads/profile-photos');
-if (!fs.existsSync(uploadsDir)) {
-  // Create directory recursively (including parent directories)
-  fs.mkdirSync(uploadsDir, { recursive: true });
+if (process.env.VERCEL !== '1') {
+  try {
+    if (!fs.existsSync(uploadsDir)) {
+      // Create directory recursively (including parent directories)
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+  } catch (err) {
+    console.warn(`[WARNING] Could not create uploads directory: ${err.message}`);
+  }
 }
 
 // Configure multer storage for profile photo uploads
@@ -241,7 +247,16 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check if account is suspended
+    // Verify password first (before checking status for security/privacy)
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+
+    // Check if account is suspended or deactivated
     if (user.status === 'Suspended') {
       return res.status(403).json({
         success: false,
@@ -249,13 +264,26 @@ export const login = async (req, res) => {
       });
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
+    if (user.status === 'Deactivated') {
+      // Check if user has explicitly requested to reactivate
+      if (req.body.reactivate === true) {
+        // Update user status and clear deactivated_at
+        await knex('users')
+          .where('id', user.id)
+          .update({
+            status: 'Active',
+            deactivated_at: null,
+            updated_at: knex.fn.now()
+          });
+        console.log(`[INFO] Account reactivated for ${user.email}`);
+      } else {
+        // Trigger reactivation prompt in frontend
+        return res.status(403).json({
+          success: false,
+          isDeactivated: true,
+          message: 'This account is deactivated. Would you like to reactivate it?'
+        });
+      }
     }
 
     // Check if 2FA is enabled

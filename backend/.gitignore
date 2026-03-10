@@ -32,3 +32,4 @@ build/
 coverage/
 *.coverage
 .nyc_output/
+.vercel

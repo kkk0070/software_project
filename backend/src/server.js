@@ -28,6 +28,7 @@ import { initializeSocketIO } from './services/socketService.js';
 
 // Load environment variables from .env file into process.env
 dotenv.config();
+console.log(`[INFO] IS_VERCEL: ${process.env.VERCEL}`);
 
 // Auto-run migrations on startup to ensure database schema is up-to-date
 // This function creates necessary tables and columns if they don't exist
@@ -240,36 +241,35 @@ const corsOptions = {
       'http://localhost:5173',  // Admin dashboard development server
       /^http:\/\/localhost:[3-9]\d{3}$/,  // Any localhost port from 3000-9999
       /^http:\/\/127\.0\.0\.1:[3-9]\d{3}$/,  // Same for 127.0.0.1
+      // Production Vercel frontend URLs
+      'https://web-axdhnv022-kkk0070s-projects.vercel.app',
+      'https://frontend-kkk0070s-projects.vercel.app',
+      /^https:\/\/.*\.vercel\.app$/,  // Any Vercel preview/production deployment
+      // Support custom domains if set via environment variable
+      ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(s => s.trim()) : []),
     ];
 
     // Check if the request origin matches any allowed pattern
     const isAllowed = allowedOrigins.some(pattern => {
       if (typeof pattern === 'string') {
-        // Exact string match
         return origin === pattern;
       } else if (pattern instanceof RegExp) {
-        // Regular expression match
         return pattern.test(origin);
       }
       return false;
     });
 
-    // Determine if we're in development mode
-    const isDevelopment = process.env.NODE_ENV === 'development';
     if (isAllowed) {
-      // Origin is in whitelist, allow the request
-      callback(null, true);
-    } else if (isDevelopment) {
-      // In development, allow all origins but log a warning for security awareness
-      console.warn(`[WARNING]  CORS: Allowing origin ${origin} in development mode`);
       callback(null, true);
     } else {
-      // In production, reject origins not in whitelist
+      console.warn(`[CORS] Blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
   // Allow credentials (cookies, authorization headers) to be sent with requests
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 };
 
 // Apply CORS middleware with the configured options
@@ -397,6 +397,20 @@ app.get('/', (req, res) => {
   });
 });
 
+// Manual migration trigger endpoint (useful for first-time setup and debugging)
+app.post('/api/migrate', async (req, res) => {
+  try {
+    // Import the full database initialization functions (creates ALL tables + seeds data)
+    const { createTables, seedInitialData } = await import('./config/initDatabase.js');
+    await createTables();
+    await seedInitialData();
+    await runMigrations(); // also run encryption key / chat table migrations
+    res.json({ success: true, message: 'All tables created and seeded successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // 404 handler - returns error for undefined routes
 app.use((req, res) => {
   res.status(404).json({
@@ -404,6 +418,7 @@ app.use((req, res) => {
     message: 'Route not found'
   });
 });
+
 
 // Global error handling middleware - catches all unhandled errors
 app.use((err, req, res, next) => {
@@ -416,38 +431,52 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start the HTTP server and initialize all services
-httpServer.listen(PORT, HOST, async () => {
-  // Display startup banner with server configuration
-  const hostDisplay = HOST === '0.0.0.0' ? '0.0.0.0 (all interfaces)' : HOST;
-  console.log(`
-╔═══════════════════════════════════════════╗
-║   🚀 EcoRide Backend API Server          ║
-║   📡 Host: ${hostDisplay}:${PORT}
-║   🌍 Environment: ${process.env.NODE_ENV || 'development'}
-║   🔗 CORS Origin: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}
-║   🔌 WebSocket: Enabled
-╚═══════════════════════════════════════════╝
-  `);
+// Start the HTTP server and initialize all services ONLY if not running in Vercel serverless environment
+// Vercel handles the invocation of the exported app automatically
+if (process.env.VERCEL !== '1') {
+  httpServer.listen(PORT, HOST, async () => {
+    // Display startup banner with server configuration
+    const hostDisplay = HOST === '0.0.0.0' ? '0.0.0.0 (all interfaces)' : HOST;
+    console.log(`
+  ╔═══════════════════════════════════════════╗
+  ║   🚀 EcoRide Backend API Server          ║
+  ║   📡 Host: ${hostDisplay}:${PORT}
+  ║   🌍 Environment: ${process.env.NODE_ENV || 'development'}
+  ║   🔗 CORS Origin: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}
+  ║   🔌 WebSocket: Enabled
+  ╚═══════════════════════════════════════════╝
+    `);
 
-  try {
-    // Step 1: Run database migrations to ensure schema is up-to-date
-    await runMigrations();
+    try {
+      // Step 1: Run database migrations to ensure schema is up-to-date
+      await runMigrations();
 
-    // Step 2: Initialize encryption key management system
-    await initializeKeyManagement();
+      // Step 2: Initialize encryption key management system
+      await initializeKeyManagement();
 
-    // Step 3: Initialize Socket.io for real-time notifications and chat
-    initializeSocketIO(httpServer);
-    console.log('[SUCCESS] Real-time notifications enabled via WebSocket');
-  } catch (error) {
-    console.error('[WARNING]  Error during initialization:', error.message);
-    // Identify if error is from WebSocket initialization
-    if (error.stack && error.stack.includes('socketService.js')) {
-      console.error('[ERROR] WebSocket functionality unavailable - server running in degraded mode');
+      // Step 3: Initialize Socket.io for real-time notifications and chat
+      initializeSocketIO(httpServer);
+      console.log('[SUCCESS] Real-time notifications enabled via WebSocket');
+    } catch (error) {
+      console.error('[WARNING]  Error during initialization:', error.message);
+      // Identify if error is from WebSocket initialization
+      if (error.stack && error.stack.includes('socketService.js')) {
+        console.error('[ERROR] WebSocket functionality unavailable - server running in degraded mode');
+      }
     }
-  }
-});
+  });
+} else {
+  // In Vercel serverless, run migrations immediately at module load time
+  console.log('[INFO] Vercel environment detected, running migrations immediately...');
+  runMigrations()
+    .then(() => initializeKeyManagement())
+    .catch(err => console.error('Initialization failed in Vercel:', err.message));
+}
+
+
+// Export the Express app for testing and Vercel serverless functions
+export { app, httpServer };
+export default app;
 
 // Graceful shutdown handler for SIGTERM signal
 // Properly closes database connections before exiting
@@ -470,6 +499,3 @@ process.on('SIGINT', () => {
     process.exit(0);
   });
 });
-
-// Export the Express app for testing purposes
-export default app;

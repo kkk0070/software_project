@@ -17,8 +17,14 @@ const __dirname = dirname(__filename);
 
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, '../../uploads');
-if (!fsSync.existsSync(uploadsDir)) {
-  fsSync.mkdirSync(uploadsDir, { recursive: true });
+if (process.env.VERCEL !== '1') {
+  try {
+    if (!fsSync.existsSync(uploadsDir)) {
+      fsSync.mkdirSync(uploadsDir, { recursive: true });
+    }
+  } catch (err) {
+    console.warn(`[WARNING] Could not create uploads directory: ${err.message}`);
+  }
 }
 
 // Configure multer for file uploads
@@ -43,7 +49,7 @@ const fileFilter = (req, file, cb) => {
     'application/msword', // .doc
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
   ];
-  
+
   const extname = allowedExtensions.test(file.originalname.toLowerCase());
   const mimetype = allowedMimetypes.includes(file.mimetype);
 
@@ -369,7 +375,7 @@ export const getDriversWithPendingDocuments = async (req, res) => {
         knex.raw('COUNT(doc.id) as pending_documents')
       )
       .leftJoin('drivers as d', 'u.id', 'd.user_id')
-      .leftJoin('documents as doc', function() {
+      .leftJoin('documents as doc', function () {
         this.on('u.id', '=', 'doc.user_id')
           .andOn('doc.status', '=', knex.raw("?", ['Pending']));
       })
@@ -491,7 +497,7 @@ export const viewDocumentEncoded = async (req, res) => {
 
     // Read file and encode to Base64
     const fileBuffer = await fs.readFile(document.file_path);
-    
+
     // ============================================================================
     // TERMINAL OUTPUT: ENCODING & DECODING DEMONSTRATION
     // ============================================================================
@@ -504,14 +510,14 @@ export const viewDocumentEncoded = async (req, res) => {
     console.log(`File Type: ${document.document_type}`);
     console.log(`Original Size: ${fileBuffer.length} bytes`);
     console.log('═'.repeat(80));
-    
+
     // Show sample of original data
     const sampleData = fileBuffer.toString('utf8', 0, Math.min(100, fileBuffer.length));
     console.log('\n[DATA] STEP 1: ORIGINAL DATA (Sample)');
     console.log('─'.repeat(80));
     console.log(`Binary Data (first 100 bytes as text): ${sampleData.substring(0, 100).replace(/[^\x20-\x7E]/g, '.')}`);
     console.log(`Total bytes: ${fileBuffer.length}`);
-    
+
     // Perform encoding
     console.log('\n[ENCRYPT] STEP 2: ENCODING TO BASE64');
     console.log('─'.repeat(80));
@@ -521,7 +527,7 @@ export const viewDocumentEncoded = async (req, res) => {
     console.log(`✓ Encoding complete!`);
     console.log(`Encoded size: ${encodedFile.length} characters`);
     console.log(`Overhead: ${(((encodedFile.length - fileBuffer.length) / fileBuffer.length) * 100).toFixed(2)}%`);
-    
+
     // Show sample of encoded data
     console.log('\n[INFO] STEP 3: ENCODED DATA (Sample)');
     console.log('─'.repeat(80));
@@ -530,7 +536,7 @@ export const viewDocumentEncoded = async (req, res) => {
     if (encodedFile.length > 200) {
       console.log(`... (${encodedFile.length - 200} more characters)`);
     }
-    
+
     // Demonstrate decoding
     console.log('\n[DECRYPT] STEP 4: DECODING FROM BASE64');
     console.log('─'.repeat(80));
@@ -538,7 +544,7 @@ export const viewDocumentEncoded = async (req, res) => {
     const decodedBuffer = Buffer.from(encodedFile, 'base64');
     console.log(`✓ Decoding complete!`);
     console.log(`Decoded size: ${decodedBuffer.length} bytes`);
-    
+
     // Verify integrity
     const isIdentical = Buffer.compare(fileBuffer, decodedBuffer) === 0;
     console.log('\n[SUCCESS] STEP 5: VERIFICATION');
@@ -547,13 +553,13 @@ export const viewDocumentEncoded = async (req, res) => {
     console.log(`Decoded size:   ${decodedBuffer.length} bytes`);
     console.log(`Match:          ${isIdentical ? '✓ IDENTICAL' : '✗ MISMATCH'}`);
     console.log(`Integrity:      ${isIdentical ? '✓ PRESERVED' : '✗ CORRUPTED'}`);
-    
+
     // Get encoding information
     const encodingInfo = getEncodingInfo(
       fileBuffer.toString('binary'),
       encodedFile
     );
-    
+
     // Show encoding statistics
     console.log('\n📊 ENCODING STATISTICS');
     console.log('─'.repeat(80));
@@ -562,11 +568,11 @@ export const viewDocumentEncoded = async (req, res) => {
     console.log(`Encoded Size:   ${encodingInfo.encodedSize} bytes`);
     console.log(`Overhead:       ${encodingInfo.overhead}`);
     console.log(`Description:    ${encodingInfo.description}`);
-    
+
     // Get security analysis
     const securityAnalysis = analyzeBase64Security();
     const securitySummary = getSecuritySummary();
-    
+
     // Log security report to terminal
     console.log('\n' + '═'.repeat(80));
     console.log('                     SECURITY ANALYSIS');
@@ -747,10 +753,10 @@ export const getSecurityAnalysis = async (req, res) => {
     // Get security analysis
     const securityAnalysis = analyzeBase64Security();
     const securitySummary = getSecuritySummary();
-    
+
     // Log security report to terminal
     console.log(generateSecurityReport());
-    
+
     res.json({
       success: true,
       data: {
@@ -781,7 +787,7 @@ export const getAllDocumentsWithEncoding = async (req, res) => {
       .innerJoin('users as u', 'd.user_id', 'u.id')
       .where('u.role', 'Driver')
       .orderBy('d.uploaded_at', 'desc');
-    
+
     // Log to terminal
     console.log('\n' + '='.repeat(80));
     console.log('DRIVER DOCUMENTS DASHBOARD - ENCODING ANALYSIS');
@@ -791,7 +797,7 @@ export const getAllDocumentsWithEncoding = async (req, res) => {
     console.log(`Approved: ${result.filter(d => d.status === 'Approved').length}`);
     console.log(`Rejected: ${result.filter(d => d.status === 'Rejected').length}`);
     console.log('='.repeat(80));
-    
+
     result.forEach((doc, index) => {
       console.log(`\n${index + 1}. ${doc.file_name}`);
       console.log(`   Driver: ${doc.user_name} (${doc.user_email})`);
@@ -799,7 +805,7 @@ export const getAllDocumentsWithEncoding = async (req, res) => {
       console.log(`   Size: ${(doc.file_size / 1024).toFixed(2)} KB`);
       console.log(`   Uploaded: ${new Date(doc.uploaded_at).toLocaleString()}`);
     });
-    
+
     console.log('\n' + '='.repeat(80));
     console.log('BASE64 ENCODING TECHNIQUE - SECURITY INFORMATION');
     console.log('='.repeat(80));
@@ -827,16 +833,16 @@ export const getPublicKeyForEncryption = async (req, res) => {
     console.log('\n' + '═'.repeat(80));
     console.log('               KEY EXCHANGE - PUBLIC KEY REQUEST');
     console.log('═'.repeat(80));
-    
+
     const { keyId, publicKey, keyName } = await getActivePublicKey();
-    
+
     console.log(`[KEY] Key ID: ${keyId}`);
     console.log(`[INFO] Key Name: ${keyName}`);
     console.log(`[ENCRYPT] Public Key Length: ${publicKey.length} characters`);
     console.log('═'.repeat(80));
     console.log('[SUCCESS] Public key distributed for secure key exchange');
     console.log('═'.repeat(80) + '\n');
-    
+
     res.json({
       success: true,
       data: {
@@ -863,10 +869,10 @@ export const getEncryptionInformation = async (req, res) => {
     const encryptionInfo = getEncryptionInfo();
     const securityAnalysis = analyzeEncryptionSecurity();
     const securitySummary = getEncryptionSummary();
-    
+
     // Log comprehensive security report to terminal
     console.log(generateEncryptionReport());
-    
+
     res.json({
       success: true,
       data: {
@@ -892,19 +898,19 @@ export const demonstrateEncryption = async (req, res) => {
   try {
     const { text } = req.body;
     const sampleData = text || 'This is a sample document for encryption demonstration.';
-    
+
     console.log('\n' + '═'.repeat(80));
     console.log('            ENCRYPTION & DECRYPTION DEMONSTRATION');
     console.log('═'.repeat(80));
     console.log(`Original Data: "${sampleData}"`);
     console.log(`Data Length: ${sampleData.length} characters`);
     console.log('═'.repeat(80));
-    
+
     // Get public key
     const { keyId, publicKey } = await getActivePublicKey();
     console.log(`\n[KEY] STEP 1: KEY GENERATION`);
     console.log(`   Using RSA Key ID: ${keyId}`);
-    
+
     // Encrypt
     console.log(`\n[ENCRYPT] STEP 2: ENCRYPTION`);
     const dataBuffer = Buffer.from(sampleData, 'utf-8');
@@ -913,7 +919,7 @@ export const demonstrateEncryption = async (req, res) => {
     console.log(`   Encrypted Size: ${encrypted.encryptedData.length} bytes`);
     console.log(`   IV: ${encrypted.iv.toString('hex').substring(0, 32)}...`);
     console.log(`   Auth Tag: ${encrypted.authTag.toString('hex')}`);
-    
+
     // Get private key and decrypt
     console.log(`\n[DECRYPT] STEP 3: DECRYPTION`);
     const privateKey = await getPrivateKey(keyId);
@@ -926,16 +932,16 @@ export const demonstrateEncryption = async (req, res) => {
     const decrypted = decryptFile(encryptedPackage, privateKey);
     const decryptedText = decrypted.toString('utf-8');
     console.log(`   Decrypted Data: "${decryptedText}"`);
-    
+
     // Verify
     console.log(`\n[SUCCESS] STEP 4: VERIFICATION`);
     const isMatch = sampleData === decryptedText;
     console.log(`   Original matches decrypted: ${isMatch ? 'YES [SUCCESS]' : 'NO [ERROR]'}`);
-    
+
     console.log('\n' + '═'.repeat(80));
     console.log('[SUCCESS] DEMONSTRATION COMPLETED SUCCESSFULLY');
     console.log('═'.repeat(80) + '\n');
-    
+
     res.json(createPostResponse({
       success: true,
       message: 'Encryption demonstration completed successfully',

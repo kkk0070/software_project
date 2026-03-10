@@ -1,4 +1,4 @@
-// Knex.js - SQL query builder and schema migration tool
+;// Knex.js - SQL query builder and schema migration tool
 import knexLib from 'knex';
 // Knex configuration file with database connection settings
 import knexConfig from './knexfile.js';
@@ -18,16 +18,27 @@ const { Pool } = pg;
 const knex = knexLib(knexConfig);
 
 // Legacy PostgreSQL connection pool for backward compatibility
-// Used by migration scripts and older code that doesn't use Knex
+const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+console.log(`[DB] Using DATABASE_URL: ${dbUrl ? 'YES (Neon)' : 'NO (localhost)'}`);
+console.log(`[DB] DB_HOST: ${process.env.DB_HOST}`);
+const poolConfig = dbUrl
+  ? {
+    connectionString: dbUrl,
+    ssl: { rejectUnauthorized: false }
+  }
+  : {
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'ecoride_db',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD,
+  };
+
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',        // Database server hostname
-  port: process.env.DB_PORT || 5432,               // PostgreSQL default port
-  database: process.env.DB_NAME || 'ecoride_db',   // Database name
-  user: process.env.DB_USER || 'postgres',         // Database user
-  password: process.env.DB_PASSWORD,               // Database password from env
-  max: 20,                                         // Maximum pool size (concurrent connections)
-  idleTimeoutMillis: 30000,                        // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 2000,                   // Timeout if connection takes > 2 seconds
+  ...poolConfig,
+  max: (process.env.VERCEL === '1') ? 5 : 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
 });
 
 // Test database connection on startup using Knex
