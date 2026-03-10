@@ -59,12 +59,7 @@ from fare_model import predict_fare, WEATHER_CONDITIONS, TRAFFIC_LEVELS, TIME_OF
 
 
 app = Flask(__name__)
-CORS(app, origins=[
-    "http://localhost:*",
-    "https://*.vercel.app",
-    "https://frontend-kkk0070s-projects.vercel.app",
-    "https://web-axdhnv022-kkk0070s-projects.vercel.app",
-])
+CORS(app)  # Allow all origins — this is a public read-only ML/routing API
 
 _geocoder = Nominatim(user_agent="sepro-route-server/1.0", timeout=10)
 
