@@ -45,7 +45,7 @@ VEHICLE_RATES = {
 # Synthetic training dataset
 # ---------------------------------------------------------------------------
 
-def _generate_training_data(n_samples: int = 2000):
+def _generate_training_data(n_samples: int = 300):
     rng = np.random.default_rng(seed=42)
     v_types = list(VEHICLE_RATES.keys())
     
@@ -101,8 +101,8 @@ class FareModel:
 
     def _build_and_train(self) -> RandomForestRegressor:
         X, y = _generate_training_data()
-        # RandomForest captures interactions like dist * rate perfectly
-        model = RandomForestRegressor(n_estimators=100, random_state=42)
+        # Lighter RandomForest for low-RAM hosting
+        model = RandomForestRegressor(n_estimators=10, random_state=42)
         model.fit(X, y)
         return model
 
@@ -146,10 +146,16 @@ class FareModel:
         }
 
 # Singleton
-_fare_model = FareModel()
+_fare_model = None
+
+def _get_model():
+    global _fare_model
+    if _fare_model is None:
+        _fare_model = FareModel()
+    return _fare_model
 
 def predict_fare(distance_km: float, weather: str, traffic: str, time: str, co2_kg: float = 0.0, vehicle_type: str = "car_petrol") -> dict:
-    return _fare_model.predict(distance_km, weather, traffic, time, vehicle_type)
+    return _get_model().predict(distance_km, weather, traffic, time, vehicle_type)
 
 if __name__ == "__main__":
     print("Fare Model Test (Car @ 33/km):")

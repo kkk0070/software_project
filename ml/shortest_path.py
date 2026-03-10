@@ -85,63 +85,42 @@ _GRAPH_CACHE = {} # key -> G
 _SPATIAL_GRAPHS = [] # list of {'bbox': (s, n, w, e), 'G': MultiDiGraph}
 _RESULT_CACHE = {} # (rounded_coords, k) -> routes_dict
 
+# ---------------------------------------------------------------------------
+# GIS Engine (Disabled on Free Tier due to 512MB RAM limit)
+# ---------------------------------------------------------------------------
+
+_ox = None
+_nx = None
+_ENABLE_GIS = False # Set to True locally if you have >2GB RAM
+
+def _get_ox():
+    if not _ENABLE_GIS: return None
+    global _ox
+    if _ox is None:
+        try:
+            import osmnx as ox  # noqa: PLC0415
+            _ox = ox
+        except ImportError: return None
+    return _ox
+
+def _get_nx():
+    if not _ENABLE_GIS: return None
+    global _nx
+    if _nx is None:
+        try:
+            import networkx as nx  # noqa: PLC0415
+            _nx = nx
+        except ImportError: return None
+    return _nx
+
 def _download_network(
     origin_lat: float, origin_lng: float,
     dest_lat: float, dest_lng: float,
     buffer_km: float = 1.0,
-) -> object:  # returns nx.MultiDiGraph
-    """Download or reuse a road network that covers origin → destination.
-    
-    For routes longer than 60km the full graph would be too large to download
-    on a free-tier server, so callers should use the haversine fallback instead.
-    """
-    # 1. Spatial Reuse Check: See if existing loaded graphs cover this route
-    min_lat, max_lat = min(origin_lat, dest_lat), max(origin_lat, dest_lat)
-    min_lng, max_lng = min(origin_lng, dest_lng), max(origin_lng, dest_lng)
-    
-    for entry in _SPATIAL_GRAPHS:
-        s, n, w, e = entry['bbox']
-        if s < min_lat - 0.002 and n > max_lat + 0.002 and \
-           w < min_lng - 0.002 and e > max_lng + 0.002:
-            print("  Reusing existing spatial graph...")
-            return entry['G']
+) -> object:
+    """Download GIS road network (Disabled)."""
+    return None
 
-    center_lat = (origin_lat + dest_lat) / 2
-    center_lng = (origin_lng + dest_lng) / 2
-
-    diag_m = haversine_m(origin_lat, origin_lng, dest_lat, dest_lng)
-    # Cap at 30km radius to avoid massive downloads on free hosting
-    radius_m = min(max((diag_m / 2 + (buffer_km * 1000)), 3000), 30_000)
-
-    cache_key = (round(center_lat, 2), round(center_lng, 2), round(radius_m, -1))
-    if cache_key in _GRAPH_CACHE:
-        print(f"  Using cached road network for {cache_key}")
-        return _GRAPH_CACHE[cache_key]
-
-    print(f"  Downloading OSM road network (radius={radius_m / 1_000:.1f} km)...")
-    ox = _get_ox()
-    ox.settings.use_cache = True
-
-    try:
-        G = ox.graph_from_point(
-            (center_lat, center_lng),
-            dist=radius_m,
-            network_type="drive",
-            simplify=True,
-        )
-    except Exception as e:
-        print(f"  OSMnx failed: {e}. Falling back to 3km...")
-        G = _get_ox().graph_from_point((center_lat, center_lng), dist=3000, network_type="drive", simplify=True)
-
-    print(f"  Network ready: {len(G.nodes):,} nodes, {len(G.edges):,} edges")
-    
-    _GRAPH_CACHE[cache_key] = G
-    _SPATIAL_GRAPHS.append({
-        'bbox': (center_lat - (radius_m/111000), center_lat + (radius_m/111000),
-                 center_lng - (radius_m/85000), center_lng + (radius_m/85000)),
-        'G': G
-    })
-    return G
 
 
 def _nearest_nodes(
@@ -350,8 +329,8 @@ def find_all_routes(
     k: int = 3,
 ) -> list:
     """
-    Download the OSM road network and compute up to *k* shortest road routes.
-    For routes longer than 60 km, returns fast estimated routes without OSMnx.
+    Compute up to *k* road routes.
+    On low-memory servers, this uses the fast Road Distance Estimator.
     """
     # 0. Result Cache Check
     cache_key = (round(origin_lat, 4), round(origin_lng, 4), round(dest_lat, 4), round(dest_lng, 4), k)
@@ -363,25 +342,29 @@ def find_all_routes(
     straight_km = straight_m / 1000
 
     _hr()
-    print("  SHORTEST PATH FINDER  (Optimized: Spatial Cache + Penalty Method)")
+    print("  SHORTEST PATH FINDER  (Optimized Mode)")
     _hr()
-    print(f"  Origin      : ({origin_lat:.6f}, {origin_lng:.6f})")
-    print(f"  Destination : ({dest_lat:.6f},  {dest_lng:.6f})")
+    print(f"  Origin       : ({origin_lat:.6f}, {origin_lng:.6f})")
+    print(f"  Destination  : ({dest_lat:.6f},  {dest_lng:.6f})")
     print(f"  Straight-line: {straight_km:.3f} km")
     _sep()
 
-    # 1. Fast fallback for long routes (> 60km straight-line)
-    if straight_km > _MAX_OSMNX_KM:
-        print(f"  Route is {straight_km:.1f} km — using distance estimator (no OSMnx download)")
+    # 1. Check if GIS is available and requested
+    if not _ENABLE_GIS or straight_km > _MAX_OSMNX_KM:
+        mode_str = "GIS Disabled" if not _ENABLE_GIS else f"Long Route ({straight_km:.1f} km)"
+        print(f"  {mode_str} — using distance estimator")
         routes = _estimated_routes(origin_lat, origin_lng, dest_lat, dest_lng, straight_m, k)
         _RESULT_CACHE[cache_key] = routes
         return routes
 
-    t0 = time.time()
-    G = _download_network(origin_lat, origin_lng, dest_lat, dest_lng)
-    orig_node, dest_node = _nearest_nodes(
-        G, origin_lat, origin_lng, dest_lat, dest_lng
-    )
+    # 2. GIS Routing (Only if enabled and short)
+    try:
+        t0 = time.time()
+        G = _download_network(origin_lat, origin_lng, dest_lat, dest_lng)
+        if G is None:
+             return _estimated_routes(origin_lat, origin_lng, dest_lat, dest_lng, straight_m, k)
+
+        orig_node, dest_node = _nearest_nodes(G, origin_lat, origin_lng, dest_lat, dest_lng)
     print(f"  Origin node      : {orig_node}")
     print(f"  Destination node : {dest_node}")
     _sep()

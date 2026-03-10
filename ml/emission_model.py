@@ -70,7 +70,7 @@ _VT_INDEX: dict[str, int] = {vt: i for i, vt in enumerate(VEHICLE_TYPES)}
 # Synthetic training dataset
 # ---------------------------------------------------------------------------
 
-def _generate_training_data(n_per_type: int = 300):
+def _generate_training_data(n_per_type: int = 30):
     """
     Generate n_per_type synthetic observations per vehicle type.
 
@@ -128,6 +128,7 @@ class EmissionModel:
     @staticmethod
     def _build_and_train() -> LinearRegression:
         X, y = _generate_training_data()
+        # Minimal linear model - extremely RAM-efficient
         model = LinearRegression(fit_intercept=False)
         model.fit(X, y)
         return model
@@ -270,12 +271,18 @@ def estimate_aqi(lat: float, lng: float,
 # Module-level singleton + convenience wrappers
 # ---------------------------------------------------------------------------
 
-_model = EmissionModel()
+_model = None
+
+def _get_model():
+    global _model
+    if _model is None:
+        _model = EmissionModel()
+    return _model
 
 
 def predict_emission(vehicle_type: str, distance_km: float) -> dict:
     """Predict CO2 emission for a vehicle type and distance (module-level API)."""
-    return _model.predict(vehicle_type, distance_km)
+    return _get_model().predict(vehicle_type, distance_km)
 
 
 # ---------------------------------------------------------------------------
