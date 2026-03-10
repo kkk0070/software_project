@@ -12,6 +12,10 @@ class ApiConfig {
   //
   // Make sure the backend server is running before using the app!
   static String get baseUrl {
+    // Check for dart-define override (useful for CI/CD deployment)
+    const String envUrl = String.fromEnvironment('BACKEND_URL');
+    if (envUrl.isNotEmpty) return envUrl;
+
     if (kIsWeb) {
       // Flutter Web - use localhost
       return 'http://localhost:5000';
@@ -19,11 +23,10 @@ class ApiConfig {
       // Mobile platforms
       try {
         if (Platform.isAndroid) {
-          // Android emulator - use 10.0.2.2 to access host machine
+          // Android emulator - use 10.12.151.38
           return 'http://10.12.151.38:5000';
         } else {
           // iOS simulator or physical device - use localhost
-          // For physical devices, you may need to change this to your computer's IP
           return 'http://localhost:5000';
         }
       } catch (e) {
@@ -35,7 +38,6 @@ class ApiConfig {
       }
     }
   }
-  
   // API endpoints
   static const String authEndpoint = '/api/auth';
   static const String documentsEndpoint = '/api/documents';
@@ -49,9 +51,14 @@ class ApiConfig {
   static String get usersUrl => '$baseUrl$usersEndpoint';
   static String get ridesUrl => '$baseUrl$ridesEndpoint';
   static String get emergencyUrl => '$baseUrl$emergencyEndpoint';
-  
+
   // ML Service (OSMx + ML Models)
   static String get mlBaseUrl {
+    // 1. Check for dart-define override (set during CI/CD build for production)
+    const String envMlUrl = String.fromEnvironment('ML_URL');
+    if (envMlUrl.isNotEmpty) return envMlUrl;
+
+    // 2. Local development fallback
     if (kIsWeb) return 'http://localhost:8080';
     try {
       if (Platform.isAndroid) return 'http://10.12.151.38:8080';
@@ -60,6 +67,7 @@ class ApiConfig {
   }
 
   static String get mlRouteUrl => '$mlBaseUrl/route';
+  static String get mlAllRoutesUrl => '$mlBaseUrl/all_routes';
   static String get mlFareUrl => '$mlBaseUrl/fare';
   static String get mlEmissionUrl => '$mlBaseUrl/emission';
   static String get mlAutocompleteUrl => '$mlBaseUrl/autocomplete';
