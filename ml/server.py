@@ -320,7 +320,8 @@ def fare():
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
+    _port_str = os.environ.get("PORT", "").strip()
+    port = int(_port_str) if _port_str.isdigit() else 8080
     print(f"\n  Route & Geocode Server  →  http://localhost:{port}\n")
     print("  Endpoints:")
     print("    GET /route        – single shortest road route")
