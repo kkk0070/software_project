@@ -22,10 +22,27 @@ import sys
 import math
 import time
 
-# Third-party - install via:  pip install -r requirements.txt
-import osmnx as ox
-import networkx as nx
+# geopy is lightweight — safe to import at top level
 from geopy.distance import geodesic
+
+# osmnx and networkx are heavy (~200MB). Imported lazily inside functions
+# so the Flask server starts instantly on Render's free 512MB tier.
+_ox = None
+_nx = None
+
+def _get_ox():
+    global _ox
+    if _ox is None:
+        import osmnx as ox  # noqa: PLC0415
+        _ox = ox
+    return _ox
+
+def _get_nx():
+    global _nx
+    if _nx is None:
+        import networkx as nx  # noqa: PLC0415
+        _nx = nx
+    return _nx
 
 
 # ---------------------------------------------------------------------------
@@ -72,7 +89,7 @@ def _download_network(
     origin_lat: float, origin_lng: float,
     dest_lat: float, dest_lng: float,
     buffer_km: float = 1.0,
-) -> nx.MultiDiGraph:
+) -> object:  # returns nx.MultiDiGraph
     """Download or reuse a road network that covers origin → destination.
     
     For routes longer than 60km the full graph would be too large to download
@@ -102,6 +119,7 @@ def _download_network(
         return _GRAPH_CACHE[cache_key]
 
     print(f"  Downloading OSM road network (radius={radius_m / 1_000:.1f} km)...")
+    ox = _get_ox()
     ox.settings.use_cache = True
 
     try:
@@ -113,7 +131,7 @@ def _download_network(
         )
     except Exception as e:
         print(f"  OSMnx failed: {e}. Falling back to 3km...")
-        G = ox.graph_from_point((center_lat, center_lng), dist=3000, network_type="drive", simplify=True)
+        G = _get_ox().graph_from_point((center_lat, center_lng), dist=3000, network_type="drive", simplify=True)
 
     print(f"  Network ready: {len(G.nodes):,} nodes, {len(G.edges):,} edges")
     
@@ -127,17 +145,16 @@ def _download_network(
 
 
 def _nearest_nodes(
-    G: nx.MultiDiGraph,
-    origin_lat: float, origin_lng: float,
-    dest_lat: float, dest_lng: float,
+    G, origin_lat, origin_lng, dest_lat, dest_lng
 ) -> tuple:
     """Return (origin_node_id, dest_node_id) closest to the given coordinates."""
+    ox = _get_ox()
     orig = ox.distance.nearest_nodes(G, origin_lng, origin_lat)
     dest = ox.distance.nearest_nodes(G, dest_lng, dest_lat)
     return orig, dest
 
 
-def _path_to_coords(G: nx.MultiDiGraph, path: list) -> list:
+def _path_to_coords(G, path: list) -> list:
     """Convert a list of node IDs to [(lat, lng), ...] coordinate pairs.
 
     OSMnx stores road-curve waypoints in the ``geometry`` attribute of each
@@ -183,22 +200,21 @@ def _est_time_min(distance_m: float, speed_kmh: float = 30.0) -> float:
 # Shortest-path algorithms
 # ---------------------------------------------------------------------------
 
-def dijkstra(
-    G: nx.MultiDiGraph, orig: int, dest: int, weight: str = "length"
-) -> tuple:
+def dijkstra(G, orig: int, dest: int, weight: str = "length") -> tuple:
     """
     Dijkstra's algorithm via NetworkX.
-
     Returns (path, length_m) where *path* is a list of node IDs and
     *length_m* is the total road distance in metres.
     """
+    nx = _get_nx()
     path = nx.dijkstra_path(G, orig, dest, weight=weight)
     length = nx.dijkstra_path_length(G, orig, dest, weight=weight)
     return path, length
 
 
-def astar(G: nx.MultiDiGraph, orig: int, dest: int, weight: str = "length") -> tuple:
+def astar(G, orig: int, dest: int, weight: str = "length") -> tuple:
     """A* algorithm with a math Haversine heuristic (faster)."""
+    nx = _get_nx()
     dest_data = G.nodes[dest]
     dest_y, dest_x = dest_data["y"], dest_data["x"]
 
@@ -216,8 +232,9 @@ def astar(G: nx.MultiDiGraph, orig: int, dest: int, weight: str = "length") -> t
     return path, length
 
 
-def _to_simple_digraph(G: nx.MultiDiGraph, weight: str = "length") -> nx.DiGraph:
+def _to_simple_digraph(G, weight: str = "length"):
     """Project a MultiDiGraph to a simple DiGraph (optimized)."""
+    nx = _get_nx()
     DG = nx.DiGraph()
     # Pre-populate nodes to avoid overhead in the loop
     DG.add_nodes_from(G.nodes(data=True))
@@ -231,14 +248,12 @@ def _to_simple_digraph(G: nx.MultiDiGraph, weight: str = "length") -> nx.DiGraph
     return DG
 
 
-def penalty_k_shortest(
-    G: nx.MultiDiGraph, orig: int, dest: int,
-    k: int = 3, weight: str = "length",
-) -> list:
+def penalty_k_shortest(G, orig: int, dest: int, k: int = 3, weight: str = "length") -> list:
     """
     Find k diverse alternative paths using the Penalty Method.
     MUCH faster than Yen's algorithm for road networks.
     """
+    nx = _get_nx()
     results = []
     # Work on a simple graph for speed in pathfinding
     DG = _to_simple_digraph(G, weight=weight)
@@ -257,7 +272,7 @@ def penalty_k_shortest(
                 new_w = curr_w * 1.5 # 50% penalty
                 DG[u][v][weight] = new_w
                 modified_edges[(u, v)] = curr_w
-        except (nx.NetworkXNoPath, nx.NodeNotFound):
+        except (_get_nx().NetworkXNoPath, _get_nx().NodeNotFound):
             break
             
     return results
@@ -375,7 +390,7 @@ def find_all_routes(
     if k == 1:
         #  Optimized Single Path (Bidirectional Dijkstra) 
         print("  Running Bidirectional Dijkstra (optimized)...")
-        path_len, path = nx.bidirectional_dijkstra(G, orig_node, dest_node, weight="length")
+        path_len, path = _get_nx().bidirectional_dijkstra(G, orig_node, dest_node, weight="length")
         k_routes = [(path, path_len)]
     else:
         #  Optimized Multiple Paths (Penalty Method) 
@@ -384,8 +399,8 @@ def find_all_routes(
     
     if not k_routes:
         print("  Falling back to standard Dijkstra...")
-        p, l = nx.dijkstra_path(G, orig_node, dest_node, weight="length"), \
-               nx.dijkstra_path_length(G, orig_node, dest_node, weight="length")
+        p = _get_nx().dijkstra_path(G, orig_node, dest_node, weight="length")
+        l = _get_nx().dijkstra_path_length(G, orig_node, dest_node, weight="length")
         k_routes = [(p, l)]
 
     elapsed = time.time() - t0

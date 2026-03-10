@@ -53,9 +53,41 @@ from flask_cors import CORS
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-from shortest_path import find_all_routes
-from emission_model import predict_emission, estimate_aqi, VEHICLE_TYPES
-from fare_model import predict_fare, WEATHER_CONDITIONS, TRAFFIC_LEVELS, TIME_OF_DAY
+# Heavy ML modules — imported lazily on first request so Flask boots instantly
+_find_all_routes = None
+_predict_emission = None
+_estimate_aqi = None
+_VEHICLE_TYPES = None
+_predict_fare = None
+_WEATHER_CONDITIONS = None
+_TRAFFIC_LEVELS = None
+_TIME_OF_DAY = None
+
+def _load_routing():
+    global _find_all_routes
+    if _find_all_routes is None:
+        from shortest_path import find_all_routes
+        _find_all_routes = find_all_routes
+    return _find_all_routes
+
+def _load_emission():
+    global _predict_emission, _estimate_aqi, _VEHICLE_TYPES
+    if _predict_emission is None:
+        from emission_model import predict_emission, estimate_aqi, VEHICLE_TYPES
+        _predict_emission = predict_emission
+        _estimate_aqi    = estimate_aqi
+        _VEHICLE_TYPES   = VEHICLE_TYPES
+    return _predict_emission, _estimate_aqi, _VEHICLE_TYPES
+
+def _load_fare():
+    global _predict_fare, _WEATHER_CONDITIONS, _TRAFFIC_LEVELS, _TIME_OF_DAY
+    if _predict_fare is None:
+        from fare_model import predict_fare, WEATHER_CONDITIONS, TRAFFIC_LEVELS, TIME_OF_DAY
+        _predict_fare        = predict_fare
+        _WEATHER_CONDITIONS  = WEATHER_CONDITIONS
+        _TRAFFIC_LEVELS      = TRAFFIC_LEVELS
+        _TIME_OF_DAY         = TIME_OF_DAY
+    return _predict_fare, _WEATHER_CONDITIONS, _TRAFFIC_LEVELS, _TIME_OF_DAY
 
 
 app = Flask(__name__)
@@ -135,7 +167,7 @@ def route():
         return _err("Required params: origin_lat, origin_lng, dest_lat, dest_lng")
 
     try:
-        routes = find_all_routes(origin_lat, origin_lng, dest_lat, dest_lng, k=1)
+        routes = _load_routing()(origin_lat, origin_lng, dest_lat, dest_lng, k=1)
         if not routes:
             return _err("No road route found between the two points", 404)
         r = routes[0]
@@ -166,7 +198,7 @@ def all_routes():
         return _err("Required params: origin_lat, origin_lng, dest_lat, dest_lng")
 
     try:
-        routes = find_all_routes(origin_lat, origin_lng, dest_lat, dest_lng, k=3)
+        routes = _load_routing()(origin_lat, origin_lng, dest_lat, dest_lng, k=3)
         return jsonify({"routes": routes})
     except Exception as exc:
         traceback.print_exc()
@@ -236,6 +268,7 @@ def emission():
     JSON with co2_kg, emission_factor_kg_per_km, category, aqi_impact,
     and the full list of supported vehicle types.
     """
+    predict_emission, estimate_aqi, VEHICLE_TYPES = _load_emission()
     vehicle_type = request.args.get("vehicle_type", "").strip()
     distance_km  = _float("distance_km")
 
@@ -292,6 +325,7 @@ def air_quality():
         return _err("Required params: lat, lng")
 
     try:
+        _, estimate_aqi, _ = _load_emission()
         result = estimate_aqi(lat, lng, distance_km, vehicle_type)
         return jsonify(result)
     except Exception as exc:
@@ -321,6 +355,7 @@ def fare():
         return _err("Required param: distance_km")
 
     try:
+        predict_fare, WEATHER_CONDITIONS, TRAFFIC_LEVELS, TIME_OF_DAY = _load_fare()
         result = predict_fare(distance_km, weather, traffic, time, co2_kg, vehicle_type)
         result["inputs"] = {
             "distance_km": distance_km,
