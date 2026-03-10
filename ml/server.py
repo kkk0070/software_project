@@ -88,10 +88,30 @@ def _err(msg: str, code: int = 400):
     return jsonify({"error": msg}), code
 
 
+@app.route("/")
+def index():
+    """API info page."""
+    return jsonify({
+        "service": "EcoRide ML Server",
+        "status": "running",
+        "version": "1.0.0",
+        "endpoints": {
+            "health":      "GET /health",
+            "route":       "GET /route?origin_lat=&origin_lng=&dest_lat=&dest_lng=",
+            "all_routes":  "GET /all_routes?origin_lat=&origin_lng=&dest_lat=&dest_lng=",
+            "geocode":     "GET /geocode?address=",
+            "autocomplete":"GET /autocomplete?input=",
+            "emission":    "GET /emission?vehicle_type=&distance_km=",
+            "air_quality": "GET /air_quality?lat=&lng=",
+            "fare":        "GET /fare?distance_km=&weather=&traffic=&time=&vehicle_type=",
+        }
+    })
+
+
 @app.route("/health")
 def health():
     """Health check endpoint for monitoring (Render, UptimeRobot, etc.)."""
-    return jsonify({"status": "ok", "service": "EcoRide ML Server"});
+    return jsonify({"status": "ok", "service": "EcoRide ML Server"})
 
 
 # ---------------------------------------------------------------------------
