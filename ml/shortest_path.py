@@ -73,15 +73,17 @@ def _download_network(
     dest_lat: float, dest_lng: float,
     buffer_km: float = 1.0,
 ) -> nx.MultiDiGraph:
-    """Download or reuse a road network that covers origin  destination."""
+    """Download or reuse a road network that covers origin → destination.
     
+    For routes longer than 60km the full graph would be too large to download
+    on a free-tier server, so callers should use the haversine fallback instead.
+    """
     # 1. Spatial Reuse Check: See if existing loaded graphs cover this route
     min_lat, max_lat = min(origin_lat, dest_lat), max(origin_lat, dest_lat)
     min_lng, max_lng = min(origin_lng, dest_lng), max(origin_lng, dest_lng)
     
     for entry in _SPATIAL_GRAPHS:
         s, n, w, e = entry['bbox']
-        # Check if points are well within the bbox (buffer of 200m to be safe)
         if s < min_lat - 0.002 and n > max_lat + 0.002 and \
            w < min_lng - 0.002 and e > max_lng + 0.002:
             print("  Reusing existing spatial graph...")
@@ -91,7 +93,8 @@ def _download_network(
     center_lng = (origin_lng + dest_lng) / 2
 
     diag_m = haversine_m(origin_lat, origin_lng, dest_lat, dest_lng)
-    radius_m = max((diag_m / 2 + (buffer_km * 1000)), 3000)
+    # Cap at 30km radius to avoid massive downloads on free hosting
+    radius_m = min(max((diag_m / 2 + (buffer_km * 1000)), 3000), 30_000)
 
     cache_key = (round(center_lat, 2), round(center_lng, 2), round(radius_m, -1))
     if cache_key in _GRAPH_CACHE:
@@ -109,14 +112,12 @@ def _download_network(
             simplify=True,
         )
     except Exception as e:
-        print(f"  OSMnx failed: {e}. Falling back...")
-        G = ox.graph_from_point((center_lat, center_lng), dist=2000, network_type="drive", simplify=True)
+        print(f"  OSMnx failed: {e}. Falling back to 3km...")
+        G = ox.graph_from_point((center_lat, center_lng), dist=3000, network_type="drive", simplify=True)
 
     print(f"  Network ready: {len(G.nodes):,} nodes, {len(G.edges):,} edges")
     
-    # Add to caches
     _GRAPH_CACHE[cache_key] = G
-    # Approximate bbox of the downloaded graph
     _SPATIAL_GRAPHS.append({
         'bbox': (center_lat - (radius_m/111000), center_lat + (radius_m/111000),
                  center_lng - (radius_m/85000), center_lng + (radius_m/85000)),
@@ -274,6 +275,60 @@ CO2_FACTORS = {
 }
 
 
+def _estimated_routes(
+    origin_lat: float, origin_lng: float,
+    dest_lat: float, dest_lng: float,
+    straight_m: float,
+    k: int,
+) -> list:
+    """Return estimated routes using straight-line × road-factor when OSMnx
+    would be too slow (routes > 60 km on free hosting)."""
+    # Straight waypoints: origin → midpoint → destination
+    mid_lat = (origin_lat + dest_lat) / 2
+    mid_lng = (origin_lng + dest_lng) / 2
+    offsets = [0.0, 0.01, -0.01]
+
+    # Realistic road-distance multipliers for eco / fast / balanced
+    multipliers = [1.30, 1.45, 1.38]
+    labels = ROUTE_LABELS[:k]
+    results = []
+    fast_km = (straight_m / 1000) * multipliers[1]
+
+    for i in range(min(k, 3)):
+        dist_km = (straight_m / 1000) * multipliers[i]
+        dist_m  = dist_km * 1000
+        time_min = dist_km / 50 * 60  # assume ~50 km/h avg highway speed
+        label = labels[i]
+        co2_factor = CO2_FACTORS.get(label, 0.15)
+        co2_kg    = dist_km * co2_factor
+        co2_saved = max(0.0, fast_km * CO2_FACTORS["Fastest"] - co2_kg)
+
+        # Slightly offset intermediate waypoint per route
+        via_lat = mid_lat + offsets[i] * abs(dest_lat - origin_lat)
+        via_lng = mid_lng + offsets[i] * abs(dest_lng - origin_lng)
+        coordinates = [
+            [origin_lat, origin_lng],
+            [via_lat, via_lng],
+            [dest_lat, dest_lng],
+        ]
+        results.append({
+            "label":       label,
+            "distance_m":  round(dist_m, 2),
+            "distance_km": round(dist_km, 3),
+            "time_min":    round(time_min, 1),
+            "co2_kg":      round(co2_kg, 3),
+            "co2_saved":   round(co2_saved, 3),
+            "node_count":  3,
+            "coordinates": coordinates,
+            "estimated":   True,  # flag so UI knows this is an approximation
+        })
+    return results
+
+
+# Max straight-line km before we skip OSMnx and use the estimator
+_MAX_OSMNX_KM = 60.0
+
+
 def find_all_routes(
     origin_lat: float, origin_lng: float,
     dest_lat: float, dest_lng: float,
@@ -281,23 +336,7 @@ def find_all_routes(
 ) -> list:
     """
     Download the OSM road network and compute up to *k* shortest road routes.
-
-    Terminal output includes:
-      * Straight-line distance
-      * Dijkstra and A* results (for comparison)
-      * All k alternative routes with distance, time, and CO
-
-    Returns a list of dicts (one per route):
-        {
-          "label":       str,
-          "distance_m":  float,
-          "distance_km": float,
-          "time_min":    float,
-          "co2_kg":      float,
-          "co2_saved":   float,   # vs the "Fastest" route
-          "node_count":  int,
-          "coordinates": [[lat, lng], ...],
-        }
+    For routes longer than 60 km, returns fast estimated routes without OSMnx.
     """
     # 0. Result Cache Check
     cache_key = (round(origin_lat, 4), round(origin_lng, 4), round(dest_lat, 4), round(dest_lng, 4), k)
@@ -306,14 +345,22 @@ def find_all_routes(
         return _RESULT_CACHE[cache_key]
 
     straight_m = haversine_m(origin_lat, origin_lng, dest_lat, dest_lng)
+    straight_km = straight_m / 1000
 
     _hr()
     print("  SHORTEST PATH FINDER  (Optimized: Spatial Cache + Penalty Method)")
     _hr()
     print(f"  Origin      : ({origin_lat:.6f}, {origin_lng:.6f})")
     print(f"  Destination : ({dest_lat:.6f},  {dest_lng:.6f})")
-    print(f"  Straight-line: {straight_m / 1_000:.3f} km")
+    print(f"  Straight-line: {straight_km:.3f} km")
     _sep()
+
+    # 1. Fast fallback for long routes (> 60km straight-line)
+    if straight_km > _MAX_OSMNX_KM:
+        print(f"  Route is {straight_km:.1f} km — using distance estimator (no OSMnx download)")
+        routes = _estimated_routes(origin_lat, origin_lng, dest_lat, dest_lng, straight_m, k)
+        _RESULT_CACHE[cache_key] = routes
+        return routes
 
     t0 = time.time()
     G = _download_network(origin_lat, origin_lng, dest_lat, dest_lng)

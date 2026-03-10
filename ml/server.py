@@ -61,6 +61,16 @@ from fare_model import predict_fare, WEATHER_CONDITIONS, TRAFFIC_LEVELS, TIME_OF
 app = Flask(__name__)
 CORS(app)  # Allow all origins — this is a public read-only ML/routing API
 
+
+@app.after_request
+def add_cors_headers(response):
+    """Ensure CORS headers are present on every response including error pages."""
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response
+
+
 _geocoder = Nominatim(user_agent="sepro-route-server/1.0", timeout=10)
 
 
