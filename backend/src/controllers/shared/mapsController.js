@@ -8,19 +8,25 @@ export const saveDownloadedMap = async (req, res) => {
 
     try {
         if (!userId || !encodedPolyline) {
+            console.warn('[WARN] saveDownloadedMap: Missing userId or encodedPolyline', { userId, encodedPolyline });
             return res.status(400).json({ success: false, message: 'Missing required fields' });
+        }
+
+        const numericUserId = parseInt(userId);
+        if (isNaN(numericUserId)) {
+            return res.status(400).json({ success: false, message: 'Invalid userId' });
         }
 
         const result = await pool.query(`
             INSERT INTO downloaded_maps (user_id, pickup, dropoff, encoded_polyline, expires_at)
             VALUES ($1, $2, $3, $4, NOW() + INTERVAL '1 hour')
             RETURNING *
-        `, [userId, pickup, dropoff, encodedPolyline]);
+        `, [numericUserId, pickup, dropoff, encodedPolyline]);
 
         res.status(201).json({ success: true, data: result.rows[0], message: 'Map downloaded successfully. It will be deleted after 1 hour.' });
     } catch (error) {
         console.error('[ERROR] saveDownloadedMap:', error);
-        res.status(500).json({ success: false, message: 'Database error' });
+        res.status(500).json({ success: false, message: 'Database error: ' + error.message });
     }
 };
 

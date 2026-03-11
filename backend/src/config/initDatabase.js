@@ -130,14 +130,21 @@ const createTables = async () => {
       CREATE TABLE IF NOT EXISTS downloaded_maps (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-        pickup VARCHAR(255),
-        dropoff VARCHAR(255),
+        pickup TEXT,
+        dropoff TEXT,
         encoded_polyline TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         expires_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP + INTERVAL '1 hour'
       );
     `);
     console.log('[SUCCESS] Downloaded maps table created');
+    
+    // Ensure downloaded_maps columns are TEXT
+    await client.query(`
+      ALTER TABLE downloaded_maps 
+        ALTER COLUMN pickup TYPE TEXT,
+        ALTER COLUMN dropoff TYPE TEXT;
+    `);
 
     // Add lat/lng columns to rides if they were created before these columns existed
     await client.query(`

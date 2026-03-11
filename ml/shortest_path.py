@@ -116,7 +116,8 @@ def _get_nx():
 def _download_network(
     origin_lat: float, origin_lng: float,
     dest_lat: float, dest_lng: float,
-    buffer_km: float = 1.0,
+    straight_m: float,
+    buffer_km: float = 3.0,
 ) -> object:
     """Download the road network within a bounding box including the route."""
     ox = _get_ox()
@@ -125,22 +126,36 @@ def _download_network(
     # Define bounding box with buffer
     north = max(origin_lat, dest_lat) + (buffer_km / 111.0)
     south = min(origin_lat, dest_lat) - (buffer_km / 111.0)
-    east = max(origin_lng, dest_lng) + (buffer_km / (111.0 * math.cos(math.radians(origin_lat))))
-    west = min(origin_lng, dest_lng) - (buffer_km / (111.0 * math.cos(math.radians(origin_lat))))
+    
+    # Simple approx for lng buffer based on lat
+    lat_factor = math.cos(math.radians(origin_lat))
+    east = max(origin_lng, dest_lng) + (buffer_km / (111.0 * lat_factor))
+    west = min(origin_lng, dest_lng) - (buffer_km / (111.0 * lat_factor))
 
-    bbox_key = (round(north, 2), round(south, 2), round(east, 2), round(west, 2))
+    bbox_key = (round(north, 3), round(south, 3), round(east, 3), round(west, 3))
     if bbox_key in _GRAPH_CACHE:
         return _GRAPH_CACHE[bbox_key]
 
-    print(f"  Downloading OSM road network for area: N:{north:.3f} S:{south:.3f} E:{east:.3f} W:{west:.3f}")
+    print(f"  Attempting OSM download: N:{north:.4f} S:{south:.4f} E:{east:.4f} W:{west:.4f} (network_type=drive)")
     try:
-        # network_type='drive' keeps the graph small for 512MB RAM
+        # Use a timeout or small area to avoid Render OOM
         G = ox.graph_from_bbox(north, south, east, west, network_type='drive', simplify=True)
         _GRAPH_CACHE[bbox_key] = G
         return G
     except Exception as e:
-        print(f"  Failed to download map network: {e}")
-        return None
+        print(f"  OSMnx graph_from_bbox Error: {e}")
+        # Try fallback: graph from point (radius around midpoint)
+        try:
+            mid_lat = (origin_lat + dest_lat) / 2
+            mid_lng = (origin_lng + dest_lng) / 2
+            radius = (straight_m / 2) + 2000 # Half dist + 2km buffer
+            print(f"  Fallback: graph_from_point (midpoint, radius={radius:.0f}m)")
+            G = ox.graph_from_point((mid_lat, mid_lng), dist=radius, network_type='drive', simplify=True)
+            _GRAPH_CACHE[bbox_key] = G
+            return G
+        except Exception as e2:
+            print(f"  OSMnx graph_from_point Fallback Error: {e2}")
+            return None
 
 
 
@@ -376,7 +391,7 @@ def find_all_routes(
              raise ValueError("GIS disabled or route too long")
 
         t0 = time.time()
-        G = _download_network(origin_lat, origin_lng, dest_lat, dest_lng)
+        G = _download_network(origin_lat, origin_lng, dest_lat, dest_lng, straight_m)
         if G is None:
              raise ValueError("Could not download road network")
 

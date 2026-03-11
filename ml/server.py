@@ -93,6 +93,10 @@ def _load_fare():
 app = Flask(__name__)
 CORS(app)  # Allow all origins — this is a public read-only ML/routing API
 
+# Register debug endpoints
+from debug_utils import register_debug_endpoints
+register_debug_endpoints(app)
+
 
 @app.after_request
 def add_cors_headers(response):
