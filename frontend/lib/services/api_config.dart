@@ -17,24 +17,24 @@ class ApiConfig {
     if (envUrl.isNotEmpty) return envUrl;
 
     if (kIsWeb) {
-      // Flutter Web - use localhost
-      return 'http://localhost:5000';
+      // Flutter Web - pointing to Vercel Prod server
+      return 'https://backend-two-sigma-39.vercel.app';
     } else {
       // Mobile platforms
       try {
         if (Platform.isAndroid) {
-          // Android emulator - use 10.12.151.38
-          return 'http://10.12.151.38:5000';
+          // Android emulator
+          return 'https://backend-two-sigma-39.vercel.app';
         } else {
-          // iOS simulator or physical device - use localhost
-          return 'http://localhost:5000';
+          // iOS simulator or physical device
+          return 'https://backend-two-sigma-39.vercel.app';
         }
       } catch (e) {
-        // Fallback to localhost if platform detection fails
+        // Fallback
         if (kDebugMode) {
-          print('Platform detection error: $e. Using localhost.');
+          print('Platform detection error: $e. Using local IP.');
         }
-        return 'http://localhost:5000';
+        return 'https://backend-two-sigma-39.vercel.app';
       }
     }
   }
@@ -43,14 +43,18 @@ class ApiConfig {
   static const String documentsEndpoint = '/api/documents';
   static const String usersEndpoint = '/api/users';
   static const String ridesEndpoint = '/api/rides';
+  static const String carpoolsEndpoint = '/api/carpools';
   static const String emergencyEndpoint = '/api/emergency';
+  static const String mapsEndpoint = '/api/maps';
   
   // Full URLs
   static String get authUrl => '$baseUrl$authEndpoint';
   static String get documentsUrl => '$baseUrl$documentsEndpoint';
   static String get usersUrl => '$baseUrl$usersEndpoint';
   static String get ridesUrl => '$baseUrl$ridesEndpoint';
+  static String get carpoolsUrl => '$baseUrl$carpoolsEndpoint';
   static String get emergencyUrl => '$baseUrl$emergencyEndpoint';
+  static String get mapsUrl => '$baseUrl$mapsEndpoint';
 
   // ML Service (OSMx + ML Models)
   static String get mlBaseUrl {
@@ -58,12 +62,12 @@ class ApiConfig {
     const String envMlUrl = String.fromEnvironment('ML_URL');
     if (envMlUrl.isNotEmpty) return envMlUrl;
 
-    // 2. Local development fallback
-    if (kIsWeb) return 'http://localhost:8080';
+    // 2. Production/Fallback
+    if (kIsWeb) return 'https://ecoride-ml.onrender.com';
     try {
-      if (Platform.isAndroid) return 'http://10.12.151.38:8080';
+      if (Platform.isAndroid) return 'https://ecoride-ml.onrender.com';
     } catch (_) {}
-    return 'http://localhost:8080';
+    return 'https://ecoride-ml.onrender.com';
   }
 
   static String get mlRouteUrl => '$mlBaseUrl/route';

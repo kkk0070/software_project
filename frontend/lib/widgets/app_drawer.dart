@@ -12,6 +12,7 @@ import '../screens/emergency_screen.dart';
 import '../screens/language_helper_screen.dart';
 import '../screens/notifications_screen.dart';
 import '../screens/destinations_screen.dart';
+import '../screens/rideshare/shared/downloaded_maps_screen.dart';
 import '../screens/budget_tracker_screen.dart';
 import '../screens/documents_screen.dart';
 import '../screens/carbon_tracker_screen.dart';
@@ -103,6 +104,13 @@ class AppDrawer extends StatelessWidget {
                   subtitle: 'Explore places',
                   gradient: AppTheme.sunsetGradient,
                   onTap: () => _navigate(context, const DestinationsScreen()),
+                ),
+                _DrawerItem(
+                  icon: FontAwesomeIcons.map,
+                  title: 'Downloaded Maps',
+                  subtitle: 'Offline routes',
+                  gradient: AppTheme.ecoGradient,
+                  onTap: () => _navigate(context, const DownloadedMapsScreen()),
                 ),
                 _DrawerItem(
                   icon: FontAwesomeIcons.dollarSign,

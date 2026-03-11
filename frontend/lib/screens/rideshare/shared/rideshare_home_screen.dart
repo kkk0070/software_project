@@ -41,7 +41,7 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
           ]
         : [
             RideBookingScreen(userRole: widget.userRole),
-            const RiderBookingScreen(), // Book for rider
+            const SustainabilityDashboardScreen(), // Eco for rider
             const MapsScreen(),
             const ChatListScreen(),
             const RidesHistoryScreen(),
@@ -101,10 +101,8 @@ class _RideshareHomeScreenState extends State<RideshareHomeScreen> {
                             index: 0,
                           ),
                           _buildNavItem(
-                            icon: isDriver
-                                ? FontAwesomeIcons.leaf
-                                : FontAwesomeIcons.calendarCheck,
-                            label: isDriver ? 'Eco' : 'Book',
+                            icon: FontAwesomeIcons.leaf,
+                            label: 'Eco',
                             index: 1,
                           ),
                           const SizedBox(width: 60), // Space for center button

@@ -151,7 +151,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '42h 35m',
+                  '0h 0m',
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
@@ -176,7 +176,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
                       ),
                       const SizedBox(width: 4),
                       const Text(
-                        '+8%',
+                        '0%',
                         style: TextStyle(
                           color: AppTheme.primaryGreen,
                           fontWeight: FontWeight.bold,
@@ -209,7 +209,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
             Expanded(
               child: _buildStatCard(
                 title: 'AVG DAILY',
-                value: '6h 20m',
+                value: '0h 0m',
                 icon: Icons.access_time,
                 color: AppTheme.primaryGreen,
               ),
@@ -218,7 +218,7 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
             Expanded(
               child: _buildStatCard(
                 title: 'PEAK HOURS',
-                value: '8-10 AM',
+                value: 'N/A',
                 icon: Icons.local_fire_department,
                 color: AppTheme.primaryGreen,
               ),
@@ -335,33 +335,16 @@ class _DriverOnlineStatsScreenState extends State<DriverOnlineStatsScreen> {
   }
 
   Widget _buildActivityHistoryList() {
-    final activities = [
-      {
-        'date': 'MONDAY, OCT 23',
-        'title': 'Morning & Afternoon',
-        'time': '6h 35m online',
-        'sessions': [
-          {'period': 'Morning Session', 'time': '6:00 AM - 10:30 AM', 'duration': '4h 30m'},
-          {'period': 'Afternoon Session', 'time': '2:00 PM - 4:05 PM', 'duration': '2h 5m'},
-        ],
-        'trips': '15 trips',
-        'breaks': '45m',
-      },
-      {
-        'date': 'SUNDAY, OCT 22',
-        'title': 'Full Day',
-        'time': '10h 15m online',
-        'trips': '22 trips',
-        'breaks': '1h 20m',
-      },
-      {
-        'date': 'SATURDAY, OCT 21',
-        'title': 'Evening Shift',
-        'time': '6h 45m online',
-        'trips': '12 trips',
-        'breaks': '30m',
-      },
-    ];
+    final List<Map<String, dynamic>> activities = [];
+
+    if (activities.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(32.0),
+        child: Center(
+          child: Text('No online activity recorded.'),
+        ),
+      );
+    }
 
     return Column(
       children: List.generate(activities.length, (index) {

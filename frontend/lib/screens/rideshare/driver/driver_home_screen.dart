@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,6 +12,8 @@ import '../shared/document_upload_screen.dart';
 import '../shared/carpool_screen.dart';
 import '../shared/profile_setup_screen.dart';
 import '../shared/user_profile_screen.dart';
+import '../shared/rides_history_screen.dart';
+import '../shared/sustainability_dashboard_screen.dart';
 import 'driver_earnings_screen.dart';
 import 'driver_online_stats_screen.dart';
 import 'driver_ride_requests_screen.dart';
@@ -31,6 +34,10 @@ class DriverHomeScreen extends StatefulWidget {
 
 class _DriverHomeScreenState extends State<DriverHomeScreen> {
   bool _isOnline = true;
+  double _earnings = 0.0;
+  int _onlineTimeInMinutes = 0;
+  Timer? _onlineTimer;
+  int _carpoolJourneys = 0;
   String _verificationStatus = 'Pending';
   bool _profileSetupComplete = false; // Default to false until loaded
   bool _isLoading = true;
@@ -41,25 +48,50 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   @override
   void initState() {
     super.initState();
+    if (_isOnline) {
+      _startOnlineTimer();
+    }
     _loadProfile();
     _loadUnreadCount();
     _loadPendingRidesCount();
+  }
+
+  @override
+  void dispose() {
+    _onlineTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startOnlineTimer() {
+    _onlineTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _onlineTimeInMinutes++;
+        });
+      }
+    });
   }
 
   Future<void> _loadProfile() async {
     try {
       final result = await AuthService.getProfile();
       if (result['success'] == true) {
+        if (mounted) {
+          setState(() {
+            _verificationStatus = result['user']['verification_status'] ?? 'Pending';
+            _profileSetupComplete = result['user']['profile_setup_complete'] ?? false;
+            // Always 0 for now
+            _carpoolJourneys = 0;
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         setState(() {
-          _verificationStatus = result['user']['verification_status'] ?? 'Pending';
-          _profileSetupComplete = result['user']['profile_setup_complete'] ?? false;
           _isLoading = false;
         });
       }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -372,6 +404,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               onTap: () {
                 setState(() {
                   _isOnline = !_isOnline;
+                  if (_isOnline) {
+                    _startOnlineTimer();
+                  } else {
+                    _onlineTimer?.cancel();
+                  }
                 });
               },
               child: Container(
@@ -520,7 +557,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             child: _buildStatCard(
               icon: FontAwesomeIcons.dollarSign,
               label: 'EARNINGS',
-              value: '\$142.50',
+              value: '\$${_earnings.toStringAsFixed(2)}',
               onTap: () {
                 Navigator.push(
                   context,
@@ -536,7 +573,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             child: _buildStatCard(
               icon: FontAwesomeIcons.clock,
               label: 'ONLINE',
-              value: '4h 20m',
+              value: '${_onlineTimeInMinutes ~/ 60}h ${_onlineTimeInMinutes % 60}m',
               onTap: () {
                 Navigator.push(
                   context,
@@ -606,8 +643,17 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   Widget _buildEcoScore() {
     return FadeInUp(
       delay: const Duration(milliseconds: 400),
-      child: Container(
-        padding: const EdgeInsets.all(20),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SustainabilityDashboardScreen(),
+            ),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: AppTheme.primaryGreen.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
@@ -640,7 +686,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                   ],
                 ),
                 Text(
-                  '98/100',
+                  '0/100',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -653,7 +699,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
-                value: 0.98,
+                value: 0.0,
                 minHeight: 8,
                 backgroundColor: Colors.white.withValues(alpha: 0.2),
                 valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryGreen),
@@ -661,7 +707,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              "Excellent! You've saved 4.2kg of CO2 today.",
+              "Start driving green to save CO2!",
               style: TextStyle(
                 fontSize: 12,
                 color: isDark ? Colors.grey[400] : Colors.grey[600],
@@ -670,179 +716,86 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
           ],
         ),
       ),
+      ),
     );
   }
 
   Widget _buildHeatMapSection() {
-    return Column(
-      children: [
-        FadeInLeft(
-          delay: const Duration(milliseconds: 500),
+    return FadeInUp(
+      delay: const Duration(milliseconds: 600),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RidesHistoryScreen(),
+            ),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: isDark ? AppTheme.cardDark : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppTheme.primaryGreen.withValues(alpha: 0.3),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryGreen.withValues(alpha: 0.05),
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Demand Heat Map',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black,
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  FontAwesomeIcons.carSide,
+                  color: AppTheme.primaryGreen,
+                  size: 24,
                 ),
               ),
-              Text(
-                'Full Map',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryGreen,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Carpool History',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'View your past carpool journeys',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: AppTheme.primaryGreen,
+                size: 16,
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        FadeInUp(
-          delay: const Duration(milliseconds: 600),
-          child: Container(
-            height: 200,
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey[900] : Colors.grey[300],
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Stack(
-                children: [
-                  // Simulated map background
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isDark
-                            ? [
-                                Colors.grey[900]!,
-                                Colors.grey[850]!,
-                              ]
-                            : [
-                                Colors.grey[300]!,
-                                Colors.grey[400]!,
-                              ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                  ),
-                  // Heat map spots
-                  Positioned(
-                    top: 50,
-                    left: 100,
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppTheme.primaryGreen.withValues(alpha: 0.4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primaryGreen.withValues(alpha: 0.3),
-                            blurRadius: 40,
-                            spreadRadius: 10,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 40,
-                    right: 60,
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppTheme.primaryGreen.withValues(alpha: 0.3),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primaryGreen.withValues(alpha: 0.2),
-                            blurRadius: 50,
-                            spreadRadius: 15,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 100,
-                    left: 150,
-                    child: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppTheme.primaryGreen.withValues(alpha: 0.6),
-                        border: Border.all(
-                          color: AppTheme.primaryGreen,
-                          width: 2,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primaryGreen.withValues(alpha: 0.4),
-                            blurRadius: 30,
-                            spreadRadius: 5,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Demand indicator
-                  Positioned(
-                    bottom: 12,
-                    left: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppTheme.primaryGreen,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppTheme.primaryGreen.withValues(alpha: 0.5),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'High Demand: Downtown',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -1150,7 +1103,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Create schedules & manage requests',
+                      '$_carpoolJourneys Carpool Journey${_carpoolJourneys != 1 ? 's' : ''}',
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.white.withValues(alpha: 0.9),

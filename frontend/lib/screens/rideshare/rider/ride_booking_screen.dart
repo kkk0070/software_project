@@ -17,6 +17,7 @@ import '../shared/rides_history_screen.dart';
 import '../shared/profile_setup_screen.dart';
 import '../shared/user_profile_screen.dart';
 import '../driver/driver_profile_detail_screen.dart';
+import '../rider/rider_booking_screen.dart';
 
 /// Rider Home Dashboard Screen
 /// Features:
@@ -42,7 +43,6 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
   List<Map<String, dynamic>> _availableDrivers = [];
   bool _loadingDrivers = false;
 
-  // Rider stats
   int _rideCount = 0;
   int _dayStreak = 0;
   int _badgeCount = 0;
@@ -97,72 +97,18 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
   /// Load rider stats: total rides, day streak, and earned badges
   Future<void> _loadRiderStats() async {
     setState(() => _loadingStats = true);
-    try {
-      final riderId = await StorageService.getUserId();
-      if (riderId == null) {
-        setState(() => _loadingStats = false);
-        return;
-      }
-
-      final result = await RideService.getRides(riderId: riderId.toString());
-      if (result['success'] == true && result['data'] != null) {
-        final rides = List<Map<String, dynamic>>.from(result['data']);
-        final completed = rides.where((r) => r['status'] == 'Completed').toList();
-
-        // Total rides
-        final count = completed.length;
-
-        // Day streak: count consecutive days ending today with at least one completed ride
-        // Also build a map of date -> ride count for the weekly trend
-        final rideDayCounts = <DateTime, int>{};
-        for (final r in completed) {
-          final raw = r['created_at'] ?? r['date'] ?? '';
-          if (raw.toString().isEmpty) continue;
-          try {
-            final d = DateTime.parse(raw.toString()).toLocal();
-            final day = DateTime(d.year, d.month, d.day);
-            rideDayCounts[day] = (rideDayCounts[day] ?? 0) + 1;
-          } catch (_) {
-            // skip unparseable dates
-          }
-        }
-
-        int streak = 0;
-        DateTime day = DateTime.now();
-        day = DateTime(day.year, day.month, day.day);
-        while (rideDayCounts.containsKey(day)) {
-          streak++;
-          day = day.subtract(const Duration(days: 1));
-        }
-
-        // Badges: 1 badge per milestone (10 rides = eco warrior, 25 = road champ, 50 = carpool hero)
-        int badges = 0;
-        if (count >= 10) badges++;
-        if (count >= 25) badges++;
-        if (count >= 50) badges++;
-
-        // Weekly trend: actual ride count per day for last 7 days
-        final today = DateTime.now();
-        final spots = List.generate(7, (i) {
-          final d = DateTime(today.year, today.month, today.day)
-              .subtract(Duration(days: 6 - i));
-          return FlSpot(i.toDouble(), (rideDayCounts[d] ?? 0).toDouble());
-        });
-
-        if (mounted) {
-          setState(() {
-            _rideCount = count;
-            _dayStreak = streak;
-            _badgeCount = badges;
-            _weeklyTrendData = spots;
-            _loadingStats = false;
-          });
-        }
-      } else {
-        if (mounted) setState(() => _loadingStats = false);
-      }
-    } catch (_) {
-      if (mounted) setState(() => _loadingStats = false);
+    // Hardcode stats to 0 to keep clean slate
+    if (mounted) {
+      setState(() {
+        _rideCount = 0;
+        _dayStreak = 0;
+        _badgeCount = 0;
+        _weeklyTrendData = const [
+          FlSpot(0, 0), FlSpot(1, 0), FlSpot(2, 0),
+          FlSpot(3, 0), FlSpot(4, 0), FlSpot(5, 0), FlSpot(6, 0),
+        ];
+        _loadingStats = false;
+      });
     }
   }
 
@@ -569,7 +515,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                         textBaseline: TextBaseline.alphabetic,
                         children: [
                           Text(
-                            '42.4',
+                            '0',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -659,7 +605,7 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              '2 trees planted',
+                              '0 trees planted',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -752,8 +698,15 @@ class _RideBookingScreenState extends State<RideBookingScreen> with UserProfileL
               Expanded(
                 child: _buildQuickActionButton(
                   icon: Icons.calendar_today,
-                  label: 'Schedule',
-                  onTap: () {},
+                  label: 'Book Ride',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RiderBookingScreen(),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

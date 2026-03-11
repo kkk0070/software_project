@@ -2,7 +2,13 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const productionURL = 'https://backend-two-sigma-39.vercel.app';
+const localURL = 'http://localhost:5000';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL ||
+  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? localURL
+    : productionURL);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -58,16 +64,16 @@ export const AuthProvider = ({ children }) => {
 
         return { success: true };
       } else {
-        return { 
-          success: false, 
-          message: data.message || 'Invalid credentials' 
+        return {
+          success: false,
+          message: data.message || 'Invalid credentials'
         };
       }
     } catch (error) {
       console.error('Login error:', error);
-      return { 
-        success: false, 
-        message: 'Network error. Please check if the server is running.' 
+      return {
+        success: false,
+        message: 'Network error. Please check if the server is running.'
       };
     }
   };
@@ -76,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     // Clear localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    
+
     // Clear state
     setUser(null);
     setIsAuthenticated(false);

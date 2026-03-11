@@ -11,12 +11,18 @@ import { encryptFile, decryptFile, generateHash, getEncryptionInfo } from '../..
 import { getActivePublicKey, getPrivateKey } from '../../utils/keyManagement.js';
 import { analyzeEncryptionSecurity, generateEncryptionReport, getEncryptionSummary } from '../../utils/encryptionSecurityAnalysis.js';
 import { createPostResponse } from '../../utils/responseHelper.js';
+import { uploadToCloudinary } from '../../utils/cloudinary.js';
+import axios from 'axios';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, '../../uploads');
+// On Vercel, we must use /tmp as it's the only writable directory
+const uploadsDir = process.env.VERCEL === '1'
+  ? '/tmp'
+  : path.join(__dirname, '../../uploads');
+
 if (process.env.VERCEL !== '1') {
   try {
     if (!fsSync.existsSync(uploadsDir)) {
@@ -65,6 +71,18 @@ export const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: fileFilter
 });
+
+/**
+ * Helper to get file buffer from either local path or remote URL
+ */
+const getFileBuffer = async (pathOrUrl) => {
+  if (pathOrUrl.startsWith('http')) {
+    const response = await axios.get(pathOrUrl, { responseType: 'arraybuffer' });
+    return Buffer.from(response.data);
+  } else {
+    return await fs.readFile(pathOrUrl);
+  }
+};
 
 // Upload document with encryption
 export const uploadDocument = async (req, res) => {
@@ -139,13 +157,39 @@ export const uploadDocument = async (req, res) => {
       }
     }
 
+    // Upload to Cloudinary if configured
+    let finalFilePath = encryptedFilePath;
+    try {
+      console.log(`[CLOUD] Uploading ${shouldEncrypt ? 'encrypted ' : ''}file to Cloudinary...`);
+      const cloudResult = await uploadToCloudinary(encryptedFilePath, 'ecoride/documents');
+      if (cloudResult && cloudResult.secure_url) {
+        finalFilePath = cloudResult.secure_url;
+        console.log(`[SUCCESS] File uploaded to Cloudinary: ${finalFilePath}`);
+
+        // Delete local files after successful cloud upload
+        try {
+          if (fsSync.existsSync(req.file.path)) await fs.unlink(req.file.path);
+          if (shouldEncrypt && fsSync.existsSync(encryptedFilePath)) await fs.unlink(encryptedFilePath);
+          console.log('[DELETE] Local temporary files removed');
+        } catch (delError) {
+          console.warn('[WARNING] Failed to delete local temp files:', delError.message);
+        }
+      }
+    } catch (cloudError) {
+      console.error('[ERROR] Cloudinary upload failed:', cloudError.message);
+      // Fallback: finalFilePath stays as encryptedFilePath (local/tmp)
+      if (process.env.VERCEL === '1') {
+        throw new Error('Cloud storage upload failed and local storage is not persistent on Vercel.');
+      }
+    }
+
     // Save document info to database
     const [document] = await knex('documents')
       .insert({
         user_id: userId,
         document_type: document_type || 'Other',
         file_name: req.file.originalname,
-        file_path: encryptedFilePath,
+        file_path: finalFilePath,
         file_size: shouldEncrypt ? fsSync.statSync(encryptedFilePath).size : req.file.size,
         description: description || null,
         is_encrypted: shouldEncrypt && encryptionMetadata !== null,
@@ -240,12 +284,18 @@ export const deleteDocument = async (req, res) => {
       });
     }
 
-    // Delete file from filesystem
+    // Delete file from filesystem/cloud
     try {
-      await fs.access(document.file_path);
-      await fs.unlink(document.file_path);
+      if (document.file_path.startsWith('http')) {
+        // We would need to extract public_id to delete from Cloudinary
+        // For now, we'll just leave it or add deletion logic later
+        console.log('[INFO] Deleting remote file from Cloudinary referenced by:', document.file_path);
+      } else {
+        await fs.access(document.file_path);
+        await fs.unlink(document.file_path);
+      }
     } catch (err) {
-      console.error('Error deleting file from filesystem:', err);
+      console.error('Error deleting file:', err);
       // Continue with database deletion even if file deletion fails
     }
 
@@ -286,7 +336,9 @@ export const downloadDocument = async (req, res) => {
 
     // Check if file exists
     try {
-      await fs.access(document.file_path);
+      if (document.file_path && !document.file_path.startsWith('http')) {
+        await fs.access(document.file_path);
+      }
     } catch (err) {
       return res.status(404).json({
         success: false,
@@ -304,8 +356,8 @@ export const downloadDocument = async (req, res) => {
         console.log(`User ID: ${userId}`);
         console.log('═'.repeat(80));
 
-        // Read encrypted file
-        const encryptedData = await fs.readFile(document.file_path);
+        // Read encrypted file (from local or cloud)
+        const encryptedData = await getFileBuffer(document.file_path);
         console.log(`[LOAD] Encrypted file loaded: ${encryptedData.length} bytes`);
 
         // Get private key for decryption
@@ -353,7 +405,15 @@ export const downloadDocument = async (req, res) => {
       }
     } else {
       // Send unencrypted file
-      res.download(document.file_path, document.file_name);
+      if (document.file_path.startsWith('http')) {
+        // Redirect to Cloudinary URL or stream it
+        const response = await axios.get(document.file_path, { responseType: 'stream' });
+        res.setHeader('Content-Type', response.headers['content-type']);
+        res.setHeader('Content-Disposition', `attachment; filename="${document.file_name}"`);
+        response.data.pipe(res);
+      } else {
+        res.download(document.file_path, document.file_name);
+      }
     }
   } catch (error) {
     console.error('Error downloading document:', error);
@@ -444,7 +504,9 @@ export const viewDocument = async (req, res) => {
 
     // Check if file exists
     try {
-      await fs.access(document.file_path);
+      if (document.file_path && !document.file_path.startsWith('http')) {
+        await fs.access(document.file_path);
+      }
     } catch (err) {
       return res.status(404).json({
         success: false,
@@ -485,18 +547,8 @@ export const viewDocumentEncoded = async (req, res) => {
       });
     }
 
-    // Check if file exists
-    try {
-      await fs.access(document.file_path);
-    } catch (err) {
-      return res.status(404).json({
-        success: false,
-        message: 'File not found on server'
-      });
-    }
-
-    // Read file and encode to Base64
-    const fileBuffer = await fs.readFile(document.file_path);
+    // Read file and encode to Base64 (from local or cloud)
+    const fileBuffer = await getFileBuffer(document.file_path);
 
     // ============================================================================
     // TERMINAL OUTPUT: ENCODING & DECODING DEMONSTRATION
@@ -640,7 +692,14 @@ export const downloadDocumentAdmin = async (req, res) => {
     }
 
     // Send file
-    res.download(document.file_path, document.file_name);
+    if (document.file_path.startsWith('http')) {
+      const response = await axios.get(document.file_path, { responseType: 'stream' });
+      res.setHeader('Content-Type', response.headers['content-type']);
+      res.setHeader('Content-Disposition', `attachment; filename="${document.file_name}"`);
+      response.data.pipe(res);
+    } else {
+      res.download(document.file_path, document.file_name);
+    }
   } catch (error) {
     console.error('Error downloading document:', error);
     res.status(500).json({

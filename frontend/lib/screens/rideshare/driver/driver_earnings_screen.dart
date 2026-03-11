@@ -150,7 +150,7 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '\$2,410.20',
+                  '\$0.00',
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
@@ -175,7 +175,7 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen> {
                       ),
                       const SizedBox(width: 4),
                       const Text(
-                        '+12%',
+                        '0%',
                         style: TextStyle(
                           color: AppTheme.primaryGreen,
                           fontWeight: FontWeight.bold,
@@ -208,7 +208,7 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen> {
             Expanded(
               child: _buildStatCard(
                 title: 'TOTAL TIPS',
-                value: '\$342.00',
+                value: '\$0.00',
                 icon: Icons.card_giftcard,
                 color: AppTheme.primaryGreen,
               ),
@@ -217,7 +217,7 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen> {
             Expanded(
               child: _buildStatCard(
                 title: 'AVG ECO-SCORE',
-                value: '96%',
+                value: '0%',
                 icon: Icons.eco,
                 color: AppTheme.primaryGreen,
               ),
@@ -334,45 +334,16 @@ class _DriverEarningsScreenState extends State<DriverEarningsScreen> {
   }
 
   Widget _buildShiftHistoryList() {
-    final shifts = [
-      {
-        'date': 'MONDAY, OCT 23',
-        'title': 'Morning Shift',
-        'time': '06:00 AM - 02:00 PM • 8h 12m',
-        'earnings': '\$245.50',
-        'ecoScore': '98%',
-        'trips': [
-          {
-            'name': 'Downtown to Airport',
-            'distance': '14.2 km • 24 min',
-            'amount': '\$32.10',
-            'tip': '+\$5.00 Tip',
-          },
-          {
-            'name': 'Westside Hub',
-            'distance': '5.4 km • 12 min',
-            'amount': '\$18.50',
-            'tip': 'Perfect Eco',
-          },
-        ],
-      },
-      {
-        'date': 'SUNDAY, OCT 22',
-        'title': 'Full Day Drive',
-        'time': '10h 05m • 22 trips',
-        'earnings': '\$412.00',
-        'ecoScore': '92%',
-        'hasMap': true,
-      },
-      {
-        'date': 'SATURDAY, OCT 21',
-        'title': 'Night Shift',
-        'time': '6h 30m • 9 trips',
-        'earnings': '\$198.25',
-        'ecoScore': '94%',
-        'hasMap': true,
-      },
-    ];
+    final List<Map<String, dynamic>> shifts = [];
+
+    if (shifts.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(32.0),
+        child: Center(
+          child: Text('No shifts recorded yet.'),
+        ),
+      );
+    }
 
     return Column(
       children: List.generate(shifts.length, (index) {

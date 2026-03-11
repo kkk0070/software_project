@@ -1,5 +1,6 @@
 // JSON Web Token library for token verification
 import jwt from 'jsonwebtoken';
+import { knex } from '../config/database.js';
 
 /**
  * Middleware to verify JWT authentication token
@@ -32,13 +33,39 @@ export const authenticateToken = (req, res, next) => {
     }
 
     // Verify token signature and expiration using JWT_SECRET
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
       if (err) {
         // Token is invalid or expired
         return res.status(403).json({
           success: false,
           message: 'Invalid or expired token'
         });
+      }
+
+      // Check if session is still active (if sessionId is present in token)
+      if (user.sessionId) {
+        try {
+          const session = await knex('device_sessions')
+            .where({ id: user.sessionId, user_id: user.id })
+            .first();
+
+          if (!session) {
+            return res.status(401).json({
+              success: false,
+              message: 'Session has been revoked'
+            });
+          }
+
+          // Update last active timestamp for the session
+          // We do this asynchronously to avoid delaying the response
+          knex('device_sessions')
+            .where({ id: user.sessionId })
+            .update({ last_active: knex.fn.now() })
+            .catch(err => console.error('[WARNING] Failed to update session last_active:', err.message));
+        } catch (dbError) {
+          console.error('Database error during session verification:', dbError);
+          // If database is down, we allow the request if JWT is valid (graceful degradation)
+        }
       }
 
       // Token is valid - attach decoded user info to request

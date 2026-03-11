@@ -17,21 +17,21 @@ class _EcoLeaderboardScreenState extends State<EcoLeaderboardScreen> {
     _LeaderEntry('Priya M.', 940, 'Pool Pro', '11.8 kg', 2, false),
     _LeaderEntry('Rahul K.', 910, 'Eco Warrior', '10.5 kg', 3, false),
     _LeaderEntry('Sneha T.', 875, 'Green Rider', '9.2 kg', 4, false),
-    _LeaderEntry('You', 850, 'Eco Rider', '8.7 kg', 5, true),
-    _LeaderEntry('Anil P.', 820, 'Pool Rider', '7.9 kg', 6, false),
-    _LeaderEntry('Meena R.', 790, 'Green Newbie', '7.1 kg', 7, false),
-    _LeaderEntry('Kiran V.', 760, 'Eco Starter', '6.5 kg', 8, false),
+    _LeaderEntry('Anil P.', 820, 'Pool Rider', '7.9 kg', 5, false),
+    _LeaderEntry('Meena R.', 790, 'Green Newbie', '7.1 kg', 6, false),
+    _LeaderEntry('Kiran V.', 760, 'Eco Starter', '6.5 kg', 7, false),
+    _LeaderEntry('You', 0, 'Eco Starter', '0.0 kg', 8, true),
   ];
 
   static const List<_LeaderEntry> _monthly = [
     _LeaderEntry('Priya M.', 3800, 'Pool Pro', '46.2 kg', 1, false),
     _LeaderEntry('Arjun S.', 3650, 'EV Champion', '44.8 kg', 2, false),
-    _LeaderEntry('You', 3400, 'Eco Rider', '42.0 kg', 3, true),
-    _LeaderEntry('Rahul K.', 3200, 'Eco Warrior', '39.5 kg', 4, false),
-    _LeaderEntry('Sneha T.', 3050, 'Green Rider', '37.8 kg', 5, false),
-    _LeaderEntry('Anil P.', 2900, 'Pool Rider', '35.2 kg', 6, false),
-    _LeaderEntry('Meena R.', 2750, 'Green Newbie', '33.6 kg', 7, false),
-    _LeaderEntry('Kiran V.', 2600, 'Eco Starter', '31.0 kg', 8, false),
+    _LeaderEntry('Rahul K.', 3200, 'Eco Warrior', '39.5 kg', 3, false),
+    _LeaderEntry('Sneha T.', 3050, 'Green Rider', '37.8 kg', 4, false),
+    _LeaderEntry('Anil P.', 2900, 'Pool Rider', '35.2 kg', 5, false),
+    _LeaderEntry('Meena R.', 2750, 'Green Newbie', '33.6 kg', 6, false),
+    _LeaderEntry('Kiran V.', 2600, 'Eco Starter', '31.0 kg', 7, false),
+    _LeaderEntry('You', 0, 'Eco Starter', '0.0 kg', 8, true),
   ];
 
   static const List<_LeaderEntry> _allTime = [
@@ -40,9 +40,9 @@ class _EcoLeaderboardScreenState extends State<EcoLeaderboardScreen> {
     _LeaderEntry('Arjun S.', 11200, 'EV Champion', '168 kg', 3, false),
     _LeaderEntry('Sneha T.', 10600, 'Green Rider', '158 kg', 4, false),
     _LeaderEntry('Anil P.', 9900, 'Pool Rider', '147 kg', 5, false),
-    _LeaderEntry('You', 8500, 'Eco Rider', '126 kg', 6, true),
-    _LeaderEntry('Meena R.', 7800, 'Green Newbie', '115 kg', 7, false),
-    _LeaderEntry('Kiran V.', 7200, 'Eco Starter', '106 kg', 8, false),
+    _LeaderEntry('Meena R.', 7800, 'Green Newbie', '115 kg', 6, false),
+    _LeaderEntry('Kiran V.', 7200, 'Eco Starter', '106 kg', 7, false),
+    _LeaderEntry('You', 0, 'Eco Starter', '0.0 kg', 8, true),
   ];
 
   List<_LeaderEntry> get _entries {

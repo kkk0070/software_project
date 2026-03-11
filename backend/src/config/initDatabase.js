@@ -94,6 +94,51 @@ const createTables = async () => {
     `);
     console.log('[SUCCESS] Rides table created');
 
+    // Carpools table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS carpools (
+        id SERIAL PRIMARY KEY,
+        creator_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        pickup_location VARCHAR(255) NOT NULL,
+        dropoff_location VARCHAR(255) NOT NULL,
+        fare DECIMAL(10, 2) NOT NULL,
+        scheduled_time TIMESTAMP NOT NULL,
+        max_participants INTEGER DEFAULT 4,
+        vehicle_type VARCHAR(50),
+        status VARCHAR(50) DEFAULT 'Open',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('[SUCCESS] Carpools table created');
+
+    // Carpool participants table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS carpool_participants (
+        id SERIAL PRIMARY KEY,
+        carpool_id INTEGER REFERENCES carpools(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        otp VARCHAR(10),
+        joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(carpool_id, user_id)
+      );
+    `);
+    console.log('[SUCCESS] Carpool participants table created');
+
+    // Downloaded maps table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS downloaded_maps (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        pickup VARCHAR(255),
+        dropoff VARCHAR(255),
+        encoded_polyline TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP + INTERVAL '1 hour'
+      );
+    `);
+    console.log('[SUCCESS] Downloaded maps table created');
+
     // Add lat/lng columns to rides if they were created before these columns existed
     await client.query(`
       ALTER TABLE rides

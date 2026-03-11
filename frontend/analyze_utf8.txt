@@ -1,0 +1,26 @@
+﻿Analyzing frontend...                                           
+
+  error - The method '_buildProfileSetupBanner' isn't defined for the type '_DriverHomeScreenState' - lib\screens\rideshare\driver\driver_home_screen.dart:131:23 - undefined_method
+  error - The method '_buildVerificationBanner' isn't defined for the type '_DriverHomeScreenState' - lib\screens\rideshare\driver\driver_home_screen.dart:138:23 - undefined_method
+  error - The method '_buildCarpoolBox' isn't defined for the type '_DriverHomeScreenState' - lib\screens\rideshare\driver\driver_home_screen.dart:154:21 - undefined_method
+  error - The method '_buildHeatMapSection' isn't defined for the type '_DriverHomeScreenState' - lib\screens\rideshare\driver\driver_home_screen.dart:159:21 - undefined_method
+  error - The method '_buildNearbyOpportunities' isn't defined for the type '_DriverHomeScreenState' - lib\screens\rideshare\driver\driver_home_screen.dart:164:21 - undefined_method
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:714:26 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:734:22 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:748:33 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:858:38 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:885:22 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:921:16 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:949:28 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:957:28 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:965:20 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\rideshare\driver\driver_home_screen.dart:979:13 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:1019:32 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:1027:32 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\rideshare\driver\driver_home_screen.dart:1051:13 - undefined_identifier
+  error - The method '_loadProfile' isn't defined for the type '_MiniHistoryStat' - lib\screens\rideshare\driver\driver_home_screen.dart:1055:25 - undefined_method
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:1091:32 - undefined_identifier
+  error - Undefined name 'isDark' - lib\screens\rideshare\driver\driver_home_screen.dart:1099:32 - undefined_identifier
+  error - Undefined name 'context' - lib\screens\rideshare\driver\driver_home_screen.dart:1123:13 - undefined_identifier
+  error - Undefined name 'StorageService' - lib\screens\rideshare\shared\carpool_screen.dart:187:28 - undefined_identifier
+

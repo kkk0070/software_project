@@ -349,46 +349,46 @@ def find_all_routes(
     print(f"  Straight-line: {straight_km:.3f} km")
     _sep()
 
-    # 1. Check if GIS is available and requested
-    if not _ENABLE_GIS or straight_km > _MAX_OSMNX_KM:
-        mode_str = "GIS Disabled" if not _ENABLE_GIS else f"Long Route ({straight_km:.1f} km)"
-        print(f"  {mode_str} — using distance estimator")
-        routes = _estimated_routes(origin_lat, origin_lng, dest_lat, dest_lng, straight_m, k)
-        _RESULT_CACHE[cache_key] = routes
-        return routes
-
     # 2. GIS Routing (Only if enabled and short)
     try:
+        if not _ENABLE_GIS or straight_km > _MAX_OSMNX_KM:
+             raise ValueError("GIS disabled or route too long")
+
         t0 = time.time()
         G = _download_network(origin_lat, origin_lng, dest_lat, dest_lng)
         if G is None:
-             return _estimated_routes(origin_lat, origin_lng, dest_lat, dest_lng, straight_m, k)
+             raise ValueError("Could not download road network")
 
         orig_node, dest_node = _nearest_nodes(G, origin_lat, origin_lng, dest_lat, dest_lng)
-    print(f"  Origin node      : {orig_node}")
-    print(f"  Destination node : {dest_node}")
-    _sep()
+        print(f"  Origin node      : {orig_node}")
+        print(f"  Destination node : {dest_node}")
+        _sep()
 
-    k_routes = []
-    if k == 1:
-        #  Optimized Single Path (Bidirectional Dijkstra) 
-        print("  Running Bidirectional Dijkstra (optimized)...")
-        path_len, path = _get_nx().bidirectional_dijkstra(G, orig_node, dest_node, weight="length")
-        k_routes = [(path, path_len)]
-    else:
-        #  Optimized Multiple Paths (Penalty Method) 
-        print(f"  Running Penalty Method for {k} alternative paths...")
-        k_routes = penalty_k_shortest(G, orig_node, dest_node, k=k)
-    
-    if not k_routes:
-        print("  Falling back to standard Dijkstra...")
-        p = _get_nx().dijkstra_path(G, orig_node, dest_node, weight="length")
-        l = _get_nx().dijkstra_path_length(G, orig_node, dest_node, weight="length")
-        k_routes = [(p, l)]
+        k_routes = []
+        if k == 1:
+            #  Optimized Single Path (Bidirectional Dijkstra) 
+            print("  Running Bidirectional Dijkstra (optimized)...")
+            path_len, path = _get_nx().bidirectional_dijkstra(G, orig_node, dest_node, weight="length")
+            k_routes = [(path, path_len)]
+        else:
+            #  Optimized Multiple Paths (Penalty Method) 
+            print(f"  Running Penalty Method for {k} alternative paths...")
+            k_routes = penalty_k_shortest(G, orig_node, dest_node, k=k)
+        
+        if not k_routes:
+            print("  Falling back to standard Dijkstra...")
+            p = _get_nx().dijkstra_path(G, orig_node, dest_node, weight="length")
+            l = _get_nx().dijkstra_path_length(G, orig_node, dest_node, weight="length")
+            k_routes = [(p, l)]
 
-    elapsed = time.time() - t0
-    _hr()
-    print(f"  RESULTS  (computed in {elapsed:.2f} s)")
+        elapsed = time.time() - t0
+        _hr()
+        print(f"  RESULTS  (computed in {elapsed:.2f} s)")
+    except Exception as e:
+        print(f"  GIS Routing skipped/failed: {e}")
+        routes = _estimated_routes(origin_lat, origin_lng, dest_lat, dest_lng, straight_m, k)
+        _RESULT_CACHE[cache_key] = routes
+        return routes
     _hr()
     print(f"  {'Route':<20}  {'Distance':>10}  {'Time':>8}  {'Nodes':>6}")
     _sep()

@@ -79,9 +79,9 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
             children: [
-              _buildBadge('Eco Warrior', FontAwesomeIcons.leaf, AppTheme.primaryGreen, true),
-              _buildBadge('Pool Pro', FontAwesomeIcons.users, AppTheme.accentBlue, true),
-              _buildBadge('EV Champion', FontAwesomeIcons.bolt, AppTheme.warningOrange, true),
+              _buildBadge('Eco Warrior', FontAwesomeIcons.leaf, Colors.grey, false),
+              _buildBadge('Pool Pro', FontAwesomeIcons.users, Colors.grey, false),
+              _buildBadge('EV Champion', FontAwesomeIcons.bolt, Colors.grey, false),
               _buildBadge('Night Rider', FontAwesomeIcons.moon, Colors.grey, false),
               _buildBadge('Century', FontAwesomeIcons.star, Colors.grey, false),
               _buildBadge('Carbon Zero', FontAwesomeIcons.seedling, Colors.grey, false),
@@ -90,13 +90,13 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
           const SizedBox(height: 24),
           Text('Milestones', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
-          _buildMilestone(context, 'Complete 10 pooled rides', 7, 10, FontAwesomeIcons.users, AppTheme.accentBlue),
+          _buildMilestone(context, 'Complete 10 pooled rides', 0, 10, FontAwesomeIcons.users, AppTheme.accentBlue),
           const SizedBox(height: 12),
-          _buildMilestone(context, 'Save 100kg CO₂', 42, 100, FontAwesomeIcons.leaf, AppTheme.primaryGreen),
+          _buildMilestone(context, 'Save 100kg CO₂', 0, 100, FontAwesomeIcons.leaf, AppTheme.primaryGreen),
           const SizedBox(height: 12),
-          _buildMilestone(context, '50 EV rides', 28, 50, FontAwesomeIcons.bolt, AppTheme.warningOrange),
+          _buildMilestone(context, '50 EV rides', 0, 50, FontAwesomeIcons.bolt, AppTheme.warningOrange),
           const SizedBox(height: 12),
-          _buildMilestone(context, '5 Bicycle trips', 2, 5, FontAwesomeIcons.bicycle, AppTheme.darkGreen),
+          _buildMilestone(context, '5 Bicycle trips', 0, 5, FontAwesomeIcons.bicycle, AppTheme.darkGreen),
         ],
       ),
     );
@@ -126,9 +126,9 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
               children: [
                 Text('Eco Points', style: TextStyle(color: Colors.black, fontSize: 16)),
                 SizedBox(height: 4),
-                Text('1,250', style: TextStyle(color: Colors.black, fontSize: 36, fontWeight: FontWeight.bold)),
+                Text('0', style: TextStyle(color: Colors.black, fontSize: 36, fontWeight: FontWeight.bold)),
                 SizedBox(height: 4),
-                Text('250 pts to next level', style: TextStyle(color: Colors.black54, fontSize: 12)),
+                Text('500 pts to next level', style: TextStyle(color: Colors.black54, fontSize: 12)),
               ],
             ),
           ),
@@ -141,7 +141,7 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
                   color: Colors.black.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text('Level 5', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
+                child: const Text('Level 1', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
               ),
               const SizedBox(height: 8),
               const Icon(Icons.trending_up, color: Colors.black54),
@@ -175,7 +175,7 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('7-Day Green Streak! 🔥', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
+                Text('0-Day Green Streak!', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
                 const SizedBox(height: 4),
                 Text('Keep choosing eco-friendly rides to grow your streak', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
               ],
@@ -183,7 +183,7 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
           ),
           Column(
             children: [
-              Text('7', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 28, fontWeight: FontWeight.bold)),
+              Text('0', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 28, fontWeight: FontWeight.bold)),
               Text('days', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
             ],
           ),
@@ -306,7 +306,7 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
                 const Icon(FontAwesomeIcons.coins, color: Color(0xFFFFC107), size: 24),
                 const SizedBox(width: 12),
                 Text('Your Balance: ', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
-                const Text('1,250 pts', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('0 pts', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
@@ -407,11 +407,11 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
 
   Widget _buildChallengesTab(BuildContext context, bool isDark) {
     final challenges = [
-      _Challenge('Green Week', 'Complete 5 eco rides this week', 3, 5, FontAwesomeIcons.calendar, AppTheme.primaryGreen, '+150 pts'),
-      _Challenge('EV Explorer', 'Take 3 EV rides this month', 1, 3, FontAwesomeIcons.bolt, const Color(0xFF00E5FF), '+200 pts'),
-      _Challenge('Carpool King', 'Pool 10 rides with others', 6, 10, FontAwesomeIcons.users, AppTheme.accentBlue, '+300 pts'),
+      _Challenge('Green Week', 'Complete 5 eco rides this week', 0, 5, FontAwesomeIcons.calendar, AppTheme.primaryGreen, '+150 pts'),
+      _Challenge('EV Explorer', 'Take 3 EV rides this month', 0, 3, FontAwesomeIcons.bolt, const Color(0xFF00E5FF), '+200 pts'),
+      _Challenge('Carpool King', 'Pool 10 rides with others', 0, 10, FontAwesomeIcons.users, AppTheme.accentBlue, '+300 pts'),
       _Challenge('Zero Emission Day', 'Use only bicycle or EV today', 0, 1, FontAwesomeIcons.bicycle, AppTheme.darkGreen, '+100 pts'),
-      _Challenge('Refer & Earn', 'Invite 2 friends to join', 1, 2, FontAwesomeIcons.userPlus, AppTheme.warningOrange, '+200 pts'),
+      _Challenge('Refer & Earn', 'Invite 2 friends to join', 0, 2, FontAwesomeIcons.userPlus, AppTheme.warningOrange, '+200 pts'),
     ];
 
     return SingleChildScrollView(

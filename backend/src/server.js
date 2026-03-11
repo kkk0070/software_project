@@ -19,12 +19,14 @@ import settingsRoutes from './routes/shared/settingsRoutes.js';
 import reportsRoutes from './routes/shared/reportsRoutes.js';
 import chatRoutes from './routes/shared/chatRoutes.js';
 import paymentRoutes from './routes/shared/paymentRoutes.js';
+import carpoolRoutes from './routes/shared/carpoolRoutes.js';
+import mapsRoutes from './routes/shared/mapsRoutes.js';
 // PostgreSQL connection pool for database operations
 import pool from './config/database.js';
 // Encryption key management utilities
 import { initializeKeyManagement } from './utils/keyManagement.js';
-// Socket.io service for real-time communication
 import { initializeSocketIO } from './services/socketService.js';
+import { createTables, seedInitialData } from './config/initDatabase.js';
 
 // Load environment variables from .env file into process.env
 dotenv.config();
@@ -38,6 +40,11 @@ const runMigrations = async () => {
 
   try {
     console.log('[INFO] Running automatic database migrations...');
+
+    // Run core table initialization from initDatabase.js
+    await createTables();
+    // Ensure initial data/admin exists
+    await seedInitialData();
 
     // Create encryption_keys table to store RSA key pairs for document encryption
     // This table manages the lifecycle of encryption keys (active, rotated, revoked)
@@ -244,6 +251,7 @@ const corsOptions = {
       // Production Vercel frontend URLs
       'https://web-axdhnv022-kkk0070s-projects.vercel.app',
       'https://frontend-kkk0070s-projects.vercel.app',
+      'https://frontend-five-omega-44.vercel.app',
       /^https:\/\/.*\.vercel\.app$/,  // Any Vercel preview/production deployment
       // Support custom domains if set via environment variable
       ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(s => s.trim()) : []),
@@ -373,6 +381,8 @@ app.use('/api/settings', settingsRoutes);     // User settings and preferences
 app.use('/api/reports', reportsRoutes);       // Reporting and analytics
 app.use('/api/chat', chatRoutes);             // Real-time chat messaging
 app.use('/api/payments', paymentRoutes);      // Payments and wallet
+app.use('/api/carpools', carpoolRoutes);     // Shared carpooling
+app.use('/api/maps', mapsRoutes);            // Downloaded maps routes
 
 // Root endpoint - API documentation and available endpoints
 app.get('/', (req, res) => {
@@ -392,9 +402,19 @@ app.get('/', (req, res) => {
       settings: '/api/settings',
       reports: '/api/reports',
       chat: '/api/chat',
-      payments: '/api/payments'
+      payments: '/api/payments',
+      carpools: '/api/carpools'
     }
   });
+});
+
+app.get('/api/debug-db', async (req, res) => {
+  try {
+    const result = await pool.query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+    res.json({ success: true, tables: result.rows.map(r => r.table_name) });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // Manual migration trigger endpoint (useful for first-time setup and debugging)
@@ -405,7 +425,17 @@ app.post('/api/migrate', async (req, res) => {
     await createTables();
     await seedInitialData();
     await runMigrations(); // also run encryption key / chat table migrations
-    res.json({ success: true, message: 'All tables created and seeded successfully' });
+    res.json({ success: true, message: 'All tables created and seeded successfully. Carpools ready.' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/api/migrate-carpools', async (req, res) => {
+  try {
+    const { default: migrate } = await import('./config/migrateCarpools.js');
+    await migrate();
+    res.json({ success: true, message: 'Carpool tables created successfully' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -433,6 +463,9 @@ app.use((err, req, res, next) => {
 
 // Start the HTTP server and initialize all services ONLY if not running in Vercel serverless environment
 // Vercel handles the invocation of the exported app automatically
+
+
+
 if (process.env.VERCEL !== '1') {
   httpServer.listen(PORT, HOST, async () => {
     // Display startup banner with server configuration
@@ -465,14 +498,7 @@ if (process.env.VERCEL !== '1') {
       }
     }
   });
-} else {
-  // In Vercel serverless, run migrations immediately at module load time
-  console.log('[INFO] Vercel environment detected, running migrations immediately...');
-  runMigrations()
-    .then(() => initializeKeyManagement())
-    .catch(err => console.error('Initialization failed in Vercel:', err.message));
 }
-
 
 // Export the Express app for testing and Vercel serverless functions
 export { app, httpServer };
