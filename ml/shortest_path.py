@@ -99,6 +99,8 @@ def _get_ox():
     if _ox is None:
         try:
             import osmnx as ox  # noqa: PLC0415
+            ox.settings.use_cache = True
+            ox.settings.log_console = True
             _ox = ox
         except ImportError: return None
     return _ox
@@ -123,39 +125,29 @@ def _download_network(
     ox = _get_ox()
     if not ox: return None
 
-    # Define bounding box with buffer
+    # Try a very small buffer first to save RAM
+    buffer_km = 1.0 
     north = max(origin_lat, dest_lat) + (buffer_km / 111.0)
     south = min(origin_lat, dest_lat) - (buffer_km / 111.0)
-    
-    # Simple approx for lng buffer based on lat
     lat_factor = math.cos(math.radians(origin_lat))
     east = max(origin_lng, dest_lng) + (buffer_km / (111.0 * lat_factor))
     west = min(origin_lng, dest_lng) - (buffer_km / (111.0 * lat_factor))
 
-    bbox_key = (round(north, 3), round(south, 3), round(east, 3), round(west, 3))
+    bbox_key = (round(north, 4), round(south, 4), round(east, 4), round(west, 4))
     if bbox_key in _GRAPH_CACHE:
         return _GRAPH_CACHE[bbox_key]
 
-    print(f"  Attempting OSM download: N:{north:.4f} S:{south:.4f} E:{east:.4f} W:{west:.4f} (network_type=drive)")
+    print(f"  Downloading tiny area GIS: N:{north:.4f} S:{south:.4f} E:{east:.4f} W:{west:.4f}")
     try:
-        # Use a timeout or small area to avoid Render OOM
+        # network_type='drive' and simplify=True are crucial
         G = ox.graph_from_bbox(north, south, east, west, network_type='drive', simplify=True)
+        # Keep only the largest strongly connected component
+        G = ox.utils_graph.get_largest_component(G, strongly=True)
         _GRAPH_CACHE[bbox_key] = G
         return G
     except Exception as e:
-        print(f"  OSMnx graph_from_bbox Error: {e}")
-        # Try fallback: graph from point (radius around midpoint)
-        try:
-            mid_lat = (origin_lat + dest_lat) / 2
-            mid_lng = (origin_lng + dest_lng) / 2
-            radius = (straight_m / 2) + 2000 # Half dist + 2km buffer
-            print(f"  Fallback: graph_from_point (midpoint, radius={radius:.0f}m)")
-            G = ox.graph_from_point((mid_lat, mid_lng), dist=radius, network_type='drive', simplify=True)
-            _GRAPH_CACHE[bbox_key] = G
-            return G
-        except Exception as e2:
-            print(f"  OSMnx graph_from_point Fallback Error: {e2}")
-            return None
+        print(f"  OSMnx Tiny Download Error: {e}")
+        return None
 
 
 
@@ -421,8 +413,11 @@ def find_all_routes(
         _hr()
         print(f"  RESULTS  (computed in {elapsed:.2f} s)")
     except Exception as e:
-        print(f"  GIS Routing skipped/failed: {e}")
+        err_msg = str(e)
+        print(f"  GIS Routing skipped/failed: {err_msg}")
         routes = _estimated_routes(origin_lat, origin_lng, dest_lat, dest_lng, straight_m, k)
+        for r in routes:
+            r["debug_error"] = err_msg
         _RESULT_CACHE[cache_key] = routes
         return routes
     _hr()
