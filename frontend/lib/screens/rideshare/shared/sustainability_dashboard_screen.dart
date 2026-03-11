@@ -22,9 +22,9 @@ class _VehicleData {
   final int totalRides;
   final String co2Saved;
   final String rankText;
-  final List<FlSpot> chartSpots;
+  final List<FlSpot> chartSpots;f
   final Color accentColor;
-
+-
   const _VehicleData({
     required this.label,
     required this.icon,
