@@ -9,7 +9,7 @@
 EcoRide is a **complete, production-ready sustainable mobility ecosystem** consisting of three integrated components:
 - 🚀 **Cross-platform Flutter Mobile App** - iOS, Android & Web support
 - 🔧 **Node.js REST API Backend** - Express + PostgreSQL + Socket.io
-- 💻 **React Admin Dashboard** - Real-time monitoring & management
+- 💻 **React Admin Dashboard** - Real-time monitoring & .
 
 The platform prioritizes environmental impact while providing efficient transportation with features like carbon tracking, ride pooling, gamification, and comprehensive safety measures.
 
