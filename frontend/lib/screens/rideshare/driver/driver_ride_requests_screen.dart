@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/ride_service.dart';
 import '../../../services/storage_service.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'driver_navigation_screen.dart';
 
 /// Driver Ride Requests Screen
 /// Shows incoming ride requests that drivers can accept or reject
@@ -59,13 +61,26 @@ class _DriverRideRequestsScreenState extends State<DriverRideRequestsScreen> {
     if (!mounted) return;
 
     if (result['success'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Ride accepted! Head to pickup location.'),
-          backgroundColor: AppTheme.successGreen,
+      // Navigate to navigation screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DriverNavigationScreen(
+            rideId: rideId,
+            riderName: ride['rider_name'] ?? 'Rider',
+            pickupLocation: LatLng(
+              double.tryParse(ride['pickup_lat'].toString()) ?? 0,
+              double.tryParse(ride['pickup_lng'].toString()) ?? 0,
+            ),
+            dropoffLocation: LatLng(
+              double.tryParse(ride['dropoff_lat'].toString()) ?? 0,
+              double.tryParse(ride['dropoff_lng'].toString()) ?? 0,
+            ),
+            pickupAddress: ride['pickup_location'] ?? 'Pickup',
+            dropoffAddress: ride['dropoff_location'] ?? 'Dropoff',
+          ),
         ),
       );
-      _loadPendingRides();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

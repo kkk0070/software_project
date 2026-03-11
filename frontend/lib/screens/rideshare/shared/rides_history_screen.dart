@@ -4,6 +4,8 @@ import '../../../theme/app_theme.dart';
 import '../../../services/ride_service.dart';
 import '../../../services/storage_service.dart';
 import 'carpool_details_screen.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../driver/driver_navigation_screen.dart';
 
 class RidesHistoryScreen extends StatefulWidget {
   const RidesHistoryScreen({super.key});
@@ -16,6 +18,7 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> with SingleTick
   List<Map<String, dynamic>> _rides = [];
   List<Map<String, dynamic>> _carpools = [];
   bool _isLoading = true;
+  int? _userId;
   late TabController _tabController;
 
   @override
@@ -35,19 +38,28 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> with SingleTick
     try {
       if (mounted) setState(() => _isLoading = true);
       
-      final userId = await StorageService.getUserId();
+      _userId = await StorageService.getUserId();
       
-      // Load standard rides
-      if (userId != null) {
-        final result = await RideService.getRides(
-          riderId: userId.toString(),
-          status: 'Completed',
-        );
-        if (result['success'] == true && result['data'] != null) {
-          final data = result['data'];
-          _rides = data is List
-              ? data.map((item) => Map<String, dynamic>.from(item as Map)).toList()
-              : [];
+      // Load standard rides (as rider)
+      if (_userId != null) {
+        final riderRes = await RideService.getRides(riderId: _userId.toString());
+        final driverRes = await RideService.getRides(driverId: _userId.toString());
+        
+        List<Map<String, dynamic>> allRides = [];
+        if (riderRes['success'] == true && riderRes['data'] != null) {
+          allRides.addAll((riderRes['data'] as List).cast<Map<String, dynamic>>());
+        }
+        if (driverRes['success'] == true && driverRes['data'] != null) {
+          allRides.addAll((driverRes['data'] as List).cast<Map<String, dynamic>>());
+        }
+        
+        // Sort by id descending (assuming newer is higher id)
+        allRides.sort((a, b) => (b['id'] as int).compareTo(a['id'] as int));
+        
+        if (mounted) {
+          setState(() {
+            _rides = allRides;
+          });
         }
       }
       
@@ -352,8 +364,64 @@ class _RidesHistoryScreenState extends State<RidesHistoryScreen> with SingleTick
                   Text(driverName, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
                 ],
               ),
+              if (ride['otp'] != null && (status == 'Active' || status == 'Arrived'))
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppTheme.primaryGreen),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'OTP: ${ride['otp']}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryGreen),
+                  ),
+                ),
             ],
           ),
+          if (status == 'Active' || status == 'Arrived' || status == 'PickedUp') ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  final isDriver = ride['driver_id'] == _userId;
+                  if (isDriver) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DriverNavigationScreen(
+                          rideId: ride['id'],
+                          riderName: ride['rider_name'] ?? 'Rider',
+                          pickupLocation: LatLng(
+                            double.tryParse(ride['pickup_lat'].toString()) ?? 0,
+                            double.tryParse(ride['pickup_lng'].toString()) ?? 0,
+                          ),
+                          dropoffLocation: LatLng(
+                            double.tryParse(ride['dropoff_lat'].toString()) ?? 0,
+                            double.tryParse(ride['dropoff_lng'].toString()) ?? 0,
+                          ),
+                          pickupAddress: ride['pickup_location'] ?? 'Pickup',
+                          dropoffAddress: ride['dropoff_location'] ?? 'Dropoff',
+                        ),
+                      ),
+                    ).then((_) => _loadHistory());
+                  } else {
+                    // For rider - could show a similar view or just a snackbar for now
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Rider tracking view coming soon!')),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.map_outlined),
+                label: const Text('Track Ride'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryGreen,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

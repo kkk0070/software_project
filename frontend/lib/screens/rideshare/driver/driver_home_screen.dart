@@ -17,6 +17,8 @@ import '../shared/sustainability_dashboard_screen.dart';
 import 'driver_earnings_screen.dart';
 import 'driver_online_stats_screen.dart';
 import 'driver_ride_requests_screen.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'driver_navigation_screen.dart';
 
 /// Driver Home Dashboard Screen
 /// Features:
@@ -43,6 +45,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   bool _isLoading = true;
   int _unreadChatCount = 0;
   int _pendingRidesCount = 0;
+  Map<String, dynamic>? _activeRide;
   late bool isDark;
 
   @override
@@ -99,14 +102,23 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     try {
       final driverId = await StorageService.getUserId();
       if (driverId == null) return;
+      
+      // Load Pending
       final result = await RideService.getRides(driverId: driverId.toString(), status: 'Pending');
       if (result['success'] == true && result['data'] != null) {
         final rides = result['data'] as List;
-        if (mounted) {
-          setState(() {
-            _pendingRidesCount = rides.length;
-          });
-        }
+        if (mounted) setState(() => _pendingRidesCount = rides.length);
+      }
+
+      // Load Active/Arrived/PickedUp
+      final activeRes = await RideService.getRides(driverId: driverId.toString());
+      if (activeRes['success'] == true && activeRes['data'] != null) {
+        final rides = activeRes['data'] as List;
+        final active = rides.firstWhere(
+          (r) => ['Active', 'Arrived', 'PickedUp'].contains(r['status']),
+          orElse: () => null,
+        );
+        if (mounted) setState(() => _activeRide = active);
       }
     } catch (e) {
       // Silently fail
@@ -152,6 +164,13 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     
                     const SizedBox(height: 16),
                     
+                    // Active Ride Card
+                    if (_activeRide != null)
+                      _buildActiveRideCard(),
+                    
+                    if (_activeRide != null)
+                      const SizedBox(height: 16),
+
                     // Ride Requests Banner
                     _buildRideRequestsBanner(),
                     
@@ -540,6 +559,94 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                 Icons.arrow_forward_ios,
                 color: AppTheme.primaryGreen,
                 size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActiveRideCard() {
+    if (_activeRide == null) return const SizedBox.shrink();
+    
+    final riderName = _activeRide!['rider_name'] ?? 'Rider';
+    final status = _activeRide!['status'];
+    final pickup = _activeRide!['pickup_location'] ?? 'Pickup';
+    final dropoff = _activeRide!['dropoff_location'] ?? 'Dropoff';
+
+    return FadeInDown(
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DriverNavigationScreen(
+                rideId: _activeRide!['id'],
+                riderName: riderName,
+                pickupLocation: LatLng(
+                  double.tryParse(_activeRide!['pickup_lat'].toString()) ?? 0,
+                  double.tryParse(_activeRide!['pickup_lng'].toString()) ?? 0,
+                ),
+                dropoffLocation: LatLng(
+                  double.tryParse(_activeRide!['dropoff_lat'].toString()) ?? 0,
+                  double.tryParse(_activeRide!['dropoff_lng'].toString()) ?? 0,
+                ),
+                pickupAddress: pickup,
+                dropoffAddress: dropoff,
+              ),
+            ),
+          ).then((_) => _loadPendingRidesCount());
+        },
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppTheme.primaryGreen, AppTheme.primaryGreen.withValues(alpha: 0.7)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryGreen.withValues(alpha: 0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'CURRENT ACTIVE RIDE',
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                    child: Text(status, style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(Icons.person, color: Colors.black, size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(riderName, style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('$pickup → $dropoff', style: const TextStyle(color: Colors.black54, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios, color: Colors.black, size: 16),
+                ],
               ),
             ],
           ),

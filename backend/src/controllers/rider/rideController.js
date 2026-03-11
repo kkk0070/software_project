@@ -324,10 +324,15 @@ export const deleteRide = async (req, res) => {
 export const acceptRide = async (req, res) => {
   try {
     const { id } = req.params;
+    const otp = Math.floor(1000 + Math.random() * 9000).toString(); // Generate 4-digit OTP
 
     const result = await knex('rides')
       .where('id', id)
-      .update({ status: 'Active', updated_at: knex.fn.now() })
+      .update({ 
+        status: 'Active', 
+        otp,
+        updated_at: knex.fn.now() 
+      })
       .returning('*');
 
     if (result.length === 0) {
@@ -342,12 +347,16 @@ export const acceptRide = async (req, res) => {
           .insert({
             user_id: ride.rider_id,
             title: 'Ride Accepted',
-            message: 'Your driver has accepted your ride request.',
+            message: `Your driver has accepted your ride request. Your OTP is ${otp}.`,
             type: 'Info',
             category: 'Ride'
           })
           .returning('*');
-        sendNotificationToUser(ride.rider_id, { ...notification, ride_id: ride.id });
+        sendNotificationToUser(ride.rider_id, { 
+          ...notification, 
+          ride_id: ride.id,
+          otp: otp 
+        });
       }
     } catch (notifyError) {
       console.error('Error sending accept notification:', notifyError);
@@ -357,6 +366,73 @@ export const acceptRide = async (req, res) => {
   } catch (error) {
     console.error('Error accepting ride:', error);
     res.status(500).json({ success: false, message: 'Error accepting ride', error: error.message });
+  }
+};
+
+// Driver arrives at pickup location
+export const arriveAtPickup = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await knex('rides')
+      .where('id', id)
+      .update({ status: 'Arrived', updated_at: knex.fn.now() })
+      .returning('*');
+
+    if (result.length === 0) {
+      return res.status(404).json({ success: false, message: 'Ride not found' });
+    }
+
+    const ride = result[0];
+    if (ride.rider_id) {
+      try {
+        const [notification] = await knex('notifications')
+          .insert({
+            user_id: ride.rider_id,
+            title: 'Driver Arrived',
+            message: 'Your driver has arrived at the pickup location.',
+            type: 'Info',
+            category: 'Ride'
+          })
+          .returning('*');
+        sendNotificationToUser(ride.rider_id, { ...notification, ride_id: ride.id });
+      } catch (e) {}
+    }
+
+    res.json({ success: true, message: 'Status updated to Arrived', data: ride });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Verify OTP and start the trip
+export const verifyOtp = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { otp } = req.body;
+
+    const ride = await knex('rides').where('id', id).first();
+
+    if (!ride) {
+      return res.status(404).json({ success: false, message: 'Ride not found' });
+    }
+
+    if (ride.otp !== otp) {
+      return res.status(400).json({ success: false, message: 'Invalid OTP' });
+    }
+
+    const result = await knex('rides')
+      .where('id', id)
+      .update({ 
+        status: 'PickedUp', 
+        started_at: knex.fn.now(),
+        updated_at: knex.fn.now() 
+      })
+      .returning('*');
+
+    res.json({ success: true, message: 'OTP Verified. Trip started.', data: result[0] });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

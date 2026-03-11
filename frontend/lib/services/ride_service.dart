@@ -105,6 +105,67 @@ class RideService {
     }
   }
 
+  /// Driver arrives at pickup
+  static Future<Map<String, dynamic>> arriveAtPickup(int rideId) async {
+    try {
+      final response = await http.put(
+        Uri.parse('${ApiConfig.ridesUrl}/$rideId/arrive'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] arriveAtPickup: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  /// Verify OTP and start trip
+  static Future<Map<String, dynamic>> verifyOtp(int rideId, String otp) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.ridesUrl}/$rideId/verify-otp'),
+        headers: await _authHeaders(),
+        body: jsonEncode({'otp': otp}),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] verifyOtp: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  /// Driver arrives at pickup
+  static Future<Map<String, dynamic>> arriveAtPickup(int rideId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.ridesUrl}/$rideId/arrive'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] arriveAtPickup: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  /// Driver completes a ride
+  static Future<Map<String, dynamic>> completeRide(int rideId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.ridesUrl}/$rideId/complete'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] completeRide: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
   /// Submit a rating for a completed ride
   static Future<Map<String, dynamic>> rateRide({
     required int rideId,
@@ -134,11 +195,12 @@ class RideService {
   static Future<Map<String, dynamic>> getRidesHistory({
     String? riderId,
     String? driverId,
+    String? status,
   }) async {
     return getRides(
       riderId: riderId,
       driverId: driverId,
-      status: 'Completed',
+      status: status,
     );
   }
 

@@ -78,8 +78,8 @@ const createTables = async () => {
         pickup_lng DECIMAL(11, 8),
         dropoff_lat DECIMAL(10, 8),
         dropoff_lng DECIMAL(11, 8),
-        ride_type VARCHAR(50) DEFAULT 'Economy' CHECK (ride_type IN ('Solo', 'Pool', 'EV', 'Economy', 'Comfort', 'Premium', 'Standard')),
-        status VARCHAR(50) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Active', 'Completed', 'Cancelled')),
+        otp VARCHAR(10),
+        status VARCHAR(50) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Active', 'Arrived', 'PickedUp', 'Completed', 'Cancelled')),
         fare DECIMAL(10,2),
         distance DECIMAL(10,2),
         duration INTEGER,
@@ -166,6 +166,17 @@ const createTables = async () => {
         CHECK (ride_type IN ('Solo', 'Pool', 'EV', 'Economy', 'Comfort', 'Premium', 'Standard'));
     `);
     console.log('[SUCCESS] Rides ride_type constraint updated');
+
+    // Add OTP column and update status constraint for existing rides table
+    await client.query(`
+      ALTER TABLE rides ADD COLUMN IF NOT EXISTS otp VARCHAR(10);
+      
+      ALTER TABLE rides DROP CONSTRAINT IF EXISTS rides_status_check;
+      ALTER TABLE rides 
+        ADD CONSTRAINT rides_status_check 
+        CHECK (status IN ('Pending', 'Active', 'Arrived', 'PickedUp', 'Completed', 'Cancelled'));
+    `);
+    console.log('[SUCCESS] Rides otp column and status constraint ensured');
 
     // Emergency incidents table
     await client.query(`

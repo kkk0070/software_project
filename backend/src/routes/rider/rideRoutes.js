@@ -9,7 +9,9 @@ import {
   acceptRide,
   rejectRide,
   completeRide,
-  rateRide
+  rateRide,
+  arriveAtPickup,
+  verifyOtp
 } from '../../controllers/rider/rideController.js';
 
 const router = express.Router();
@@ -23,6 +25,8 @@ router.put('/:id/accept', acceptRide);
 router.put('/:id/reject', rejectRide);
 router.post('/:id/complete', completeRide);
 router.post('/:id/rate', rateRide);
+router.put('/:id/arrive', arriveAtPickup);
+router.post('/:id/verify-otp', verifyOtp);
 router.delete('/:id', deleteRide);
 
 export default router;
