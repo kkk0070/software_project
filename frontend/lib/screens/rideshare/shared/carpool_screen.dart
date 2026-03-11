@@ -3,6 +3,8 @@ import 'package:animate_do/animate_do.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../../theme/app_theme.dart';
+import '../../../services/ride_service.dart';
+import '../../../services/storage_service.dart';
 import 'carpool_search_screen.dart';
 import 'carpool_detail_screen.dart';
 
@@ -30,6 +32,12 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
   final TextEditingController _searchPickupController = TextEditingController();
   final TextEditingController _searchDropoffController = TextEditingController();
   List<Map<String, dynamic>> _filteredCarpoolRequests = [];
+  String? _currentUserId;
+
+  // Create schedule state
+  int _availableSeats = 2;
+  double _pricePerSeat = 5.0;
+  bool _isEv = true;
 
   // Filter state
   bool _filterEvOnly = false;
@@ -37,144 +45,58 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
   String _sortBy = 'default'; // 'default' | 'price' | 'rating'
 
   // Sample carpool requests data
-  final List<Map<String, dynamic>> _carpoolRequests = [
-    {
-      'id': 1,
-      'driverId': 101,
-      'pickup': 'Downtown Plaza',
-      'dropoff': 'Airport Terminal 2',
-      'date': 'Today, 2:30 PM',
-      'seats': 2,
-      'price': '\$8.50',
-      'driver': 'John D.',
-      'rating': 4.8,
-      'carbonSaved': '2.1 kg CO₂',
-      'distance': '15.2 km',
-      'duration': '28 min',
-      'tripCount': 245,
-      'vehicleType': 'EV',
-    },
-    {
-      'id': 2,
-      'driverId': 102,
-      'pickup': 'University Campus',
-      'dropoff': 'Shopping Mall',
-      'date': 'Tomorrow, 10:00 AM',
-      'seats': 3,
-      'price': '\$6.00',
-      'driver': 'Sarah M.',
-      'rating': 4.9,
-      'carbonSaved': '1.8 kg CO₂',
-      'distance': '10.5 km',
-      'duration': '18 min',
-      'tripCount': 312,
-      'vehicleType': 'EV',
-    },
-    {
-      'id': 3,
-      'driverId': 103,
-      'pickup': 'Tech Park',
-      'dropoff': 'Central Station',
-      'date': 'Today, 5:45 PM',
-      'seats': 1,
-      'price': '\$7.25',
-      'driver': 'Mike R.',
-      'rating': 4.7,
-      'carbonSaved': '1.5 kg CO₂',
-      'distance': '12.8 km',
-      'duration': '22 min',
-      'tripCount': 189,
-      'vehicleType': 'Hybrid',
-    },
-    {
-      'id': 4,
-      'driverId': 104,
-      'pickup': 'Green Park',
-      'dropoff': 'Business District',
-      'date': 'Today, 8:00 AM',
-      'seats': 2,
-      'price': '\$5.50',
-      'driver': 'Amy L.',
-      'rating': 5.0,
-      'carbonSaved': '2.5 kg CO₂',
-      'distance': '14.0 km',
-      'duration': '25 min',
-      'tripCount': 420,
-      'vehicleType': 'EV',
-    },
-    {
-      'id': 5,
-      'driverId': 105,
-      'pickup': 'Riverside Apartments',
-      'dropoff': 'City Center',
-      'date': 'Tomorrow, 7:30 AM',
-      'seats': 4,
-      'price': '\$4.75',
-      'driver': 'Carlos B.',
-      'rating': 4.6,
-      'carbonSaved': '1.2 kg CO₂',
-      'distance': '8.0 km',
-      'duration': '15 min',
-      'tripCount': 98,
-      'vehicleType': 'EV',
-    },
-    {
-      'id': 6,
-      'driverId': 106,
-      'pickup': 'Northside Mall',
-      'dropoff': 'South Beach',
-      'date': 'Today, 3:00 PM',
-      'seats': 2,
-      'price': '\$9.00',
-      'driver': 'Priya S.',
-      'rating': 4.8,
-      'carbonSaved': '3.0 kg CO₂',
-      'distance': '18.5 km',
-      'duration': '35 min',
-      'tripCount': 175,
-      'vehicleType': 'Hybrid',
-    },
-    {
-      'id': 7,
-      'driverId': 107,
-      'pickup': 'Old Town Square',
-      'dropoff': 'Sports Stadium',
-      'date': 'Tomorrow, 5:00 PM',
-      'seats': 3,
-      'price': '\$7.00',
-      'driver': 'David K.',
-      'rating': 4.5,
-      'carbonSaved': '1.9 kg CO₂',
-      'distance': '11.2 km',
-      'duration': '20 min',
-      'tripCount': 63,
-      'vehicleType': 'EV',
-    },
-    {
-      'id': 8,
-      'driverId': 108,
-      'pickup': 'West Side Library',
-      'dropoff': 'Airport Terminal 1',
-      'date': 'Today, 11:15 AM',
-      'seats': 1,
-      'price': '\$11.00',
-      'driver': 'Nina W.',
-      'rating': 4.9,
-      'carbonSaved': '2.8 kg CO₂',
-      'distance': '20.0 km',
-      'duration': '40 min',
-      'tripCount': 301,
-      'vehicleType': 'EV',
-    },
-  ];
+  List<Map<String, dynamic>> _carpoolRequests = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _filteredCarpoolRequests = _carpoolRequests; // Initialize with all rides
+    _filteredCarpoolRequests = _carpoolRequests;
     _searchPickupController.addListener(_filterRides);
     _searchDropoffController.addListener(_filterRides);
+    _loadAvailableCarpools();
+  }
+
+  Future<void> _loadAvailableCarpools() async {
+    try {
+      if (mounted) setState(() => _isLoading = true);
+      _currentUserId = (await StorageService.getUserId())?.toString();
+      final res = await RideService.getAvailableCarpools();
+      if (res['success'] == true && res['data'] != null) {
+        final data = res['data'];
+        final validList = data is List
+            ? data.map((item) => Map<String, dynamic>.from(item as Map)).toList()
+            : <Map<String, dynamic>>[];
+            
+        // Map db payload format to the UI expectations setup by earlier static arrays
+        _carpoolRequests = validList.map((cp) => {
+          'id': cp['id'],
+          'driverId': cp['creator_id'] ?? cp['driverId'],
+          'pickup': cp['pickup'] ?? cp['pickup_location'] ?? cp['from'] ?? 'Unknown',
+          'dropoff': cp['dropoff'] ?? cp['dropoff_location'] ?? cp['to'] ?? 'Unknown',
+          'date': cp['scheduled_time'] != null ? DateFormat('MMM dd, yyyy h:mm a').format(DateTime.parse(cp['scheduled_time']).toLocal()) : 'Unknown Time',
+          'seats': cp['max_participants'] ?? 0,
+          'price': '₹${cp['fare'] ?? 0}',
+          'driver': cp['creator'] ?? 'Driver',
+          'rating': 4.8, 
+          'carbonSaved': '2.1 kg CO₂',
+          'distance': '15.2 km',
+          'duration': '28 min',
+          'tripCount': 10,
+          'vehicleType': cp['vehicle_type'] ?? 'EV',
+        }).toList();
+        
+      }
+      if (mounted) {
+        setState(() {
+          _filteredCarpoolRequests = _carpoolRequests;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -284,11 +206,15 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
           ],
         ),
       ),
-      body: TabBarView(
+      body: _isLoading ? const Center(child: CircularProgressIndicator()) : TabBarView(
         controller: _tabController,
         children: [
           _buildScheduleTab(isDark),
-          _buildAvailableRidesTab(isDark),
+          RefreshIndicator(
+            onRefresh: _loadAvailableCarpools,
+            color: AppTheme.primaryGreen,
+            child: _buildAvailableRidesTab(isDark)
+          ),
         ],
       ),
     );
@@ -494,13 +420,24 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
           
           FadeInLeft(
             delay: const Duration(milliseconds: 350),
-            child: Text(
-              'Additional Options',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Additional Options',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.edit, color: AppTheme.primaryGreen, size: 20),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: _showEditOptionsDialog,
+                ),
+              ],
             ),
           ),
           
@@ -519,21 +456,21 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
                   _buildOptionRow(
                     icon: FontAwesomeIcons.users,
                     label: 'Available Seats',
-                    value: '2',
+                    value: '$_availableSeats',
                     isDark: isDark,
                   ),
                   const Divider(height: 32),
                   _buildOptionRow(
                     icon: FontAwesomeIcons.dollarSign,
                     label: 'Price per Seat',
-                    value: '\$5.00',
+                    value: '\$${_pricePerSeat.toStringAsFixed(2)}',
                     isDark: isDark,
                   ),
                   const Divider(height: 32),
                   _buildOptionRow(
                     icon: FontAwesomeIcons.bolt,
                     label: 'Electric Vehicle',
-                    value: 'Yes',
+                    value: _isEv ? 'Yes' : 'No',
                     isDark: isDark,
                   ),
                 ],
@@ -974,11 +911,15 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      _acceptCarpoolRequest(request);
-                    },
+                    onPressed: request['driverId']?.toString() == _currentUserId 
+                        ? null 
+                        : () {
+                            _acceptCarpoolRequest(request);
+                          },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryGreen,
+                      backgroundColor: request['driverId']?.toString() == _currentUserId 
+                          ? Colors.grey 
+                          : AppTheme.primaryGreen,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -986,11 +927,15 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
                       elevation: 0,
                     ),
                     child: Text(
-                      'Accept Carpool',
+                      request['driverId']?.toString() == _currentUserId 
+                          ? 'Your Carpool' 
+                          : 'Accept Carpool',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: request['driverId']?.toString() == _currentUserId 
+                            ? Colors.white70 
+                            : Colors.black,
                       ),
                     ),
                   ),
@@ -1303,153 +1248,351 @@ class _CarpoolScreenState extends State<CarpoolScreen> with SingleTickerProvider
     }
   }
 
-  void _scheduleRide() {
+  Future<void> _scheduleRide() async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    // Show success dialog
+    // Validate inputs
+    if (_pickupController.text.isEmpty || _dropoffController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter pickup and drop-off locations.')),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? AppTheme.cardDark : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    final userIdStr = await StorageService.getUserId();
+    final userId = int.tryParse(userIdStr?.toString() ?? '0') ?? 0;
+
+    final datetimeStr = DateTime(
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
+      _selectedTime.hour,
+      _selectedTime.minute,
+    ).toUtc().toIso8601String();
+
+    final res = await RideService.createCarpool(
+      creatorId: userId,
+      pickupLocation: _pickupController.text,
+      dropoffLocation: _dropoffController.text,
+      scheduledTime: datetimeStr,
+      fare: _pricePerSeat,
+      maxParticipants: _availableSeats,
+      vehicleType: _isEv ? 'EV' : 'Car',
+    );
+
+    if (!mounted) return;
+    Navigator.pop(context); // hide loading
+
+    if (res['success'] == true) {
+      // Refresh available carpools list
+      _loadAvailableCarpools();
+      
+      // Clear form
+      _pickupController.clear();
+      _dropoffController.clear();
+
+      // Show success dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: isDark ? AppTheme.cardDark : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
+                ),
+                child: Icon(
+                  Icons.check_circle,
+                  color: AppTheme.primaryGreen,
+                  size: 50,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Ride Scheduled!',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Your carpool ride has been scheduled successfully.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // Optionally switch to Available Rides tab
+                    _tabController.animateTo(1);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryGreen,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
-              ),
-              child: Icon(
-                Icons.check_circle,
-                color: AppTheme.primaryGreen,
-                size: 50,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Ride Scheduled!',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Your carpool ride has been scheduled successfully.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryGreen,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text(res['message'] ?? 'Failed to schedule carpool.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
             ),
           ],
         ),
-      ),
+      );
+    }
+  }
+
+  void _showEditOptionsDialog() {
+    int tempSeats = _availableSeats;
+    double tempPrice = _pricePerSeat;
+    bool tempEv = _isEv;
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Edit Options'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Seats:'),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.remove),
+                            onPressed: () {
+                              if (tempSeats > 1) {
+                                setDialogState(() => tempSeats--);
+                              }
+                            },
+                          ),
+                          Text('$tempSeats'),
+                          IconButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: () {
+                              if (tempSeats < 8) {
+                                setDialogState(() => tempSeats++);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Price: \$'),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.remove),
+                            onPressed: () {
+                              if (tempPrice > 1.0) {
+                                setDialogState(() => tempPrice--);
+                              }
+                            },
+                          ),
+                          Text(tempPrice.toStringAsFixed(2)),
+                          IconButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: () {
+                              setDialogState(() => tempPrice++);
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SwitchListTile(
+                    title: const Text('Electric Vehicle'),
+                    value: tempEv,
+                    onChanged: (val) => setDialogState(() => tempEv = val),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _availableSeats = tempSeats;
+                      _pricePerSeat = tempPrice;
+                      _isEv = tempEv;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
-  void _acceptCarpoolRequest(Map<String, dynamic> request) {
+  Future<void> _acceptCarpoolRequest(Map<String, dynamic> request) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    // Show confirmation dialog
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? AppTheme.cardDark : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+    
+    final userId = int.tryParse(_currentUserId ?? '0') ?? 0;
+    final res = await RideService.acceptCarpool(carpoolId: request['id'], participantId: userId);
+    
+    if (!mounted) return;
+    Navigator.pop(context); // close loading
+    
+    if (res['success'] == true) {
+      final otp = res['user_otp'] ?? 'N/A';
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: isDark ? AppTheme.cardDark : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.2),
+                ),
+                child: Icon(
+                  Icons.check_circle,
+                  color: AppTheme.primaryGreen,
+                  size: 50,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Carpool Accepted!',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'OTP: $otp',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryGreen,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Share this OTP with the driver. You can view it anytime in your ride history.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryGreen,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'OK',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTheme.primaryGreen.withValues(alpha: 0.2),
-              ),
-              child: Icon(
-                Icons.check_circle,
-                color: AppTheme.primaryGreen,
-                size: 50,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Carpool Accepted!',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'You have successfully joined this carpool ride. The driver will be notified.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryGreen,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text(res['message'] ?? 'Failed to accept carpool.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
             ),
           ],
         ),
-      ),
-    );
+      );
+    }
   }
 }

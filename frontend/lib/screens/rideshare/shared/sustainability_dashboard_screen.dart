@@ -22,9 +22,9 @@ class _VehicleData {
   final int totalRides;
   final String co2Saved;
   final String rankText;
-  final List<FlSpot> chartSpots;
+  final List<FlSpot> chartSpots;f
   final Color accentColor;
-
+-
   const _VehicleData({
     required this.label,
     required this.icon,
@@ -54,65 +54,65 @@ class _SustainabilityDashboardScreenState
     VehicleFilter.all: _VehicleData(
       label: 'All Vehicles',
       icon: FontAwesomeIcons.chartBar,
-      ecoScore: 850,
-      totalRides: 28,
-      co2Saved: '42 kg',
-      rankText: 'Top 10% of riders',
+      ecoScore: 0,
+      totalRides: 0,
+      co2Saved: '0 kg',
+      rankText: 'Getting Started',
       chartSpots: [
-        FlSpot(0, 2), FlSpot(1, 3), FlSpot(2, 1.5),
-        FlSpot(3, 4), FlSpot(4, 3.5), FlSpot(5, 5), FlSpot(6, 4.5),
+        FlSpot(0, 0), FlSpot(1, 0), FlSpot(2, 0),
+        FlSpot(3, 0), FlSpot(4, 0), FlSpot(5, 0), FlSpot(6, 0),
       ],
       accentColor: AppTheme.primaryGreen,
     ),
     VehicleFilter.car: _VehicleData(
       label: 'Car',
       icon: FontAwesomeIcons.car,
-      ecoScore: 620,
-      totalRides: 15,
-      co2Saved: '18 kg',
-      rankText: 'Top 35% of car riders',
+      ecoScore: 0,
+      totalRides: 0,
+      co2Saved: '0 kg',
+      rankText: 'Getting Started',
       chartSpots: [
-        FlSpot(0, 1.2), FlSpot(1, 1.8), FlSpot(2, 1.0),
-        FlSpot(3, 2.2), FlSpot(4, 1.9), FlSpot(5, 2.5), FlSpot(6, 2.0),
+        FlSpot(0, 0), FlSpot(1, 0), FlSpot(2, 0),
+        FlSpot(3, 0), FlSpot(4, 0), FlSpot(5, 0), FlSpot(6, 0),
       ],
       accentColor: AppTheme.accentBlue,
     ),
     VehicleFilter.ev: _VehicleData(
       label: 'Electric Vehicle',
       icon: FontAwesomeIcons.bolt,
-      ecoScore: 950,
-      totalRides: 8,
-      co2Saved: '20 kg',
-      rankText: 'Top 5% of EV riders',
+      ecoScore: 0,
+      totalRides: 0,
+      co2Saved: '0 kg',
+      rankText: 'Getting Started',
       chartSpots: [
-        FlSpot(0, 2.5), FlSpot(1, 3.2), FlSpot(2, 2.8),
-        FlSpot(3, 3.8), FlSpot(4, 4.2), FlSpot(5, 4.8), FlSpot(6, 5.0),
+        FlSpot(0, 0), FlSpot(1, 0), FlSpot(2, 0),
+        FlSpot(3, 0), FlSpot(4, 0), FlSpot(5, 0), FlSpot(6, 0),
       ],
       accentColor: Color(0xFF00E5FF),
     ),
     VehicleFilter.motorcycle: _VehicleData(
       label: 'Motorcycle',
       icon: FontAwesomeIcons.motorcycle,
-      ecoScore: 710,
-      totalRides: 3,
-      co2Saved: '3 kg',
-      rankText: 'Top 20% of moto riders',
+      ecoScore: 0,
+      totalRides: 0,
+      co2Saved: '0 kg',
+      rankText: 'Getting Started',
       chartSpots: [
-        FlSpot(0, 0.5), FlSpot(1, 0.8), FlSpot(2, 0.4),
-        FlSpot(3, 1.0), FlSpot(4, 0.7), FlSpot(5, 1.1), FlSpot(6, 0.9),
+        FlSpot(0, 0), FlSpot(1, 0), FlSpot(2, 0),
+        FlSpot(3, 0), FlSpot(4, 0), FlSpot(5, 0), FlSpot(6, 0),
       ],
       accentColor: AppTheme.warningOrange,
     ),
     VehicleFilter.bicycle: _VehicleData(
       label: 'Bicycle',
       icon: FontAwesomeIcons.bicycle,
-      ecoScore: 990,
-      totalRides: 2,
-      co2Saved: '1 kg',
-      rankText: 'Top 1% — Carbon Hero!',
+      ecoScore: 0,
+      totalRides: 0,
+      co2Saved: '0 kg',
+      rankText: 'Getting Started',
       chartSpots: [
-        FlSpot(0, 0.1), FlSpot(1, 0.2), FlSpot(2, 0.1),
-        FlSpot(3, 0.3), FlSpot(4, 0.2), FlSpot(5, 0.4), FlSpot(6, 0.3),
+        FlSpot(0, 0), FlSpot(1, 0), FlSpot(2, 0),
+        FlSpot(3, 0), FlSpot(4, 0), FlSpot(5, 0), FlSpot(6, 0),
       ],
       accentColor: AppTheme.primaryGreen,
     ),

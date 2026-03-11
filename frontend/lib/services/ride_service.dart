@@ -105,6 +105,67 @@ class RideService {
     }
   }
 
+  /// Driver arrives at pickup
+  static Future<Map<String, dynamic>> arriveAtPickup(int rideId) async {
+    try {
+      final response = await http.put(
+        Uri.parse('${ApiConfig.ridesUrl}/$rideId/arrive'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] arriveAtPickup: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  /// Verify OTP and start trip
+  static Future<Map<String, dynamic>> verifyOtp(int rideId, String otp) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.ridesUrl}/$rideId/verify-otp'),
+        headers: await _authHeaders(),
+        body: jsonEncode({'otp': otp}),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] verifyOtp: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  /// Driver arrives at pickup
+  static Future<Map<String, dynamic>> arriveAtPickup(int rideId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.ridesUrl}/$rideId/arrive'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] arriveAtPickup: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  /// Driver completes a ride
+  static Future<Map<String, dynamic>> completeRide(int rideId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.ridesUrl}/$rideId/complete'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] completeRide: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
   /// Submit a rating for a completed ride
   static Future<Map<String, dynamic>> rateRide({
     required int rideId,
@@ -134,11 +195,185 @@ class RideService {
   static Future<Map<String, dynamic>> getRidesHistory({
     String? riderId,
     String? driverId,
+    String? status,
   }) async {
     return getRides(
       riderId: riderId,
       driverId: driverId,
-      status: 'Completed',
+      status: status,
     );
+  }
+
+  // CARPOOL METHODS
+
+  static Future<Map<String, dynamic>> getAvailableCarpools() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.carpoolsUrl}/available'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] getAvailableCarpools: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> createCarpool({
+    required int creatorId,
+    required String pickupLocation,
+    required String dropoffLocation,
+    required String scheduledTime,
+    required double fare,
+    required int maxParticipants,
+    String? vehicleType,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.carpoolsUrl}/create'),
+        headers: await _authHeaders(),
+        body: jsonEncode({
+          'creator_id': creatorId,
+          'pickup_location': pickupLocation,
+          'dropoff_location': dropoffLocation,
+          'pickup': pickupLocation,
+          'dropoff': dropoffLocation,
+          'scheduled_time': scheduledTime,
+          'fare': fare,
+          'max_participants': maxParticipants,
+          if (vehicleType != null) 'vehicleType': vehicleType,
+        }),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] createCarpool: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> acceptCarpool({
+    required int carpoolId,
+    required int participantId,
+    Map<String, double>? userLocation,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.carpoolsUrl}/accept'),
+        headers: await _authHeaders(),
+        body: jsonEncode({
+          'carpoolId': carpoolId,
+          'userId': participantId,
+          'location': userLocation,
+        }),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      final result = jsonDecode(response.body);
+      if (result['success'] == true) {
+        return {'success': true, 'user_otp': result['otp']};
+      }
+      return result;
+    } catch (e) {
+      return {'success': false, 'message': 'Network error'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> getCarpoolHistory() async {
+    try {
+      final userId = await StorageService.getUserId();
+      final response = await http.get(
+        Uri.parse('${ApiConfig.carpoolsUrl}/history?userId=$userId'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'success': false, 'message': 'Network error'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> getCarpoolDetails(int carpoolId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.carpoolsUrl}/$carpoolId'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {'success': false, 'message': 'Network error'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> deleteCarpool(int carpoolId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${ApiConfig.carpoolsUrl}/$carpoolId'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] deleteCarpool: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  // Maps
+  static Future<Map<String, dynamic>> saveDownloadedMap({
+    required String pickup,
+    required String dropoff,
+    required String encodedPolyline,
+  }) async {
+    try {
+      final userId = await StorageService.getUserId();
+      final body = jsonEncode({
+        'userId': userId,
+        'pickup': pickup,
+        'dropoff': dropoff,
+        'encodedPolyline': encodedPolyline,
+      });
+
+      final response = await http.post(
+        Uri.parse('${ApiConfig.mapsUrl}/download'),
+        headers: await _authHeaders(),
+        body: body,
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] saveDownloadedMap: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> getDownloadedMaps() async {
+    try {
+      final userId = await StorageService.getUserId();
+      final response = await http.get(
+        Uri.parse('${ApiConfig.mapsUrl}/downloaded?userId=$userId'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] getDownloadedMaps: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> deleteDownloadedMap(int mapId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${ApiConfig.mapsUrl}/downloaded/$mapId'),
+        headers: await _authHeaders(),
+      ).timeout(ApiConfig.connectionTimeout);
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      if (kDebugMode) print('[ERROR] deleteDownloadedMap: $e');
+      return {'success': false, 'message': 'Network error: $e'};
+    }
   }
 }

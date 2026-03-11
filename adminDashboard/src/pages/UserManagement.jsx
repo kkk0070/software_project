@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, CheckCircle, XCircle, AlertCircle, User, X, Mail, Phone, MapPin, Calendar, Star, Car } from 'lucide-react';
-import { userAPI } from '../services/api';
+import { Search, Filter, CheckCircle, XCircle, AlertCircle, User, X, Mail, Phone, MapPin, Calendar, Star, Car, Smartphone, ShieldCheck, Clock } from 'lucide-react';
+import { userAPI, authAPI } from '../services/api';
 
 const UserManagement = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -15,10 +15,18 @@ const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sessions, setSessions] = useState([]);
+  const [loadingSessions, setLoadingSessions] = useState(false);
 
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    if (selectedUser) {
+      fetchSessions(selectedUser.id);
+    }
+  }, [selectedUser]);
 
   const fetchUsers = async () => {
     try {
@@ -50,6 +58,37 @@ const UserManagement = () => {
     }
   };
 
+  const fetchSessions = async (userId) => {
+    try {
+      setLoadingSessions(true);
+      const response = await authAPI.getSessionsForUser(userId);
+      if (response.success) {
+        setSessions(response.data);
+      }
+    } catch (err) {
+      console.error('Error fetching user sessions:', err);
+    } finally {
+      setLoadingSessions(false);
+    }
+  };
+
+  const handleRevokeSession = async (userId, sessionId) => {
+    if (!window.confirm('Are you sure you want to revoke this session? The user will be logged out from this device.')) {
+      return;
+    }
+
+    try {
+      const response = await authAPI.logoutDeviceForUser(userId, sessionId);
+      if (response.success) {
+        // Refresh sessions list
+        fetchSessions(userId);
+      }
+    } catch (err) {
+      console.error('Error revoking session:', err);
+      alert('Failed to revoke session: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -69,19 +108,19 @@ const UserManagement = () => {
   const filteredUsers = users.filter(user => {
     // Tab filter
     const tabMatch = activeTab === 'all' || user.role.toLowerCase() === activeTab;
-    
+
     // Search filter
     const searchMatch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                       user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+
     // Status filter
     const statusMatch = filters.status === 'all' || user.status === filters.status;
-    
+
     // Verified filter
-    const verifiedMatch = filters.verified === 'all' || 
-                          (filters.verified === 'verified' && user.verified) ||
-                          (filters.verified === 'unverified' && !user.verified);
-    
+    const verifiedMatch = filters.verified === 'all' ||
+      (filters.verified === 'verified' && user.verified) ||
+      (filters.verified === 'unverified' && !user.verified);
+
     // Rating filter (for drivers)
     let ratingMatch = true;
     if (filters.rating !== 'all' && user.role === 'Driver') {
@@ -89,12 +128,12 @@ const UserManagement = () => {
       if (filters.rating === 'medium' && (user.rating < 3.5 || user.rating >= 4.5)) ratingMatch = false;
       if (filters.rating === 'low' && user.rating >= 3.5) ratingMatch = false;
     }
-    
+
     return tabMatch && searchMatch && statusMatch && verifiedMatch && ratingMatch;
   });
 
   const getStatusColor = (status) => {
-    switch(status) {
+    switch (status) {
       case 'Active': return 'bg-green-100 text-green-800';
       case 'Suspended': return 'bg-red-100 text-red-800';
       case 'Pending': return 'bg-yellow-100 text-yellow-800';
@@ -125,7 +164,7 @@ const UserManagement = () => {
                 <X size={24} />
               </button>
             </div>
-            
+
             <div className="p-6 space-y-6">
               {/* Contact Information */}
               <div>
@@ -208,6 +247,57 @@ const UserManagement = () => {
                 </div>
               )}
 
+              {/* Active Sessions */}
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Smartphone className="text-blue-600" size={20} />
+                    Active Sessions
+                  </h3>
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                    {sessions.length} Active
+                  </span>
+                </div>
+
+                {loadingSessions ? (
+                  <div className="text-sm text-gray-500 py-2">Loading sessions...</div>
+                ) : sessions.length > 0 ? (
+                  <div className="space-y-3">
+                    {sessions.map((session) => (
+                      <div key={session.id} className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg flex justify-between items-center group">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-white dark:bg-gray-600 rounded-md">
+                            <Smartphone size={18} className="text-gray-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {session.device_info || 'Unknown Device'}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <ShieldCheck size={12} /> {session.ip_address}
+                              </span>
+                              <span className="text-gray-300 dark:text-gray-600">•</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <Clock size={12} /> {new Date(session.last_active).toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleRevokeSession(selectedUser.id, session.id)}
+                          className="text-xs font-medium text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors opacity-0 group-hover:opacity-100 dark:bg-red-900/20 dark:hover:bg-red-900/40"
+                        >
+                          Revoke
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500 italic py-2">No active sessions found.</div>
+                )}
+              </div>
+
               {/* Member Since */}
               <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <Calendar className="text-green-600" size={20} />
@@ -254,25 +344,22 @@ const UserManagement = () => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setActiveTab('all')}
-              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-                activeTab === 'all' ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${activeTab === 'all' ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
             >
               All Users
             </button>
             <button
               onClick={() => setActiveTab('rider')}
-              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-                activeTab === 'rider' ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${activeTab === 'rider' ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
             >
               Riders
             </button>
             <button
               onClick={() => setActiveTab('driver')}
-              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-                activeTab === 'driver' ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${activeTab === 'driver' ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
             >
               Drivers
             </button>
@@ -292,9 +379,8 @@ const UserManagement = () => {
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                showFilters ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${showFilters ? 'bg-green-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
             >
               <Filter size={20} />
               <span>Filters</span>
@@ -308,7 +394,7 @@ const UserManagement = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
                 <select
                   value={filters.status}
-                  onChange={(e) => setFilters({...filters, status: e.target.value})}
+                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option value="all">All Status</option>
@@ -321,7 +407,7 @@ const UserManagement = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Verification</label>
                 <select
                   value={filters.verified}
-                  onChange={(e) => setFilters({...filters, verified: e.target.value})}
+                  onChange={(e) => setFilters({ ...filters, verified: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option value="all">All</option>
@@ -334,7 +420,7 @@ const UserManagement = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rating</label>
                   <select
                     value={filters.rating}
-                    onChange={(e) => setFilters({...filters, rating: e.target.value})}
+                    onChange={(e) => setFilters({ ...filters, rating: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="all">All Ratings</option>
@@ -366,8 +452,8 @@ const UserManagement = () => {
             </thead>
             <tbody>
               {filteredUsers.map((user) => (
-                <tr 
-                  key={user.id} 
+                <tr
+                  key={user.id}
                   className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                   onClick={() => setSelectedUser(user)}
                 >
@@ -414,13 +500,13 @@ const UserManagement = () => {
                   )}
                   <td className="py-4 px-4">
                     <div className="flex flex-wrap gap-2">
-                      <button 
+                      <button
                         onClick={(e) => e.stopPropagation()}
                         className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 text-sm font-medium"
                       >
                         Verify
                       </button>
-                      <button 
+                      <button
                         onClick={(e) => e.stopPropagation()}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
                       >

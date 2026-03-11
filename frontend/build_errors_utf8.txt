@@ -1,0 +1,398 @@
+﻿Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.66 (1.3.67 available)
+  animate_do 3.3.9 (4.2.0 available)
+  characters 1.4.0 (1.4.1 available)
+  ffi 2.1.5 (2.2.0 available)
+  file_picker 8.3.7 (10.3.10 available)
+  firebase_core 4.4.0 (4.5.0 available)
+  firebase_core_web 3.4.0 (3.5.0 available)
+  firebase_messaging 16.1.1 (16.1.2 available)
+  firebase_messaging_platform_interface 4.7.6 (4.7.7 available)
+  firebase_messaging_web 4.1.2 (4.1.3 available)
+  fl_chart 0.66.2 (1.1.1 available)
+  flutter_lints 5.0.0 (6.0.0 available)
+  flutter_local_notifications 17.2.4 (21.0.0 available)
+  flutter_local_notifications_linux 4.0.1 (8.0.0 available)
+  flutter_local_notifications_platform_interface 7.2.0 (11.0.0 available)
+  geocoding 2.2.2 (4.0.0 available)
+  geocoding_android 3.3.1 (5.0.0 available)
+  geocoding_ios 2.3.0 (3.1.0 available)
+  geocoding_platform_interface 3.2.0 (5.0.0 available)
+  geolocator 10.1.1 (14.0.2 available)
+  geolocator_android 4.6.2 (5.0.2 available)
+  geolocator_web 2.2.1 (4.1.3 available)
+  google_maps_flutter 2.14.0 (2.15.0 available)
+  google_maps_flutter_android 2.18.12 (2.19.2 available)
+  google_maps_flutter_ios 2.17.1 (2.18.0 available)
+  google_maps_flutter_platform_interface 2.14.1 (2.14.2 available)
+  google_maps_flutter_web 0.5.14+3 (0.6.1 available)
+  image 4.5.4 (4.8.0 available)
+  image_picker_android 0.8.13+13 (0.8.13+14 available)
+  image_picker_ios 0.8.13+3 (0.8.13+6 available)
+  intl 0.19.0 (0.20.2 available)
+  js 0.6.7 (0.7.2 available)
+  lints 5.1.1 (6.1.0 available)
+  location 5.0.3 (8.0.1 available)
+  location_platform_interface 3.1.2 (6.0.1 available)
+  location_web 4.2.0 (6.0.1 available)
+  matcher 0.12.17 (0.12.19 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.16.0 (1.18.1 available)
+  path_provider_foundation 2.5.1 (2.6.0 available)
+  pointycastle 3.9.1 (4.0.0 available)
+  shared_preferences_android 2.4.20 (2.4.21 available)
+  source_span 1.10.1 (1.10.2 available)
+  test_api 0.7.6 (0.7.10 available)
+  timezone 0.9.4 (0.11.0 available)
+  uuid 4.5.2 (4.5.3 available)
+  win32 5.15.0 (6.0.0 available)
+Got dependencies!
+47 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Compiling lib\main.dart for the Web...                          
+flutter : Wasm dry run 
+findings:
+At line:1 char:1
++ flutter build web 
+--release > build_errors.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Wasm dr  
+  y run findings::String)    
+ [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Found incompatibilities with 
+WebAssembly.
+
+package:location_web/location
+_web.dart 1:1 - dart:html 
+unsupported (0)
+package:geolocator_web/src/ht
+ml_geolocation_manager.dart 
+1:1 - dart:html unsupported 
+(0)
+package:geolocator_web/src/ht
+ml_permissions_manager.dart 
+1:1 - dart:html unsupported 
+(0)
+package:geolocator_web/src/ut
+ils.dart 2:1 - dart:html 
+unsupported (0)
+
+Consider addressing these 
+issues to enable wasm 
+builds. See docs for more 
+info: https://docs.flutter.de
+v/platform-integration/web/wa
+sm
+
+Use --no-wasm-dry-run to 
+disable these warnings.
+Target dart2js failed: 
+ProcessException: Process 
+exited abnormally with exit 
+code 1:
+lib/services/ride_service.dar
+t:9:19:
+Error: Can't find '}' to 
+match '{'.
+class RideService {
+                  ^
+lib/screens/rideshare/shared/
+rides_history_screen.dart:43:
+44:
+Error: Member not found: 'Rid
+eService.getCarpoolHistory'.
+      final carpoolRes = 
+await RideService.getCarpoolH
+istory();
+                             
+              
+^^^^^^^^^^^^^^^^^
+lib/screens/rideshare/shared/
+rides_history_screen.dart:225
+:63:
+Error: The method 
+'CarpoolDetailsScreen' isn't 
+defined for the type 
+'_RidesHistoryScreenState'.
+ - 
+'_RidesHistoryScreenState' 
+is from 'package:sepro/screen
+s/rideshare/shared/rides_hist
+ory_screen.dart' ('lib/screen
+s/rideshare/shared/rides_hist
+ory_screen.dart').
+                      
+MaterialPageRoute(builder: 
+(context) => CarpoolDetailsSc
+reen(carpoolId: 
+carpool['id'])),
+                             
+                             
+    ^^^^^^^^^^^^^^^^^^^^
+lib/screens/rideshare/shared/
+rides_history_screen.dart:166
+:51:
+Error: The method 
+'CarpoolDetailsScreen' isn't 
+defined for the type 
+'_RidesHistoryScreenState'.
+ - 
+'_RidesHistoryScreenState' 
+is from 'package:sepro/screen
+s/rideshare/shared/rides_hist
+ory_screen.dart' ('lib/screen
+s/rideshare/shared/rides_hist
+ory_screen.dart').
+          
+MaterialPageRoute(builder: 
+(context) => CarpoolDetailsSc
+reen(carpoolId: 
+carpool['id'])),
+                             
+                     
+^^^^^^^^^^^^^^^^^^^^
+lib/services/ride_service.dar
+t:168:3:
+Error: Can't have modifier 
+'static' here.
+  static final 
+List<Map<String, dynamic>> 
+_mockCarpools = [
+  ^^^^^^
+lib/services/ride_service.dar
+t:195:3:
+Error: Can't have modifier 
+'static' here.
+  static final 
+List<Map<String, dynamic>> 
+_acceptedCarpools = [];
+  ^^^^^^
+lib/services/ride_service.dar
+t:197:3:
+Error: Can't have modifier 
+'static' here.
+  static Future<Map<String, 
+dynamic>> 
+getAvailableCarpools() async 
+{
+  ^^^^^^
+lib/services/ride_service.dar
+t:202:3:
+Error: Can't have modifier 
+'static' here.
+  static Future<Map<String, 
+dynamic>> acceptCarpool(int 
+carpoolId, String 
+participantName, Map<String, 
+double> userLocation) async {
+  ^^^^^^
+lib/services/ride_service.dar
+t:231:3:
+Error: Can't have modifier 
+'static' here.
+  static Future<Map<String, 
+dynamic>> 
+getCarpoolHistory() async {
+  ^^^^^^
+lib/services/ride_service.dar
+t:236:3:
+Error: Can't have modifier 
+'static' here.
+  static Future<Map<String, 
+dynamic>> 
+getCarpoolDetails(int 
+carpoolId) async {
+  ^^^^^^
+lib/screens/rideshare/shared/
+ride_pooling_screen.dart:28:3
+8:
+Error: Member not found: 'Rid
+eService.getAvailableCarpools
+'.
+    final result = await Ride
+Service.getAvailableCarpools(
+);
+                             
+        ^^^^^^^^^^^^^^^^^^^^
+lib/screens/rideshare/shared/
+ride_pooling_screen.dart:53:4
+1:
+Error: Member not found: 
+'RideService.acceptCarpool'.
+    final acceptRes = await 
+RideService.acceptCarpool(
+                             
+           ^^^^^^^^^^^^^
+lib/screens/rideshare/shared/
+carpool_details_screen.dart:3
+5:38:
+Error: Member not found: 'Rid
+eService.getCarpoolDetails'.
+    final result = await Ride
+Service.getCarpoolDetails(wid
+get.carpoolId);
+                             
+        ^^^^^^^^^^^^^^^^^
+lib/screens/rideshare/shared/
+carpool_details_screen.dart:2
+60:40:
+Error: Member not found: 
+'flag_checkered'.
+                            
+Icon(Icons.flag_checkered, 
+color: 
+AppTheme.primaryGreen),
+                             
+          ^^^^^^^^^^^^^^
+Error: Compilation failed.
+  Command: D:\Program Files\f
+lutter\bin\cache\dart-sdk\bin
+\dart.exe compile js --platfo
+rm-binaries=D:\Program Files\
+flutter\bin\cache\flutter_web
+_sdk\kernel 
+--invoker=flutter_tool 
+-Ddart.vm.product=true 
+-DFLUTTER_VERSION=3.35.4 
+-DFLUTTER_CHANNEL=stable -DFL
+UTTER_GIT_URL=https://github.
+com/flutter/flutter.git -DFLU
+TTER_FRAMEWORK_REVISION=d693b
+4b9db -DFLUTTER_ENGINE_REVISI
+ON=c298091351 
+-DFLUTTER_DART_VERSION=3.9.2 
+-DFLUTTER_WEB_USE_SKIA=true -
+DFLUTTER_WEB_USE_SKWASM=false
+ -DFLUTTER_WEB_CANVASKIT_URL=
+https://www.gstatic.com/flutt
+er-canvaskit/c29809135135e262
+a912cf583b2c90deb9ded610/ 
+--native-null-assertions 
+--no-source-maps -O4 
+--minify -o C:\Users\punit\Do
+wnloads\software_project\fron
+tend\.dart_tool\flutter_build
+\d93cf8f33f6e1652a7aabce92f0a
+e3c5\app.dill --packages=C:\U
+sers\punit\Downloads\software
+_project\frontend\.dart_tool\
+package_config.json 
+--cfe-only C:\Users\punit\Dow
+nloads\software_project\front
+end\.dart_tool\flutter_build\
+d93cf8f33f6e1652a7aabce92f0ae
+3c5\main.dart
+#0      
+RunResult.throwException (pac
+kage:flutter_tools/src/base/p
+rocess.dart:118:5)
+#1      
+_DefaultProcessUtils.run (pac
+kage:flutter_tools/src/base/p
+rocess.dart:344:19)
+<asynchronous suspension>
+#2      Dart2JSTarget.build (
+package:flutter_tools/src/bui
+ld_system/targets/web.dart:20
+4:5)
+<asynchronous suspension>
+#3      _BuildInstance._invok
+eInternal (package:flutter_to
+ols/src/build_system/build_sy
+stem.dart:873:9)
+<asynchronous suspension>
+#4      
+Future.wait.<anonymous 
+closure> (dart:async/future.d
+art:525:21)
+<asynchronous suspension>
+#5      
+_BuildInstance.invokeTarget (
+package:flutter_tools/src/bui
+ld_system/build_system.dart:8
+11:32)
+<asynchronous suspension>
+#6      
+Future.wait.<anonymous 
+closure> (dart:async/future.d
+art:525:21)
+<asynchronous suspension>
+#7      
+_BuildInstance.invokeTarget (
+package:flutter_tools/src/bui
+ld_system/build_system.dart:8
+11:32)
+<asynchronous suspension>
+#8      
+FlutterBuildSystem.build (pac
+kage:flutter_tools/src/build_
+system/build_system.dart:631:
+16)
+<asynchronous suspension>
+#9      WebBuilder.buildWeb (
+package:flutter_tools/src/web
+/compile.dart:90:34)
+<asynchronous suspension>
+#10     
+BuildWebCommand.runCommand (p
+ackage:flutter_tools/src/comm
+ands/build_web.dart:282:5)
+<asynchronous suspension>
+#11     FlutterCommand.run.<a
+nonymous closure> (package:fl
+utter_tools/src/runner/flutte
+r_command.dart:1581:27)
+<asynchronous suspension>
+#12     
+AppContext.run.<anonymous 
+closure> (package:flutter_too
+ls/src/base/context.dart:154:
+19)
+<asynchronous suspension>
+#13     
+CommandRunner.runCommand (pac
+kage:args/command_runner.dart
+:212:13)
+<asynchronous suspension>
+#14     FlutterCommandRunner.
+runCommand.<anonymous 
+closure> (package:flutter_too
+ls/src/runner/flutter_command
+_runner.dart:503:9)
+<asynchronous suspension>
+#15     
+AppContext.run.<anonymous 
+closure> (package:flutter_too
+ls/src/base/context.dart:154:
+19)
+<asynchronous suspension>
+#16     FlutterCommandRunner.
+runCommand (package:flutter_t
+ools/src/runner/flutter_comma
+nd_runner.dart:438:5)
+<asynchronous suspension>
+#17     run.<anonymous 
+closure>.<anonymous closure> 
+(package:flutter_tools/runner
+.dart:98:11)
+<asynchronous suspension>
+#18     
+AppContext.run.<anonymous 
+closure> (package:flutter_too
+ls/src/base/context.dart:154:
+19)
+<asynchronous suspension>
+#19     main (package:flutter
+_tools/executable.dart:101:3)
+<asynchronous suspension>
+
+Compiling lib\main.dart for the Web...                             15.5s
+Error: Failed to compile 
+application for the Web.

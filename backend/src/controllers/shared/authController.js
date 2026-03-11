@@ -20,16 +20,27 @@ import { generateOTP, storeOTP, verifyOTP, generate2FASecret } from '../../utils
 import { sendOTPEmail, send2FAStatusEmail } from '../../utils/emailService.js';
 // Response helper for including request body in responses
 import { createPostResponse } from '../../utils/responseHelper.js';
+import { uploadToCloudinary } from '../../utils/cloudinary.js';
 
 // Get current file path and directory (required for ES modules)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Create directory for storing profile photos if it doesn't exist
-const uploadsDir = path.join(__dirname, '../../uploads/profile-photos');
-if (!fs.existsSync(uploadsDir)) {
-  // Create directory recursively (including parent directories)
-  fs.mkdirSync(uploadsDir, { recursive: true });
+// On Vercel, we must use /tmp as it's the only writable directory
+const uploadsDir = process.env.VERCEL === '1'
+  ? '/tmp'
+  : path.join(__dirname, '../../uploads/profile-photos');
+
+if (process.env.VERCEL !== '1') {
+  try {
+    if (!fs.existsSync(uploadsDir)) {
+      // Create directory recursively (including parent directories)
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+  } catch (err) {
+    console.warn(`[WARNING] Could not create uploads directory: ${err.message}`);
+  }
 }
 
 // Configure multer storage for profile photo uploads
@@ -74,13 +85,18 @@ export const uploadProfilePhoto = multer({
 });
 
 // Generate JWT token
-const generateToken = (userId, email, role) => {
+const generateToken = (userId, email, role, sessionId = null) => {
   if (!process.env.JWT_SECRET) {
     throw new Error('JWT_SECRET is not configured in environment variables');
   }
 
+  const payload = { id: userId, email, role };
+  if (sessionId) {
+    payload.sessionId = sessionId;
+  }
+
   return jwt.sign(
-    { id: userId, email, role },
+    payload,
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE || '24h' }
   );
@@ -185,15 +201,30 @@ export const signup = async (req, res) => {
       });
     }
 
-    // Generate JWT token
-    const token = generateToken(newUser.id, newUser.email, newUser.role);
+    // Track active device session
+    const refreshToken = crypto.randomBytes(40).toString('hex');
+    const [session] = await knex('device_sessions')
+      .insert({
+        user_id: newUser.id,
+        refresh_token: refreshToken,
+        device_info: req.headers['user-agent'] || 'Unknown Device',
+        ip_address: req.ip || req.connection?.remoteAddress || 'Unknown IP'
+      })
+      .returning('id');
+
+    const sessionId = session?.id || session;
+
+    // Generate JWT token with sessionId
+    const token = generateToken(newUser.id, newUser.email, newUser.role, sessionId);
 
     res.status(201).json(createPostResponse({
       success: true,
       message: 'User registered successfully',
       data: {
         user: newUser,
-        token
+        token,
+        refreshToken,
+        sessionId
       },
       requestBody: req.body
     }));
@@ -241,7 +272,16 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check if account is suspended
+    // Verify password first (before checking status for security/privacy)
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+
+    // Check if account is suspended or deactivated
     if (user.status === 'Suspended') {
       return res.status(403).json({
         success: false,
@@ -249,13 +289,26 @@ export const login = async (req, res) => {
       });
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
+    if (user.status === 'Deactivated') {
+      // Check if user has explicitly requested to reactivate
+      if (req.body.reactivate === true) {
+        // Update user status and clear deactivated_at
+        await knex('users')
+          .where('id', user.id)
+          .update({
+            status: 'Active',
+            deactivated_at: null,
+            updated_at: knex.fn.now()
+          });
+        console.log(`[INFO] Account reactivated for ${user.email}`);
+      } else {
+        // Trigger reactivation prompt in frontend
+        return res.status(403).json({
+          success: false,
+          isDeactivated: true,
+          message: 'This account is deactivated. Would you like to reactivate it?'
+        });
+      }
     }
 
     // Check if 2FA is enabled
@@ -297,16 +350,21 @@ export const login = async (req, res) => {
     delete user.password;
 
     // Generate JWT token
-    const token = generateToken(user.id, user.email, user.role);
-
     // Track active device session
     const refreshToken = crypto.randomBytes(40).toString('hex');
-    await knex('device_sessions').insert({
-      user_id: user.id,
-      refresh_token: refreshToken,
-      device_info: req.headers['user-agent'] || 'Unknown Device',
-      ip_address: req.ip || req.connection?.remoteAddress || 'Unknown IP'
-    });
+    const [session] = await knex('device_sessions')
+      .insert({
+        user_id: user.id,
+        refresh_token: refreshToken,
+        device_info: req.headers['user-agent'] || 'Unknown Device',
+        ip_address: req.ip || req.connection?.remoteAddress || 'Unknown IP'
+      })
+      .returning('id');
+
+    const sessionId = session?.id || session;
+
+    // Generate JWT token with sessionId
+    const token = generateToken(user.id, user.email, user.role, sessionId);
 
     res.json(createPostResponse({
       success: true,
@@ -314,7 +372,8 @@ export const login = async (req, res) => {
       data: {
         user,
         token,
-        refreshToken
+        refreshToken,
+        sessionId
       },
       requestBody: req.body
     }));
@@ -376,16 +435,21 @@ export const verifyLoginOTP = async (req, res) => {
     delete user.password;
 
     // Generate JWT token
-    const token = generateToken(user.id, user.email, user.role);
-
     // Track active device session
     const refreshToken = crypto.randomBytes(40).toString('hex');
-    await knex('device_sessions').insert({
-      user_id: user.id,
-      refresh_token: refreshToken,
-      device_info: req.headers['user-agent'] || 'Unknown Device',
-      ip_address: req.ip || req.connection?.remoteAddress || 'Unknown IP'
-    });
+    const [session] = await knex('device_sessions')
+      .insert({
+        user_id: user.id,
+        refresh_token: refreshToken,
+        device_info: req.headers['user-agent'] || 'Unknown Device',
+        ip_address: req.ip || req.connection?.remoteAddress || 'Unknown IP'
+      })
+      .returning('id');
+
+    const sessionId = session?.id || session;
+
+    // Generate JWT token with sessionId
+    const token = generateToken(user.id, user.email, user.role, sessionId);
 
     res.json(createPostResponse({
       success: true,
@@ -393,7 +457,8 @@ export const verifyLoginOTP = async (req, res) => {
       data: {
         user,
         token,
-        refreshToken
+        refreshToken,
+        sessionId
       },
       requestBody: req.body
     }));
@@ -835,7 +900,29 @@ export const uploadPhoto = async (req, res) => {
     }
 
     const userId = req.user.id;
-    const photoUrl = `/uploads/profile-photos/${req.file.filename}`;
+    let photoUrl = `/uploads/profile-photos/${req.file.filename}`;
+
+    // Upload to Cloudinary if configured
+    try {
+      console.log('[CLOUD] Uploading profile photo to Cloudinary...');
+      const cloudResult = await uploadToCloudinary(req.file.path, 'ecoride/profiles');
+      if (cloudResult && cloudResult.secure_url) {
+        photoUrl = cloudResult.secure_url;
+        console.log(`[SUCCESS] Profile photo uploaded to Cloudinary: ${photoUrl}`);
+
+        // Delete local temp file
+        try {
+          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        } catch (err) {
+          console.warn('[WARNING] Failed to delete local temp photo:', err.message);
+        }
+      }
+    } catch (cloudError) {
+      console.error('[ERROR] Cloudinary upload failed:', cloudError.message);
+      if (process.env.VERCEL === '1') {
+        throw new Error('Cloud storage upload failed and local storage is not persistent on Vercel.');
+      }
+    }
 
     // Delete old profile photo if exists
     const oldProfile = await knex('users')
@@ -843,7 +930,7 @@ export const uploadPhoto = async (req, res) => {
       .where('id', userId)
       .first();
 
-    if (oldProfile?.profile_photo) {
+    if (oldProfile?.profile_photo && !oldProfile.profile_photo.startsWith('http')) {
       const oldPhotoPath = path.join(__dirname, '../..', oldProfile.profile_photo);
       if (fs.existsSync(oldPhotoPath)) {
         fs.unlinkSync(oldPhotoPath);
@@ -966,6 +1053,59 @@ export const deactivateAccount = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error deactivating account',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Get active device sessions for ANY user
+export const getSessionsForUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const sessions = await knex('device_sessions')
+      .select('id', 'device_info', 'ip_address', 'last_active', 'created_at')
+      .where('user_id', userId)
+      .orderBy('last_active', 'desc');
+
+    res.json({
+      success: true,
+      data: sessions
+    });
+  } catch (error) {
+    console.error('Error fetching user sessions:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching device sessions',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Logout a specific device session for ANY user
+export const logoutDeviceForUser = async (req, res) => {
+  try {
+    const { userId, id } = req.params;
+
+    const deleted = await knex('device_sessions')
+      .where({ id, user_id: userId })
+      .del();
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: 'Session not found or already revoked'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Device session revoked successfully'
+    });
+  } catch (error) {
+    console.error('Error revoking user session:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error revoking device session',
       error: error.message
     });
   }

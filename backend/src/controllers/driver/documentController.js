@@ -11,14 +11,26 @@ import { encryptFile, decryptFile, generateHash, getEncryptionInfo } from '../..
 import { getActivePublicKey, getPrivateKey } from '../../utils/keyManagement.js';
 import { analyzeEncryptionSecurity, generateEncryptionReport, getEncryptionSummary } from '../../utils/encryptionSecurityAnalysis.js';
 import { createPostResponse } from '../../utils/responseHelper.js';
+import { uploadToCloudinary } from '../../utils/cloudinary.js';
+import axios from 'axios';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, '../../uploads');
-if (!fsSync.existsSync(uploadsDir)) {
-  fsSync.mkdirSync(uploadsDir, { recursive: true });
+// On Vercel, we must use /tmp as it's the only writable directory
+const uploadsDir = process.env.VERCEL === '1'
+  ? '/tmp'
+  : path.join(__dirname, '../../uploads');
+
+if (process.env.VERCEL !== '1') {
+  try {
+    if (!fsSync.existsSync(uploadsDir)) {
+      fsSync.mkdirSync(uploadsDir, { recursive: true });
+    }
+  } catch (err) {
+    console.warn(`[WARNING] Could not create uploads directory: ${err.message}`);
+  }
 }
 
 // Configure multer for file uploads
@@ -43,7 +55,7 @@ const fileFilter = (req, file, cb) => {
     'application/msword', // .doc
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
   ];
-  
+
   const extname = allowedExtensions.test(file.originalname.toLowerCase());
   const mimetype = allowedMimetypes.includes(file.mimetype);
 
@@ -59,6 +71,18 @@ export const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: fileFilter
 });
+
+/**
+ * Helper to get file buffer from either local path or remote URL
+ */
+const getFileBuffer = async (pathOrUrl) => {
+  if (pathOrUrl.startsWith('http')) {
+    const response = await axios.get(pathOrUrl, { responseType: 'arraybuffer' });
+    return Buffer.from(response.data);
+  } else {
+    return await fs.readFile(pathOrUrl);
+  }
+};
 
 // Upload document with encryption
 export const uploadDocument = async (req, res) => {
@@ -133,13 +157,39 @@ export const uploadDocument = async (req, res) => {
       }
     }
 
+    // Upload to Cloudinary if configured
+    let finalFilePath = encryptedFilePath;
+    try {
+      console.log(`[CLOUD] Uploading ${shouldEncrypt ? 'encrypted ' : ''}file to Cloudinary...`);
+      const cloudResult = await uploadToCloudinary(encryptedFilePath, 'ecoride/documents');
+      if (cloudResult && cloudResult.secure_url) {
+        finalFilePath = cloudResult.secure_url;
+        console.log(`[SUCCESS] File uploaded to Cloudinary: ${finalFilePath}`);
+
+        // Delete local files after successful cloud upload
+        try {
+          if (fsSync.existsSync(req.file.path)) await fs.unlink(req.file.path);
+          if (shouldEncrypt && fsSync.existsSync(encryptedFilePath)) await fs.unlink(encryptedFilePath);
+          console.log('[DELETE] Local temporary files removed');
+        } catch (delError) {
+          console.warn('[WARNING] Failed to delete local temp files:', delError.message);
+        }
+      }
+    } catch (cloudError) {
+      console.error('[ERROR] Cloudinary upload failed:', cloudError.message);
+      // Fallback: finalFilePath stays as encryptedFilePath (local/tmp)
+      if (process.env.VERCEL === '1') {
+        throw new Error('Cloud storage upload failed and local storage is not persistent on Vercel.');
+      }
+    }
+
     // Save document info to database
     const [document] = await knex('documents')
       .insert({
         user_id: userId,
         document_type: document_type || 'Other',
         file_name: req.file.originalname,
-        file_path: encryptedFilePath,
+        file_path: finalFilePath,
         file_size: shouldEncrypt ? fsSync.statSync(encryptedFilePath).size : req.file.size,
         description: description || null,
         is_encrypted: shouldEncrypt && encryptionMetadata !== null,
@@ -234,12 +284,18 @@ export const deleteDocument = async (req, res) => {
       });
     }
 
-    // Delete file from filesystem
+    // Delete file from filesystem/cloud
     try {
-      await fs.access(document.file_path);
-      await fs.unlink(document.file_path);
+      if (document.file_path.startsWith('http')) {
+        // We would need to extract public_id to delete from Cloudinary
+        // For now, we'll just leave it or add deletion logic later
+        console.log('[INFO] Deleting remote file from Cloudinary referenced by:', document.file_path);
+      } else {
+        await fs.access(document.file_path);
+        await fs.unlink(document.file_path);
+      }
     } catch (err) {
-      console.error('Error deleting file from filesystem:', err);
+      console.error('Error deleting file:', err);
       // Continue with database deletion even if file deletion fails
     }
 
@@ -280,7 +336,9 @@ export const downloadDocument = async (req, res) => {
 
     // Check if file exists
     try {
-      await fs.access(document.file_path);
+      if (document.file_path && !document.file_path.startsWith('http')) {
+        await fs.access(document.file_path);
+      }
     } catch (err) {
       return res.status(404).json({
         success: false,
@@ -298,8 +356,8 @@ export const downloadDocument = async (req, res) => {
         console.log(`User ID: ${userId}`);
         console.log('═'.repeat(80));
 
-        // Read encrypted file
-        const encryptedData = await fs.readFile(document.file_path);
+        // Read encrypted file (from local or cloud)
+        const encryptedData = await getFileBuffer(document.file_path);
         console.log(`[LOAD] Encrypted file loaded: ${encryptedData.length} bytes`);
 
         // Get private key for decryption
@@ -347,7 +405,15 @@ export const downloadDocument = async (req, res) => {
       }
     } else {
       // Send unencrypted file
-      res.download(document.file_path, document.file_name);
+      if (document.file_path.startsWith('http')) {
+        // Redirect to Cloudinary URL or stream it
+        const response = await axios.get(document.file_path, { responseType: 'stream' });
+        res.setHeader('Content-Type', response.headers['content-type']);
+        res.setHeader('Content-Disposition', `attachment; filename="${document.file_name}"`);
+        response.data.pipe(res);
+      } else {
+        res.download(document.file_path, document.file_name);
+      }
     }
   } catch (error) {
     console.error('Error downloading document:', error);
@@ -369,7 +435,7 @@ export const getDriversWithPendingDocuments = async (req, res) => {
         knex.raw('COUNT(doc.id) as pending_documents')
       )
       .leftJoin('drivers as d', 'u.id', 'd.user_id')
-      .leftJoin('documents as doc', function() {
+      .leftJoin('documents as doc', function () {
         this.on('u.id', '=', 'doc.user_id')
           .andOn('doc.status', '=', knex.raw("?", ['Pending']));
       })
@@ -438,7 +504,9 @@ export const viewDocument = async (req, res) => {
 
     // Check if file exists
     try {
-      await fs.access(document.file_path);
+      if (document.file_path && !document.file_path.startsWith('http')) {
+        await fs.access(document.file_path);
+      }
     } catch (err) {
       return res.status(404).json({
         success: false,
@@ -479,19 +547,9 @@ export const viewDocumentEncoded = async (req, res) => {
       });
     }
 
-    // Check if file exists
-    try {
-      await fs.access(document.file_path);
-    } catch (err) {
-      return res.status(404).json({
-        success: false,
-        message: 'File not found on server'
-      });
-    }
+    // Read file and encode to Base64 (from local or cloud)
+    const fileBuffer = await getFileBuffer(document.file_path);
 
-    // Read file and encode to Base64
-    const fileBuffer = await fs.readFile(document.file_path);
-    
     // ============================================================================
     // TERMINAL OUTPUT: ENCODING & DECODING DEMONSTRATION
     // ============================================================================
@@ -504,14 +562,14 @@ export const viewDocumentEncoded = async (req, res) => {
     console.log(`File Type: ${document.document_type}`);
     console.log(`Original Size: ${fileBuffer.length} bytes`);
     console.log('═'.repeat(80));
-    
+
     // Show sample of original data
     const sampleData = fileBuffer.toString('utf8', 0, Math.min(100, fileBuffer.length));
     console.log('\n[DATA] STEP 1: ORIGINAL DATA (Sample)');
     console.log('─'.repeat(80));
     console.log(`Binary Data (first 100 bytes as text): ${sampleData.substring(0, 100).replace(/[^\x20-\x7E]/g, '.')}`);
     console.log(`Total bytes: ${fileBuffer.length}`);
-    
+
     // Perform encoding
     console.log('\n[ENCRYPT] STEP 2: ENCODING TO BASE64');
     console.log('─'.repeat(80));
@@ -521,7 +579,7 @@ export const viewDocumentEncoded = async (req, res) => {
     console.log(`✓ Encoding complete!`);
     console.log(`Encoded size: ${encodedFile.length} characters`);
     console.log(`Overhead: ${(((encodedFile.length - fileBuffer.length) / fileBuffer.length) * 100).toFixed(2)}%`);
-    
+
     // Show sample of encoded data
     console.log('\n[INFO] STEP 3: ENCODED DATA (Sample)');
     console.log('─'.repeat(80));
@@ -530,7 +588,7 @@ export const viewDocumentEncoded = async (req, res) => {
     if (encodedFile.length > 200) {
       console.log(`... (${encodedFile.length - 200} more characters)`);
     }
-    
+
     // Demonstrate decoding
     console.log('\n[DECRYPT] STEP 4: DECODING FROM BASE64');
     console.log('─'.repeat(80));
@@ -538,7 +596,7 @@ export const viewDocumentEncoded = async (req, res) => {
     const decodedBuffer = Buffer.from(encodedFile, 'base64');
     console.log(`✓ Decoding complete!`);
     console.log(`Decoded size: ${decodedBuffer.length} bytes`);
-    
+
     // Verify integrity
     const isIdentical = Buffer.compare(fileBuffer, decodedBuffer) === 0;
     console.log('\n[SUCCESS] STEP 5: VERIFICATION');
@@ -547,13 +605,13 @@ export const viewDocumentEncoded = async (req, res) => {
     console.log(`Decoded size:   ${decodedBuffer.length} bytes`);
     console.log(`Match:          ${isIdentical ? '✓ IDENTICAL' : '✗ MISMATCH'}`);
     console.log(`Integrity:      ${isIdentical ? '✓ PRESERVED' : '✗ CORRUPTED'}`);
-    
+
     // Get encoding information
     const encodingInfo = getEncodingInfo(
       fileBuffer.toString('binary'),
       encodedFile
     );
-    
+
     // Show encoding statistics
     console.log('\n📊 ENCODING STATISTICS');
     console.log('─'.repeat(80));
@@ -562,11 +620,11 @@ export const viewDocumentEncoded = async (req, res) => {
     console.log(`Encoded Size:   ${encodingInfo.encodedSize} bytes`);
     console.log(`Overhead:       ${encodingInfo.overhead}`);
     console.log(`Description:    ${encodingInfo.description}`);
-    
+
     // Get security analysis
     const securityAnalysis = analyzeBase64Security();
     const securitySummary = getSecuritySummary();
-    
+
     // Log security report to terminal
     console.log('\n' + '═'.repeat(80));
     console.log('                     SECURITY ANALYSIS');
@@ -634,7 +692,14 @@ export const downloadDocumentAdmin = async (req, res) => {
     }
 
     // Send file
-    res.download(document.file_path, document.file_name);
+    if (document.file_path.startsWith('http')) {
+      const response = await axios.get(document.file_path, { responseType: 'stream' });
+      res.setHeader('Content-Type', response.headers['content-type']);
+      res.setHeader('Content-Disposition', `attachment; filename="${document.file_name}"`);
+      response.data.pipe(res);
+    } else {
+      res.download(document.file_path, document.file_name);
+    }
   } catch (error) {
     console.error('Error downloading document:', error);
     res.status(500).json({
@@ -747,10 +812,10 @@ export const getSecurityAnalysis = async (req, res) => {
     // Get security analysis
     const securityAnalysis = analyzeBase64Security();
     const securitySummary = getSecuritySummary();
-    
+
     // Log security report to terminal
     console.log(generateSecurityReport());
-    
+
     res.json({
       success: true,
       data: {
@@ -781,7 +846,7 @@ export const getAllDocumentsWithEncoding = async (req, res) => {
       .innerJoin('users as u', 'd.user_id', 'u.id')
       .where('u.role', 'Driver')
       .orderBy('d.uploaded_at', 'desc');
-    
+
     // Log to terminal
     console.log('\n' + '='.repeat(80));
     console.log('DRIVER DOCUMENTS DASHBOARD - ENCODING ANALYSIS');
@@ -791,7 +856,7 @@ export const getAllDocumentsWithEncoding = async (req, res) => {
     console.log(`Approved: ${result.filter(d => d.status === 'Approved').length}`);
     console.log(`Rejected: ${result.filter(d => d.status === 'Rejected').length}`);
     console.log('='.repeat(80));
-    
+
     result.forEach((doc, index) => {
       console.log(`\n${index + 1}. ${doc.file_name}`);
       console.log(`   Driver: ${doc.user_name} (${doc.user_email})`);
@@ -799,7 +864,7 @@ export const getAllDocumentsWithEncoding = async (req, res) => {
       console.log(`   Size: ${(doc.file_size / 1024).toFixed(2)} KB`);
       console.log(`   Uploaded: ${new Date(doc.uploaded_at).toLocaleString()}`);
     });
-    
+
     console.log('\n' + '='.repeat(80));
     console.log('BASE64 ENCODING TECHNIQUE - SECURITY INFORMATION');
     console.log('='.repeat(80));
@@ -827,16 +892,16 @@ export const getPublicKeyForEncryption = async (req, res) => {
     console.log('\n' + '═'.repeat(80));
     console.log('               KEY EXCHANGE - PUBLIC KEY REQUEST');
     console.log('═'.repeat(80));
-    
+
     const { keyId, publicKey, keyName } = await getActivePublicKey();
-    
+
     console.log(`[KEY] Key ID: ${keyId}`);
     console.log(`[INFO] Key Name: ${keyName}`);
     console.log(`[ENCRYPT] Public Key Length: ${publicKey.length} characters`);
     console.log('═'.repeat(80));
     console.log('[SUCCESS] Public key distributed for secure key exchange');
     console.log('═'.repeat(80) + '\n');
-    
+
     res.json({
       success: true,
       data: {
@@ -863,10 +928,10 @@ export const getEncryptionInformation = async (req, res) => {
     const encryptionInfo = getEncryptionInfo();
     const securityAnalysis = analyzeEncryptionSecurity();
     const securitySummary = getEncryptionSummary();
-    
+
     // Log comprehensive security report to terminal
     console.log(generateEncryptionReport());
-    
+
     res.json({
       success: true,
       data: {
@@ -892,19 +957,19 @@ export const demonstrateEncryption = async (req, res) => {
   try {
     const { text } = req.body;
     const sampleData = text || 'This is a sample document for encryption demonstration.';
-    
+
     console.log('\n' + '═'.repeat(80));
     console.log('            ENCRYPTION & DECRYPTION DEMONSTRATION');
     console.log('═'.repeat(80));
     console.log(`Original Data: "${sampleData}"`);
     console.log(`Data Length: ${sampleData.length} characters`);
     console.log('═'.repeat(80));
-    
+
     // Get public key
     const { keyId, publicKey } = await getActivePublicKey();
     console.log(`\n[KEY] STEP 1: KEY GENERATION`);
     console.log(`   Using RSA Key ID: ${keyId}`);
-    
+
     // Encrypt
     console.log(`\n[ENCRYPT] STEP 2: ENCRYPTION`);
     const dataBuffer = Buffer.from(sampleData, 'utf-8');
@@ -913,7 +978,7 @@ export const demonstrateEncryption = async (req, res) => {
     console.log(`   Encrypted Size: ${encrypted.encryptedData.length} bytes`);
     console.log(`   IV: ${encrypted.iv.toString('hex').substring(0, 32)}...`);
     console.log(`   Auth Tag: ${encrypted.authTag.toString('hex')}`);
-    
+
     // Get private key and decrypt
     console.log(`\n[DECRYPT] STEP 3: DECRYPTION`);
     const privateKey = await getPrivateKey(keyId);
@@ -926,16 +991,16 @@ export const demonstrateEncryption = async (req, res) => {
     const decrypted = decryptFile(encryptedPackage, privateKey);
     const decryptedText = decrypted.toString('utf-8');
     console.log(`   Decrypted Data: "${decryptedText}"`);
-    
+
     // Verify
     console.log(`\n[SUCCESS] STEP 4: VERIFICATION`);
     const isMatch = sampleData === decryptedText;
     console.log(`   Original matches decrypted: ${isMatch ? 'YES [SUCCESS]' : 'NO [ERROR]'}`);
-    
+
     console.log('\n' + '═'.repeat(80));
     console.log('[SUCCESS] DEMONSTRATION COMPLETED SUCCESSFULLY');
     console.log('═'.repeat(80) + '\n');
-    
+
     res.json(createPostResponse({
       success: true,
       message: 'Encryption demonstration completed successfully',

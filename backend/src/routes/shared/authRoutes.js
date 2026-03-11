@@ -14,9 +14,11 @@ import {
   uploadPhoto,
   getSessions,
   logoutDevice,
+  getSessionsForUser,
+  logoutDeviceForUser,
   deactivateAccount
 } from '../../controllers/shared/authController.js';
-import { authenticateToken } from '../../middleware/authMiddleware.js';
+import { authenticateToken, authorizeRole } from '../../middleware/authMiddleware.js';
 import { otpRateLimiter, twoFactorRateLimiter, uploadRateLimiter } from '../../middleware/rateLimiter.js';
 
 const router = express.Router();
@@ -43,6 +45,11 @@ router.post('/2fa/disable', authenticateToken, twoFactorRateLimiter, disable2FA)
 // Device Sessions and Account Management routes
 router.get('/sessions', authenticateToken, getSessions);
 router.delete('/sessions/:id', authenticateToken, logoutDevice);
+
+// Admin-only session management
+router.get('/admin/sessions/:userId', authenticateToken, authorizeRole('Admin'), getSessionsForUser);
+router.delete('/admin/sessions/:userId/:id', authenticateToken, authorizeRole('Admin'), logoutDeviceForUser);
+
 router.post('/deactivate', authenticateToken, deactivateAccount);
 
 export default router;

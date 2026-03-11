@@ -53,12 +53,59 @@ from flask_cors import CORS
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-from shortest_path import find_all_routes
-from emission_model import predict_emission, estimate_aqi, VEHICLE_TYPES
+# Heavy ML modules — imported lazily on first request so Flask boots instantly
+_find_all_routes = None
+_predict_emission = None
+_estimate_aqi = None
+_VEHICLE_TYPES = None
+_predict_fare = None
+_WEATHER_CONDITIONS = None
+_TRAFFIC_LEVELS = None
+_TIME_OF_DAY = None
+
+def _load_routing():
+    global _find_all_routes
+    if _find_all_routes is None:
+        from shortest_path import find_all_routes
+        _find_all_routes = find_all_routes
+    return _find_all_routes
+
+def _load_emission():
+    global _predict_emission, _estimate_aqi, _VEHICLE_TYPES
+    if _predict_emission is None:
+        from emission_model import predict_emission, estimate_aqi, VEHICLE_TYPES
+        _predict_emission = predict_emission
+        _estimate_aqi    = estimate_aqi
+        _VEHICLE_TYPES   = VEHICLE_TYPES
+    return _predict_emission, _estimate_aqi, _VEHICLE_TYPES
+
+def _load_fare():
+    global _predict_fare, _WEATHER_CONDITIONS, _TRAFFIC_LEVELS, _TIME_OF_DAY
+    if _predict_fare is None:
+        from fare_model import predict_fare, WEATHER_CONDITIONS, TRAFFIC_LEVELS, TIME_OF_DAY
+        _predict_fare        = predict_fare
+        _WEATHER_CONDITIONS  = WEATHER_CONDITIONS
+        _TRAFFIC_LEVELS      = TRAFFIC_LEVELS
+        _TIME_OF_DAY         = TIME_OF_DAY
+    return _predict_fare, _WEATHER_CONDITIONS, _TRAFFIC_LEVELS, _TIME_OF_DAY
 
 
 app = Flask(__name__)
-CORS(app)  # Allow all origins – required for Flutter Web on localhost
+CORS(app)  # Allow all origins — this is a public read-only ML/routing API
+
+# Register debug endpoints
+from debug_utils import register_debug_endpoints
+register_debug_endpoints(app)
+
+
+@app.after_request
+def add_cors_headers(response):
+    """Ensure CORS headers are present on every response including error pages."""
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response
+
 
 _geocoder = Nominatim(user_agent="sepro-route-server/1.0", timeout=10)
 
@@ -82,6 +129,32 @@ def _err(msg: str, code: int = 400):
     return jsonify({"error": msg}), code
 
 
+@app.route("/")
+def index():
+    """API info page."""
+    return jsonify({
+        "service": "EcoRide ML Server",
+        "status": "running",
+        "version": "1.0.0",
+        "endpoints": {
+            "health":      "GET /health",
+            "route":       "GET /route?origin_lat=&origin_lng=&dest_lat=&dest_lng=",
+            "all_routes":  "GET /all_routes?origin_lat=&origin_lng=&dest_lat=&dest_lng=",
+            "geocode":     "GET /geocode?address=",
+            "autocomplete":"GET /autocomplete?input=",
+            "emission":    "GET /emission?vehicle_type=&distance_km=",
+            "air_quality": "GET /air_quality?lat=&lng=",
+            "fare":        "GET /fare?distance_km=&weather=&traffic=&time=&vehicle_type=",
+        }
+    })
+
+
+@app.route("/health")
+def health():
+    """Health check endpoint for monitoring (Render, UptimeRobot, etc.)."""
+    return jsonify({"status": "ok", "service": "EcoRide ML Server"})
+
+
 # ---------------------------------------------------------------------------
 # /route  — single shortest road route
 # ---------------------------------------------------------------------------
@@ -98,7 +171,7 @@ def route():
         return _err("Required params: origin_lat, origin_lng, dest_lat, dest_lng")
 
     try:
-        routes = find_all_routes(origin_lat, origin_lng, dest_lat, dest_lng, k=1)
+        routes = _load_routing()(origin_lat, origin_lng, dest_lat, dest_lng, k=1)
         if not routes:
             return _err("No road route found between the two points", 404)
         r = routes[0]
@@ -129,7 +202,7 @@ def all_routes():
         return _err("Required params: origin_lat, origin_lng, dest_lat, dest_lng")
 
     try:
-        routes = find_all_routes(origin_lat, origin_lng, dest_lat, dest_lng, k=3)
+        routes = _load_routing()(origin_lat, origin_lng, dest_lat, dest_lng, k=3)
         return jsonify({"routes": routes})
     except Exception as exc:
         traceback.print_exc()
@@ -199,6 +272,7 @@ def emission():
     JSON with co2_kg, emission_factor_kg_per_km, category, aqi_impact,
     and the full list of supported vehicle types.
     """
+    predict_emission, estimate_aqi, VEHICLE_TYPES = _load_emission()
     vehicle_type = request.args.get("vehicle_type", "").strip()
     distance_km  = _float("distance_km")
 
@@ -255,6 +329,7 @@ def air_quality():
         return _err("Required params: lat, lng")
 
     try:
+        _, estimate_aqi, _ = _load_emission()
         result = estimate_aqi(lat, lng, distance_km, vehicle_type)
         return jsonify(result)
     except Exception as exc:
@@ -263,11 +338,54 @@ def air_quality():
 
 
 # ---------------------------------------------------------------------------
+# /fare — ML-based fare prediction
+# ---------------------------------------------------------------------------
+
+@app.route("/fare")
+def fare():
+    """
+    Calculate estimated fare using the ML fare model.
+
+    Required params: distance_km, weather, traffic, time, co2_kg
+    """
+    distance_km = _float("distance_km")
+    weather     = request.args.get("weather", "Clear").strip()
+    traffic     = request.args.get("traffic", "Low").strip()
+    time        = request.args.get("time", "Off-Peak").strip()
+    co2_kg      = _float("co2_kg") or 0.0
+    vehicle_type = request.args.get("vehicle_type", "car_petrol").strip()
+
+    if distance_km is None:
+        return _err("Required param: distance_km")
+
+    try:
+        predict_fare, WEATHER_CONDITIONS, TRAFFIC_LEVELS, TIME_OF_DAY = _load_fare()
+        result = predict_fare(distance_km, weather, traffic, time, co2_kg, vehicle_type)
+        result["inputs"] = {
+            "distance_km": distance_km,
+            "weather": weather,
+            "traffic": traffic,
+            "time": time,
+            "co2_kg": co2_kg
+        }
+        result["supported_options"] = {
+            "weather": WEATHER_CONDITIONS,
+            "traffic": TRAFFIC_LEVELS,
+            "time": TIME_OF_DAY
+        }
+        return jsonify(result)
+    except Exception as exc:
+        traceback.print_exc()
+        return _err(f"Fare calculation error: {exc}", 500)
+
+
+# ---------------------------------------------------------------------------
 # Entry-point
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
+    _port_str = os.environ.get("PORT", "").strip()
+    port = int(_port_str) if _port_str.isdigit() else 8080
     print(f"\n  Route & Geocode Server  →  http://localhost:{port}\n")
     print("  Endpoints:")
     print("    GET /route        – single shortest road route")

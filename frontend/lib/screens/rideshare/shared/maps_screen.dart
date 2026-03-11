@@ -7,10 +7,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
+import '../../../services/ride_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/maps_utils.dart';
 import '../driver/driver_navigation_screen.dart';
+import '../../../services/api_config.dart';
 
 /// Google Maps API key.
 /// Must match the key used in:
@@ -25,7 +27,7 @@ const String _kMapsApiKey = 'AIzaSyDrpIN_Stxm5qFtWu8YjvShd3PNK8OMcMY';
 /// Base URL of the local ML route server (ml/server.py).
 /// Start it with: cd ml && python server.py
 /// Used on Flutter Web to bypass CORS restrictions on Google Maps REST APIs.
-const String _kRouteServerUrl = 'http://localhost:8080';
+String get _kRouteServerUrl => ApiConfig.mlBaseUrl;
 
 /// Dark-mode map style JSON (night theme).
 const String _darkMapStyle = '''[
@@ -1162,6 +1164,32 @@ class _MapsScreenState extends State<MapsScreen> {
                         ),
                       ),
                     ],
+                    ],
+                    if (_routePoints.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.download),
+                          label: const Text('Download Map'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primaryGreen,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () async {
+                            final encoded = jsonEncode(_routePoints.map((p) => [p.latitude, p.longitude]).toList());
+                            final res = await RideService.saveDownloadedMap(
+                              pickup: _fromController.text,
+                              dropoff: _destinationController.text,
+                              encodedPolyline: encoded,
+                            );
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(res['message'] ?? 'Map downloaded successfully')),
+                            );
+                          },
+                        ),
+                      ),
                     ],
                   ],
                 ),

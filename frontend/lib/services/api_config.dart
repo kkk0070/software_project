@@ -12,43 +12,70 @@ class ApiConfig {
   //
   // Make sure the backend server is running before using the app!
   static String get baseUrl {
+    // Check for dart-define override (useful for CI/CD deployment)
+    const String envUrl = String.fromEnvironment('BACKEND_URL');
+    if (envUrl.isNotEmpty) return envUrl;
+
     if (kIsWeb) {
-      // Flutter Web - use localhost
-      return 'http://localhost:5000';
+      // Flutter Web - pointing to Vercel Prod server
+      return 'https://backend-two-sigma-39.vercel.app';
     } else {
       // Mobile platforms
       try {
         if (Platform.isAndroid) {
-          // Android emulator - use 10.0.2.2 to access host machine
-          return 'http://10.12.151.38:5000';
+          // Android emulator
+          return 'https://backend-two-sigma-39.vercel.app';
         } else {
-          // iOS simulator or physical device - use localhost
-          // For physical devices, you may need to change this to your computer's IP
-          return 'http://localhost:5000';
+          // iOS simulator or physical device
+          return 'https://backend-two-sigma-39.vercel.app';
         }
       } catch (e) {
-        // Fallback to localhost if platform detection fails
+        // Fallback
         if (kDebugMode) {
-          print('Platform detection error: $e. Using localhost.');
+          print('Platform detection error: $e. Using local IP.');
         }
-        return 'http://localhost:5000';
+        return 'https://backend-two-sigma-39.vercel.app';
       }
     }
   }
-  
   // API endpoints
   static const String authEndpoint = '/api/auth';
   static const String documentsEndpoint = '/api/documents';
   static const String usersEndpoint = '/api/users';
   static const String ridesEndpoint = '/api/rides';
+  static const String carpoolsEndpoint = '/api/carpools';
   static const String emergencyEndpoint = '/api/emergency';
+  static const String mapsEndpoint = '/api/maps';
   
   // Full URLs
   static String get authUrl => '$baseUrl$authEndpoint';
   static String get documentsUrl => '$baseUrl$documentsEndpoint';
   static String get usersUrl => '$baseUrl$usersEndpoint';
   static String get ridesUrl => '$baseUrl$ridesEndpoint';
+  static String get carpoolsUrl => '$baseUrl$carpoolsEndpoint';
   static String get emergencyUrl => '$baseUrl$emergencyEndpoint';
+  static String get mapsUrl => '$baseUrl$mapsEndpoint';
+
+  // ML Service (OSMx + ML Models)
+  static String get mlBaseUrl {
+    // 1. Check for dart-define override (set during CI/CD build for production)
+    const String envMlUrl = String.fromEnvironment('ML_URL');
+    if (envMlUrl.isNotEmpty) return envMlUrl;
+
+    // 2. Production/Fallback
+    if (kIsWeb) return 'https://ecoride-ml.onrender.com';
+    try {
+      if (Platform.isAndroid) return 'https://ecoride-ml.onrender.com';
+    } catch (_) {}
+    return 'https://ecoride-ml.onrender.com';
+  }
+
+  static String get mlRouteUrl => '$mlBaseUrl/route';
+  static String get mlAllRoutesUrl => '$mlBaseUrl/all_routes';
+  static String get mlFareUrl => '$mlBaseUrl/fare';
+  static String get mlEmissionUrl => '$mlBaseUrl/emission';
+  static String get mlAutocompleteUrl => '$mlBaseUrl/autocomplete';
+  static String get mlGeocodeUrl => '$mlBaseUrl/geocode';
   
   // Timeout durations
   static const Duration connectionTimeout = Duration(seconds: 30);

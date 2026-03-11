@@ -4,9 +4,15 @@
  * Provides methods to interact with users, rides, monitoring, and analytics endpoints
  */
 
-// Get base API URL from environment variable or use localhost default
+// Get base API URL from environment variable or use logic based on current hostname
 // VITE_API_URL should be set in .env file for production deployment
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const productionURL = 'https://backend-two-sigma-39.vercel.app';
+const localURL = 'http://localhost:5000';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL ||
+  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? localURL
+    : productionURL);
 
 /**
  * Helper function to handle API responses consistently
@@ -18,13 +24,13 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const handleResponse = async (response) => {
   // Parse response body as JSON
   const data = await response.json();
-  
+
   // Check if HTTP status indicates error (4xx or 5xx)
   if (!response.ok) {
     // Throw error with message from server or generic message
     throw new Error(data.message || 'API request failed');
   }
-  
+
   // Return parsed data for successful requests
   return data;
 };
@@ -444,6 +450,47 @@ export const reportsAPI = {
 };
 
 /**
+ * Auth API methods
+ */
+export const authAPI = {
+  /**
+   * Get active device sessions
+   * @returns {Promise} Session list
+   */
+  getSessions: async () => {
+    return apiWrapper.get('/auth/sessions');
+  },
+
+  /**
+   * Logout a specific device session
+   * @param {string} id - Session ID
+   * @returns {Promise}
+   */
+  logoutSession: async (id) => {
+    return apiWrapper.delete(`/auth/sessions/${id}`);
+  },
+
+  /**
+   * Admin: Get active device sessions for ANY user
+   * @param {number} userId - User ID
+   * @returns {Promise} Session list
+   */
+  getSessionsForUser: async (userId) => {
+    return apiWrapper.get(`/auth/admin/sessions/${userId}`);
+  },
+
+  /**
+   * Admin: Logout a specific device session for ANY user
+   * @param {number} userId - User ID
+   * @param {string} id - Session ID
+   * @returns {Promise}
+   */
+  logoutDeviceForUser: async (userId, id) => {
+    return apiWrapper.delete(`/auth/admin/sessions/${userId}/${id}`);
+  }
+};
+
+/**
  * Get auth token from localStorage
  */
 const getAuthToken = () => {
@@ -459,19 +506,19 @@ const createApiWrapper = () => {
     const headers = {
       ...options.headers
     };
-    
+
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
       options.body = JSON.stringify(options.body);
     }
-    
+
     const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}/api${url}`;
     const response = await fetch(fullUrl, { ...options, headers });
-    
+
     // Handle blob responses (file downloads)
     if (options.responseType === 'blob') {
       if (!response.ok) {
@@ -479,7 +526,7 @@ const createApiWrapper = () => {
       }
       return { data: await response.blob() };
     }
-    
+
     return handleResponse(response);
   };
 
@@ -497,6 +544,7 @@ const apiWrapper = createApiWrapper();
 
 export default {
   ...apiWrapper,
+  auth: authAPI,
   users: userAPI,
   rides: rideAPI,
   emergency: emergencyAPI,

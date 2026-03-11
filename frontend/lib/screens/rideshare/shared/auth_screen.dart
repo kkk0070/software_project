@@ -6,6 +6,7 @@ import '../../../theme/app_theme.dart';
 import '../../../services/auth_service.dart';
 import 'rideshare_home_screen.dart';
 import 'profile_setup_screen.dart';
+import 'reactivate_account_screen.dart';
 
 /// 2️⃣ User Authentication Page
 /// Features:
@@ -392,7 +393,6 @@ class _AuthScreenState extends State<AuthScreen> {
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
-          
           // Check if 2FA is required
           if (result['success'] == true && result['requires2FA'] == true) {
             if (!mounted) return;
@@ -404,6 +404,26 @@ class _AuthScreenState extends State<AuthScreen> {
             await _show2FADialog(
               email: _emailController.text.trim(),
               maskedEmail: result['email'] ?? '',
+            );
+            return;
+          }
+
+          // Check if account is deactivated
+          if (result['success'] == false && result['isDeactivated'] == true) {
+            if (!mounted) return;
+            setState(() {
+              _isLoading = false;
+            });
+            
+            // Navigate to reactivation page as requested by user
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ReactivateAccountScreen(
+                  email: _emailController.text.trim(),
+                  password: _passwordController.text,
+                ),
+              ),
             );
             return;
           }

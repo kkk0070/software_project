@@ -15,18 +15,7 @@ class _ImpactHistoryScreenState extends State<ImpactHistoryScreen> {
   String _selectedVehicle = 'All';
   final List<String> _vehicles = ['All', 'Car', 'EV', 'Motorcycle', 'Bicycle'];
 
-  static const List<_RideImpact> _allRides = [
-    _RideImpact('Feb 27', 'Home → Office', 'EV', 12.4, 3.2, 45, FontAwesomeIcons.bolt, Color(0xFF00E5FF)),
-    _RideImpact('Feb 26', 'Mall → Home', 'Car', 8.2, 1.8, 28, FontAwesomeIcons.car, AppTheme.accentBlue),
-    _RideImpact('Feb 25', 'Office → Gym', 'Bicycle', 3.1, 0.8, 99, FontAwesomeIcons.bicycle, AppTheme.primaryGreen),
-    _RideImpact('Feb 24', 'Home → Airport', 'Car', 22.5, 4.5, 18, FontAwesomeIcons.car, AppTheme.accentBlue),
-    _RideImpact('Feb 23', 'Station → Office', 'EV', 6.8, 2.1, 52, FontAwesomeIcons.bolt, Color(0xFF00E5FF)),
-    _RideImpact('Feb 22', 'Home → Park', 'Bicycle', 4.2, 1.1, 99, FontAwesomeIcons.bicycle, AppTheme.primaryGreen),
-    _RideImpact('Feb 21', 'Office → Home', 'Motorcycle', 11.3, 2.3, 35, FontAwesomeIcons.motorcycle, AppTheme.warningOrange),
-    _RideImpact('Feb 20', 'Mall → Restaurant', 'Car', 5.0, 1.0, 22, FontAwesomeIcons.car, AppTheme.accentBlue),
-    _RideImpact('Feb 19', 'Home → Office', 'EV', 12.4, 3.1, 50, FontAwesomeIcons.bolt, Color(0xFF00E5FF)),
-    _RideImpact('Feb 18', 'Gym → Home', 'Bicycle', 3.1, 0.8, 99, FontAwesomeIcons.bicycle, AppTheme.primaryGreen),
-  ];
+  static const List<_RideImpact> _allRides = [];
 
   List<_RideImpact> get _filtered {
     if (_selectedVehicle == 'All') return _allRides;
