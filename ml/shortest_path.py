@@ -91,7 +91,7 @@ _RESULT_CACHE = {} # (rounded_coords, k) -> routes_dict
 
 _ox = None
 _nx = None
-_ENABLE_GIS = False # Set to True locally if you have >2GB RAM
+_ENABLE_GIS = True # Enabled for road-following routes
 
 def _get_ox():
     if not _ENABLE_GIS: return None
@@ -118,8 +118,29 @@ def _download_network(
     dest_lat: float, dest_lng: float,
     buffer_km: float = 1.0,
 ) -> object:
-    """Download GIS road network (Disabled)."""
-    return None
+    """Download the road network within a bounding box including the route."""
+    ox = _get_ox()
+    if not ox: return None
+
+    # Define bounding box with buffer
+    north = max(origin_lat, dest_lat) + (buffer_km / 111.0)
+    south = min(origin_lat, dest_lat) - (buffer_km / 111.0)
+    east = max(origin_lng, dest_lng) + (buffer_km / (111.0 * math.cos(math.radians(origin_lat))))
+    west = min(origin_lng, dest_lng) - (buffer_km / (111.0 * math.cos(math.radians(origin_lat))))
+
+    bbox_key = (round(north, 2), round(south, 2), round(east, 2), round(west, 2))
+    if bbox_key in _GRAPH_CACHE:
+        return _GRAPH_CACHE[bbox_key]
+
+    print(f"  Downloading OSM road network for area: N:{north:.3f} S:{south:.3f} E:{east:.3f} W:{west:.3f}")
+    try:
+        # network_type='drive' keeps the graph small for 512MB RAM
+        G = ox.graph_from_bbox(north, south, east, west, network_type='drive', simplify=True)
+        _GRAPH_CACHE[bbox_key] = G
+        return G
+    except Exception as e:
+        print(f"  Failed to download map network: {e}")
+        return None
 
 
 
